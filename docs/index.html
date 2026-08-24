@@ -3,37 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>INSTAR — invertebrate welfare reporting</title>
-    <meta http-equiv="refresh"
-          content="0; url=https://thomas-white.shinyapps.io/instar/" />
-    <link rel="canonical" href="https://thomas-white.shinyapps.io/instar/" />
-    <style>
-      body {
-        max-width: 560px;
-        margin: 0 auto;
-        padding: 4em 1.5em;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                     Roboto, sans-serif;
-        color: #1f1f1f;
-        line-height: 1.45;
-      }
-      h1 { font-size: 1.4em; margin: 0 0 0.4em 0; font-weight: 600; }
-      p  { margin: 0.6em 0; color: #444; }
-      a  { color: #2E5F8E; }
-    </style>
+    <title>Shiny App</title>
+    <script
+      src="./shinylive/load-shinylive-sw.js"
+      type="module"
+    ></script>
+    <script type="module">
+      import { runExportedApp } from "./shinylive/shinylive.js";
+      runExportedApp({
+        id: "root",
+        appEngine: "r",
+        relPath: "",
+      });
+    </script>
+    <link rel="stylesheet" href="./shinylive/style-resets.css" />
+    <link rel="stylesheet" href="./shinylive/shinylive.css" />
+    
   </head>
   <body>
-    <h1>INSTAR</h1>
-    <p>The hosted web tool has moved.</p>
-    <p>If you are not redirected automatically, open
-       <a href="https://thomas-white.shinyapps.io/instar/">
-         https://thomas-white.shinyapps.io/instar/
-       </a>.</p>
-    <p style="color:#888; font-size:0.9em;">
-      Package source:
-      <a href="https://github.com/thomased/invertreport">
-        github.com/thomased/invertreport
-      </a>
-    </p>
+    
+    <div style="height: 100vh; width: 100vw" id="root"></div>
+    
   </body>
 </html>

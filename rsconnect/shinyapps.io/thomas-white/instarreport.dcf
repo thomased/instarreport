@@ -1,0 +1,10 @@
+name: instarreport
+title:
+username: thomas-white
+account: thomas-white
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17746534
+bundleId: 12455350
+url: https://thomas-white.shinyapps.io/instarreport/
+version: 1
