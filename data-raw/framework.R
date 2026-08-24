@@ -47,7 +47,7 @@ id_map <- c(
 framework <- raw %>%
   mutate(
     item_id = unname(id_map[item]),
-    group = ifelse(domain %in% welfare_set, "welfare", "essential"),
+    group = ifelse(domain %in% welfare_set, "welfare", "foundation"),
     order = row_number()
   ) %>%
   select(order, group, domain, item_id, item, description, lab, field) %>%

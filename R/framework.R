@@ -3,14 +3,14 @@
 #' A data frame describing the 18 reporting items grouped into eight
 #' domains: five welfare domains adapted from the Mellor five-domains
 #' model (Nutrition, Environment, Health, Behaviour, Affective state),
-#' and three cross-cutting essentials (Subjects, Procedures, Ethics &
+#' and three cross-cutting foundations (Subjects, Procedures, Ethics &
 #' compliance). End-of-study disposition (`fate_end`) lives within the
 #' Health welfare domain.
 #'
 #' @format A data frame with 18 rows and the following columns:
 #' \describe{
 #'   \item{order}{integer; canonical display order}
-#'   \item{group}{`"welfare"` or `"essential"`}
+#'   \item{group}{`"welfare"` or `"foundation"`}
 #'   \item{domain}{one of eight domain names}
 #'   \item{item_id}{short snake_case identifier; the join key for user input}
 #'   \item{item}{display name of the item}
@@ -22,16 +22,16 @@
 #' @source White et al. (in prep), \emph{Reporting items for invertebrate welfare}.
 #' @export
 framework <- (function() {
-  # Order: essentials block first (Subjects, Procedures, Ethics &
+  # Order: foundations block first (Subjects, Procedures, Ethics &
   # compliance), then welfare block (Nutrition, Environment, Health,
   # Behaviour, Affective state). This matches the left-to-right reading
   # order of the figure produced by invert_report().
   cols <- list(
     order = 1:18,
     group = c(
-      "essential", "essential", "essential",
-      "essential", "essential", "essential",
-      "essential", "essential", "essential",
+      "foundation", "foundation", "foundation",
+      "foundation", "foundation", "foundation",
+      "foundation", "foundation", "foundation",
       "welfare",
       "welfare", "welfare", "welfare",
       "welfare", "welfare", "welfare",
@@ -41,7 +41,7 @@ framework <- (function() {
     domain = c(
       "Subjects", "Subjects", "Subjects",
       "Procedures", "Procedures", "Procedures",
-      "Ethics & compliance", "Ethics & compliance", "Ethics & compliance",
+      "Ethics & Compliance", "Ethics & Compliance", "Ethics & Compliance",
       "Nutrition",
       "Environment", "Environment", "Environment",
       "Health", "Health", "Health",
@@ -79,23 +79,23 @@ framework <- (function() {
       "Indicators & precautionary measures"
     ),
     description = c(
-      "Species identification to the lowest practicable taxonomic level (with method); life stage(s) and sex where determinable or relevant; voucher specimens or imagery deposited as appropriate.",
+      "Species identification to the lowest practicable taxonomic level (with method); life stage(s) and sex where determinable or relevant; voucher specimens or reference imagery deposited where appropriate.",
       "Origin: wild-collected (with locality and date), laboratory colony (founding stock, source, date of establishment), or commercial supplier (named). For captive stock: generations in captivity, rearing conditions, and selection or inbreeding history.",
       "Total individuals collected or used and number contributing to analysis, with attrition accounted for. Justification of sample size (a priori power, pilot data, or stated convention). For bulk-sampling or mass-rearing work, report order-of-magnitude counts or ranges, and the unit of replication (colony, cycle, trap-day, batch), rather than individual totals.",
       "Capture method; transport duration, conditions, and mortality. Routine handling and restraint. Marking or tagging method, tag mass where relevant, retention checks. Where individual handling is not practicable (pitfall, Malaise, light, or sticky trapping and similar), report sampling effort (trap-days, trap-nights, deployment volume), trap design and check routine, and measures taken to reduce by-catch, retention time, and trapped-animal suffering.",
       "Anaesthetic or immobilisation agent or method; induction and recovery times; justification. Whether post-procedure analgesia was used, agent and dose, or explicit justification for omission. For surgical/invasive procedures: procedure, instruments, sterility, duration, recovery.",
       "Measures to prevent escape (particularly for non-native taxa) and procedures for disposal of waste and contaminated material.",
-      "Institutional or regulatory ethics review and permit numbers, or an explicit statement that none was required with the welfare reasoning applied. Collection or import permits. IUCN, national, or regional conservation status of focal taxa.",
+      "Institutional or regulatory ethics review and permit numbers, or an explicit statement that none was required. Collection or import permits. IUCN, national, or regional conservation status of focal taxa. Country, state, and any translocation between jurisdictions, including distance from point of collection where relevant.",
       "Predefined criteria for terminating procedures or experiments early in response to welfare concerns, and any instances triggered. For field work: anticipated and observed non-target impacts, with mitigation.",
       "Brief statement summarising welfare considerations and how the three Rs (Replacement, Reduction, Refinement) informed study design.",
-      "Composition and source of diet or bait; preparation; feeding frequency and access; provision of water or moisture; any pre-experimental fasting with justification.",
-      "Enclosure materials, dimensions, substrate, and structural complexity. Stocking density and grouping. Temperature, humidity, ventilation, photoperiod and lighting, and water parameters for aquatic species.",
+      "Composition and source of diet or bait; preparation; feeding frequency and access; provision of water or moisture; any pre- or post-experimental fasting with justification.",
+      "Enclosure materials, dimensions, substrate, and structural complexity. Stocking density and grouping. Temperature, humidity, ventilation, photoperiod and lighting, and water parameters for aquatic species. Enclosure cleaning frequency and protocol.",
       "Duration and conditions of any acclimation period before experimental procedures.",
       "Habitat type, location, abiotic conditions, and seasonality. Trap design, placement, deployment duration, checking frequency, and measures to limit injury, predation, exposure, or desiccation.",
       "Methods and criteria for assessing physical condition (responsiveness, posture, integument, autotomy). Any screening for disease or parasites and quarantine procedures. Frequency of welfare checks.",
       "Number and timing of injuries and unexpected deaths, suspected causes, and any interventions or protocol adjustments. For colony or industrial-scale work where individual death counts are not meaningful (because of scale, cannibalism, or routine attrition), report the disease-screening and prevention regime, density and condition monitoring, and any conditions under which cohort losses triggered intervention or protocol change.",
-      "Slaughter or euthanasia method and justification; release protocols for field-collected animals; continued holding, rehoming, or transfer arrangements; voucher specimen deposition. For mass-rearing work, use the welfare-community terminology for the context (slaughter method for farmed insects). For studies considering release, note the reasoning behind the choice between release, continued holding, rehoming, and slaughter, including disease-spread risk to wild conspecifics and any maladaptation incurred during captivity.",
-      "Aspects of the setup that supported or constrained species-typical behaviour. Provision of refugia or enrichment. Measures to reduce ambient disturbance. For social or gregarious species, access to conspecifics and the structure of social grouping.",
+      "Method of killing (euthanasia, sacrifice, or slaughter as contextually appropriate) and justification; release protocols for field-collected animals; continued holding, rehoming, or transfer arrangements; voucher specimen deposition. For mass-rearing work, use the welfare-community terminology for the context (slaughter method for farmed insects). For studies considering release, note the reasoning behind the choice between release, continued holding, rehoming, and slaughter, including disease-spread risk to wild conspecifics and any maladaptation incurred during captivity.",
+      "Aspects of the setup that supported or constrained species-typical behaviour. Provision of refugia or enrichment. Measures to reduce ambient disturbance. For social or gregarious species, access to conspecifics and the structure of social grouping. Opportunities for agency and choice (e.g., control over aspects of the physical or social environment).",
       "Taxon-appropriate behavioural and physiological indicators of stress, pain, or distress monitored, and how interpreted. Where capacity for affective experience is uncertain, the precautionary measures adopted."
     ),
     lab = c(

@@ -32,7 +32,7 @@
 # whitespace inside each card.
 .ITEM_GAP_LINES <- 0.45   # breathing room between items within a card
 .TITLE_LINES    <- 1.6    # vertical share of each card's domain title
-.STRIP_LINES    <- 1.5    # the "WELFARE DOMAINS" / "ESSENTIALS" strip
+.STRIP_LINES    <- 1.5    # the "WELFARE DOMAINS" / "FOUNDATIONS" strip
 .HEADER_LINES   <- 4.5    # paper title + authors + framework version
 .FOOTER_LINES   <- 1.2    # legend (single line)
 
@@ -140,13 +140,18 @@
 #' Column header strip
 #' @keywords internal
 .header_strip <- function(label, accent) {
+  # Fill the entire plot area (not just the data-coord rect) so the strip
+  # stretches full column width regardless of scale expansion or margins.
   ggplot2::ggplot() +
-    ggplot2::annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1,
-                      fill = accent, colour = NA) +
     ggplot2::annotate("text", x = 0.5, y = 0.5, label = label,
                       fontface = "bold", size = 4, colour = "white") +
-    ggplot2::xlim(0, 1) + ggplot2::ylim(0, 1) +
-    ggplot2::theme_void()
+    ggplot2::scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+    ggplot2::scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+    ggplot2::theme_void() +
+    ggplot2::theme(
+      plot.background = ggplot2::element_rect(fill = accent, colour = NA),
+      plot.margin     = ggplot2::margin(0, 0, 0, 0)
+    )
 }
 
 
@@ -164,13 +169,13 @@
     attr(g, "total_lines") + .TITLE_LINES
   }
   w_heights <- vapply(.welfare_domains,   card_h, numeric(1))
-  e_heights <- vapply(.essential_domains, card_h, numeric(1))
+  e_heights <- vapply(.foundation_domains, card_h, numeric(1))
 
   welfare_cards <- lapply(.welfare_domains, .make_card,
                           data = data, accent = .palette$welfare,
                           value_wrap = value_wrap)
-  essential_cards <- lapply(.essential_domains, .make_card,
-                            data = data, accent = .palette$essential,
+  foundation_cards <- lapply(.foundation_domains, .make_card,
+                            data = data, accent = .palette$foundation,
                             value_wrap = value_wrap)
 
   # Scale the shorter column's cards proportionally so both columns
@@ -190,8 +195,8 @@
                patchwork::plot_layout(
                  heights = c(.STRIP_LINES, target_body)
                )
-  right_col <- .header_strip("ESSENTIALS", .palette$essential) /
-               patchwork::wrap_plots(essential_cards,
+  right_col <- .header_strip("FOUNDATIONS", .palette$foundation) /
+               patchwork::wrap_plots(foundation_cards,
                                      ncol = 1, heights = e_heights) +
                patchwork::plot_layout(
                  heights = c(.STRIP_LINES, target_body)
@@ -237,7 +242,7 @@
   # much body content the figure carries. The trailing `&` theme call
   # zeroes the default per-plot outer margins so the body fills the
   # full page width with only a small gutter between the two columns.
-  # Essentials on the left, welfare domains on the right.
+  # Foundations on the left, welfare domains on the right.
   fig <- header / (right_col | left_col) / footer +
     patchwork::plot_layout(
       heights = c(.HEADER_LINES, col_total, .FOOTER_LINES)

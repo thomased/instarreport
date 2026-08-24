@@ -7,7 +7,7 @@
 A data frame with 18 rows and the following columns:
 \describe{
 \item{order}{integer; canonical display order}
-\item{group}{\code{"welfare"} or \code{"essential"}}
+\item{group}{\code{"welfare"} or \code{"foundation"}}
 \item{domain}{one of eight domain names}
 \item{item_id}{short snake_case identifier; the join key for user input}
 \item{item}{display name of the item}
@@ -26,7 +26,7 @@ framework
 A data frame describing the 18 reporting items grouped into eight
 domains: five welfare domains adapted from the Mellor five-domains
 model (Nutrition, Environment, Health, Behaviour, Affective state),
-and three cross-cutting essentials (Subjects, Procedures, Ethics &
+and three cross-cutting foundations (Subjects, Procedures, Ethics &
 compliance). End-of-study disposition (\code{fate_end}) lives within the
 Health welfare domain.
 }

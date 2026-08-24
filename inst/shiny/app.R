@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------
-# invertreport — Shiny web tool
+# instarreport — Shiny web tool
 #
 # Lets users fill out the 18-item welfare reporting framework
 # interactively, preview the figure, and download as PDF or PNG.
@@ -10,7 +10,7 @@ library(shiny)
 local({
   # Source the bundled R files into globalenv. The same R/ directory
   # ships inside inst/shiny/ both when the app is run locally via
-  # invertreport::run_shiny_app() (working directory points at the
+  # instarreport::run_shiny_app() (working directory points at the
   # installed package's inst/shiny) and when it's run under shinylive
   # (where the directory is bundled into the static export). Sourcing
   # always avoids any library() call for the package — which is

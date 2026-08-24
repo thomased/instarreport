@@ -1,4 +1,4 @@
 library(testthat)
-library(invertreport)
+library(instarreport)
 
-test_check("invertreport")
+test_check("instarreport")

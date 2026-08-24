@@ -4,7 +4,7 @@
 \alias{validate_items}
 \title{Validate user inputs to invert_report()}
 \usage{
-validate_items(items, framework_df = invertreport::framework, strict = TRUE)
+validate_items(items, framework_df = instarreport::framework, strict = TRUE)
 }
 \arguments{
 \item{items}{A data frame with at least \code{item_id} and \code{value} columns.}

@@ -1,8 +1,8 @@
 ---
-title: "Getting started with invertreport"
+title: "Getting started with instarreport"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with invertreport}
+  %\VignetteIndexEntry{Getting started with instarreport}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
                       fig.width = 8.5, fig.height = 11, dpi = 100)
 ```
 
-`invertreport` is the R implementation of **INSTAR** (INvertebrate
+`instarreport` is the R implementation of **INSTAR** (INvertebrate
 Standards for Treatment And Reporting), an 18-item reporting framework
 for invertebrate welfare in research. It produces a standardised,
 one-page summary figure for a paper in the spirit of the PRISMA and
@@ -20,7 +20,7 @@ ROSES flow diagrams. Each cell of the figure carries the substantive
 content for the corresponding framework item, not just a tick-box.
 
 ```{r setup}
-library(invertreport)
+library(instarreport)
 ```
 
 ## The INSTAR framework
@@ -33,7 +33,7 @@ framework
 
 Items are grouped into five welfare domains (Mellor *et al.* 2020, with
 "affective state" in place of "mental state") and three cross-cutting
-essentials. End-of-study disposition lives within the Health welfare
+foundations. End-of-study disposition lives within the Health welfare
 domain.
 
 ## Three ways to fill out the items
@@ -93,7 +93,7 @@ hand-copy:
 
 ```{r}
 template_path <- system.file("extdata", "template_items.csv",
-                             package = "invertreport")
+                             package = "instarreport")
 template_path
 ```
 
@@ -101,7 +101,7 @@ And a filled example to look at:
 
 ```{r}
 example_path <- system.file("extdata", "example_items.csv",
-                            package = "invertreport")
+                            package = "instarreport")
 items <- load_items(example_path)
 head(items)
 ```

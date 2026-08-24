@@ -1,6 +1,6 @@
-#' invertreport: an R implementation of the INSTAR framework
+#' instarreport: an R implementation of the INSTAR framework
 #'
-#' `invertreport` is the R implementation of **INSTAR** (INvertebrate
+#' `instarreport` is the R implementation of **INSTAR** (INvertebrate
 #' Standards for Treatment And Reporting; White et al., in prep), an
 #' 18-item reporting standard for invertebrate welfare in research.
 #' The package produces a standardised,

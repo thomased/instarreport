@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_shiny_app.R
 \name{run_shiny_app}
 \alias{run_shiny_app}
-\title{Launch the invertreport web tool}
+\title{Launch the instarreport web tool}
 \usage{
 run_shiny_app(launch.browser = TRUE, ...)
 }

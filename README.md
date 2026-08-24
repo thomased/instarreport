@@ -1,4 +1,4 @@
-# invertreport
+# instarreport
 
 A small R toolkit implementing **INSTAR** (**IN**vertebrate **S**tandards
 for **T**reatment **A**nd **R**eporting), an 18-item reporting framework
@@ -17,7 +17,7 @@ diagrams for evidence synthesis.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("thomased/invertreport")
+remotes::install_github("thomased/instarreport")
 ```
 
 ## Three ways to fill out the framework
@@ -28,7 +28,7 @@ Pick whichever fits your workflow. All three produce the same kind of
 ### 1. Interactive prompt (recommended for first-time users)
 
 ```r
-library(invertreport)
+library(instarreport)
 items <- fill_items(save_to = "my_study_items.csv")
 ```
 
@@ -84,14 +84,14 @@ A bundled blank template is also available without writing anything:
 
 ```r
 template_path <- system.file("extdata", "template_items.csv",
-                             package = "invertreport")
+                             package = "instarreport")
 file.copy(template_path, "my_study_items.csv")
 ```
 
 A filled example (a notional bumblebee study) is at:
 
 ```r
-system.file("extdata", "example_items.csv", package = "invertreport")
+system.file("extdata", "example_items.csv", package = "instarreport")
 ```
 
 ### 3. Programmatic fill (for scripts)
@@ -144,7 +144,7 @@ run_shiny_app()
 
 The 18 items are split into five welfare domains adapted from Mellor *et al.*
 (2020) (Nutrition, Environment, Health, Behaviour, Affective state) and
-three cross-cutting essentials (Subjects, Procedures, Ethics & compliance).
+three cross-cutting foundations (Subjects, Procedures, Ethics & compliance).
 End-of-study disposition lives within the Health welfare domain. See
 `?framework` for the full table, or:
 
@@ -163,16 +163,16 @@ table(framework$domain, framework$group)
 
 ## Citation
 
-If you use `invertreport`, please cite:
+If you use `instarreport`, please cite:
 
 > White, T. E. ... & Drinkwater, E. (in prep). INSTAR: reporting items for
 > invertebrate welfare in research.
 
 And the package directly:
 
-> White, T. E. ... & Drinkwater, E. (2026). `invertreport`: An R
+> White, T. E. ... & Drinkwater, E. (2026). `instarreport`: An R
 > implementation of the INSTAR framework. R package version 0.1.0.
-> https://github.com/thomased/invertreport.
+> https://github.com/thomased/instarreport.
 
 ## Licence
 

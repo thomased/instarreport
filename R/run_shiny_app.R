@@ -1,4 +1,4 @@
-#' Launch the invertreport web tool
+#' Launch the instarreport web tool
 #'
 #' Starts a local Shiny app that lets users fill in the 18 framework items
 #' interactively, preview the figure, and download the result as PDF or PNG.
@@ -19,9 +19,9 @@ run_shiny_app <- function(launch.browser = TRUE, ...) {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Install shiny: install.packages('shiny')", call. = FALSE)
   }
-  app_dir <- system.file("shiny", package = "invertreport")
+  app_dir <- system.file("shiny", package = "instarreport")
   if (!nzchar(app_dir)) {
-    stop("Shiny app directory not found. Reinstall invertreport.",
+    stop("Shiny app directory not found. Reinstall instarreport.",
          call. = FALSE)
   }
   shiny::runApp(app_dir, launch.browser = launch.browser, ...)

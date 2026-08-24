@@ -5,12 +5,12 @@
                       "Behaviour", "Affective state")
 
 #' @keywords internal
-.essential_domains <- c("Subjects", "Procedures", "Ethics & compliance")
+.foundation_domains <- c("Subjects", "Procedures", "Ethics & Compliance")
 
 #' @keywords internal
 .palette <- list(
   welfare    = "#3F7A3A",
-  essential  = "#2E5F8E",
+  foundation = "#2E5F8E",
   text       = "#1f1f1f",
   label      = "#5a5a5a",
   muted      = "#a8a8a8",
