@@ -161,6 +161,119 @@ new_instar_items <- function(x) {
 }
 
 
+#' Record what a study reports for one or more items
+#'
+#' The main way to fill in items from a script. Pass `item_id = "what the
+#' study reports"` pairs; each sets both the item's `value` and its
+#' `status` in one step.
+#'
+#' Setting `value` directly does not work, and fails quietly: `status` is
+#' the single source of truth, and [instar_report()] blanks `value`
+#' wherever status is not `"reported"`. A table built by assigning
+#' `value` alone renders as wholly unreported, with no error. This
+#' function exists so that is not a trap you can fall into.
+#'
+#' The three states follow the same convention as the `report` column of
+#' the CSV sheet:
+#'
+#' | Value passed        | Resulting status   |
+#' |---------------------|--------------------|
+#' | a string            | `"reported"`       |
+#' | `NA`                | `"not_applicable"` |
+#' | `""` or `NULL`      | `"not_reported"`   |
+#'
+#' @param items An items table, typically from [instar_template()] or
+#'   [read_items()].
+#' @param ... Named values, one per `item_id`. Names must be valid item
+#'   ids; see `instar_items$item_id`. Values are length-one character
+#'   (or coercible to it), `NA`, or `NULL`.
+#'
+#' @return The updated items table.
+#'
+#' @seealso [instar_na()] for marking items not applicable by id,
+#'   [instar_fill()] for the interactive equivalent.
+#'
+#' @examples
+#' items <- instar_set(
+#'   instar_template(),
+#'   subjects_taxon  = "Bombus terrestris (worker female); morphology + COI",
+#'   subjects_n      = "n = 80; 72 analysed (10% attrition)",
+#'   env_field       = NA,          # laboratory study, does not apply
+#'   proc_biosecurity = ""          # explicitly leave unreported
+#' )
+#' summary(instar_report(items, paper = list(title = "T", authors = "A")))
+#'
+#' @export
+instar_set <- function(items, ...) {
+  items <- validate_items(items)
+  vals <- list(...)
+  if (length(vals) == 0L) return(items)
+
+  ids <- names(vals)
+  if (is.null(ids) || any(!nzchar(ids))) {
+    stop("Every value must be named with an item_id, for example: ",
+         "instar_set(items, subjects_n = \"n = 24\").", call. = FALSE)
+  }
+  dup <- unique(ids[duplicated(ids)])
+  if (length(dup) > 0L) {
+    stop("Each item can only be set once per call. Repeated: ",
+         paste(dup, collapse = ", "), call. = FALSE)
+  }
+  unknown <- setdiff(ids, instar_items$item_id)
+  if (length(unknown) > 0L) {
+    stop("Unknown item_id(s): ", paste(unknown, collapse = ", "),
+         .suggest_item_id(unknown),
+         " Run instar_items$item_id for the full list.", call. = FALSE)
+  }
+
+  # Tables read from a partial file may not carry every framework row.
+  missing_rows <- setdiff(ids, items$item_id)
+  if (length(missing_rows) > 0L) {
+    pad <- items[rep(NA_integer_, length(missing_rows)), , drop = FALSE]
+    pad$item_id <- missing_rows
+    items <- rbind(as.data.frame(items), as.data.frame(pad))
+    rownames(items) <- NULL
+  }
+
+  for (i in seq_along(vals)) {
+    v <- vals[[i]]
+    hit <- items$item_id == ids[i]
+
+    if (is.null(v) || (length(v) == 1L && is.na(v))) {
+      # NULL clears the item; NA marks it as not applicable.
+      items$status[hit] <- if (is.null(v)) "not_reported" else "not_applicable"
+      items$value[hit]  <- NA_character_
+      next
+    }
+    if (length(v) != 1L) {
+      stop("`", ids[i], "` must be a single value, not ", length(v), ". ",
+           "To report several things about one item, write them as one ",
+           "string.", call. = FALSE)
+    }
+    v <- as.character(v)
+    if (!nzchar(trimws(v))) {
+      items$status[hit] <- "not_reported"
+      items$value[hit]  <- NA_character_
+    } else {
+      items$status[hit] <- "reported"
+      items$value[hit]  <- v
+    }
+  }
+  new_instar_items(items)
+}
+
+
+#' Suggest a near-matching item_id for a typo
+#' @keywords internal
+.suggest_item_id <- function(bad) {
+  near <- unique(unlist(lapply(bad, function(b) {
+    agrep(b, instar_items$item_id, max.distance = 0.35, value = TRUE)
+  })))
+  if (length(near) == 0L) return("")
+  paste0(" Did you mean: ", paste(near, collapse = ", "), "?")
+}
+
+
 #' Mark items as not applicable
 #'
 #' Sets `status` to `"not_applicable"` for the named items, clearing any

@@ -12,38 +12,23 @@
 
 # A fixed, fully-specified report so the figure is deterministic.
 demo_report <- function() {
-  items <- instar_template()
-
-  set_item <- function(items, id, text) {
-    items$value[items$item_id == id]  <- text
-    items$status[items$item_id == id] <- "reported"
-    items
-  }
-
-  items <- set_item(items, "subjects_taxon",
-                    "Acheta domesticus; adults of both sexes")
-  items <- set_item(items, "subjects_source",
-                    "Commercially reared; generations in captivity not recorded")
-  items <- set_item(items, "subjects_n",
-                    "n = 80 adults (40 M, 40 F); all analysed")
-  items <- set_item(items, "proc_handling",
-                    "Gently immobilised on a sponge; identical handling across treatments")
-  items <- set_item(items, "ethics_review",
-                    "No institutional review applied; welfare reasoning given in Methods")
-  items <- set_item(items, "nutrition_diet",
-                    "Wheatgerm ad libitum; peaches in juice as food and water")
-  items <- set_item(items, "env_housing",
-                    "Shared containers 40 x 40 x 100 cm; 12:12 L:D; 23 +/- 1 C")
-  items <- set_item(items, "health_injury",
-                    "No injuries or unexpected deaths")
-  items <- set_item(items, "fate_end",
-                    "Returned to housing; lived out natural lifespans")
-  items <- set_item(items, "affect_indicators",
-                    "Site-directed grooming as a pain-like indicator")
-
-  # Leave a spread of not-reported items, and mark one not applicable, so
-  # the snapshot exercises all three render states.
-  items <- instar_na(items, c("env_field", "proc_anaesthesia"))
+  # Leave a spread of items unset so they render as not reported, and
+  # mark two NA, so the snapshot exercises all three render states.
+  items <- instar_set(
+    instar_template(),
+    subjects_taxon    = "Acheta domesticus; adults of both sexes",
+    subjects_source   = "Commercially reared; generations in captivity not recorded",
+    subjects_n        = "n = 80 adults (40 M, 40 F); all analysed",
+    proc_handling     = "Gently immobilised on a sponge; identical handling across treatments",
+    ethics_review     = "No institutional review applied; welfare reasoning given in Methods",
+    nutrition_diet    = "Wheatgerm ad libitum; peaches in juice as food and water",
+    env_housing       = "Shared containers 40 x 40 x 100 cm; 12:12 L:D; 23 +/- 1 C",
+    health_injury     = "No injuries or unexpected deaths",
+    fate_end          = "Returned to housing; lived out natural lifespans",
+    affect_indicators = "Site-directed grooming as a pain-like indicator",
+    env_field         = NA,
+    proc_anaesthesia  = NA
+  )
 
   instar_report(
     items,

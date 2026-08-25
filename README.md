@@ -126,20 +126,20 @@ print(items)
 ### 3. Programmatic fill (for scripts)
 
 ```r
-items <- instar_template(study_type = "field")
-
-report_item <- function(items, id, text) {
-  items$value[items$item_id == id]  <- text
-  items$status[items$item_id == id] <- "reported"
-  items
-}
-
-items <- report_item(items, "subjects_taxon",  "Bombus terrestris (worker female); COI")
-items <- report_item(items, "subjects_source", "Wild-collected, Royal NP, May 2025")
-items <- report_item(items, "subjects_n",      "n=80; n=72 analysed (10% attrition)")
-items <- instar_na(items, "proc_anaesthesia")   # mark items that don't apply
-# ...and so on
+items <- instar_set(
+  instar_template(study_type = "field"),
+  subjects_taxon   = "Bombus terrestris (worker female); COI",
+  subjects_source  = "Wild-collected, Royal NP, May 2025",
+  subjects_n       = "n=80; n=72 analysed (10% attrition)",
+  proc_anaesthesia = NA           # does not apply to this study
+  # ...and so on
+)
 ```
+
+`instar_set()` sets both `value` and `status` together. Assigning
+`items$value` on its own does **not** work: `status` is the source of
+truth, so an item whose status is still `"not_reported"` has its value
+discarded when the report is built — silently, with no error.
 
 ## Building the figure
 

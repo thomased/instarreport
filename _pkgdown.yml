@@ -39,6 +39,7 @@ reference:
   contents:
   - instar_items
   - instar_template
+  - instar_set
   - instar_na
 - title: Completing a report
   desc: |

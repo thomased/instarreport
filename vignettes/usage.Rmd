@@ -108,28 +108,31 @@ items <- instar_edit(items, "subjects_n")   # or by id
 
 Useful in scripts and pipelines.
 
+`instar_set()` takes `item_id = "what the study reports"` pairs, as many
+as you like at once:
+
 ```{r, eval = FALSE}
-items <- instar_template()
-
-# Reporting an item means setting both `value` and `status`.
-items$value[items$item_id == "subjects_taxon"] <-
-  "Bombus terrestris (worker female); morphology + COI"
-items$status[items$item_id == "subjects_taxon"] <- "reported"
-
-# Items that do not apply to the study:
-items <- instar_na(items, c("env_field", "proc_anaesthesia"))
+items <- instar_set(
+  instar_template(),
+  subjects_taxon = "Bombus terrestris (worker female); morphology + COI",
+  subjects_n     = "n = 80; 72 analysed",
+  env_field      = NA,       # does not apply
+  proc_anaesthesia = NA
+)
 ```
 
-A small helper keeps this tidy if you are filling many items at once:
+A string reports the item, `NA` marks it not applicable, and `""` leaves
+it unreported. The same three states as the `report` column of the sheet.
+
+Set `value` directly and it will not work — and will not tell you so.
+`status` is the single source of truth, and `instar_report()` blanks
+`value` for any item whose status is not `"reported"`, so a table filled
+in that way renders as an entirely unreported study:
 
 ```{r, eval = FALSE}
-report_item <- function(items, id, text) {
-  items$value[items$item_id == id]  <- text
-  items$status[items$item_id == id] <- "reported"
-  items
-}
-
-items <- report_item(items, "subjects_n", "n = 80; 72 analysed")
+# Does nothing useful: status is still "not_reported", so the text is
+# dropped when the report is built.
+items$value[items$item_id == "subjects_taxon"] <- "Bombus terrestris"
 ```
 
 ## Checking progress
