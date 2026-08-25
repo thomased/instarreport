@@ -47,3 +47,10 @@ vignettes/*.pdf
 *archive*
 /doc/
 /Meta/
+
+# pkgdown build output. The site is published to the gh-pages branch by
+# .github/workflows/pkgdown.yaml, so docs/ is a build artifact rather
+# than something to commit. The shinylive app it serves at /app/ lives
+# in pkgdown/assets/app/, which IS tracked.
+/docs/
+docs

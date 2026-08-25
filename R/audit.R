@@ -131,6 +131,32 @@ audit_from_matrix <- function(scores, id = NULL) {
   } else {
     study <- as.character(seq_len(nrow(scores)))
   }
+
+  # Say so before disambiguating. A repeated id usually means either the
+  # same study scored twice, or a column that does not actually identify
+  # a study (a DOI that failed to extract for some rows, say). Both are
+  # worth knowing about; silently suffixing them is not.
+  study[is.na(study)] <- ""
+  dup <- unique(study[duplicated(study)])
+  if (length(dup) > 0L) {
+    blank <- any(!nzchar(dup))
+    warning(
+      "Duplicate study identifier(s) in `", id %||% meta_cols[1], "`: ",
+      paste(utils::head(ifelse(nzchar(dup), dup, "<blank>"), 5),
+            collapse = ", "),
+      if (length(dup) > 5L) sprintf(" (and %d more)", length(dup) - 5L) else "",
+      ". They have been made unique, so each row is still counted as its ",
+      "own study",
+      if (blank) {
+        paste0(". A blank id usually means the column is incomplete ",
+               "rather than that those rows are duplicates: pick a ",
+               "column that identifies every row")
+      } else {
+        ", but check they are not the same study scored twice"
+      },
+      ".", call. = FALSE
+    )
+  }
   study <- make.unique(study, sep = "_")
 
   meta <- if (length(meta_cols) > 0L) {

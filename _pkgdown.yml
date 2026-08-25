@@ -1,0 +1,85 @@
+url: https://instar-statement.org/
+template:
+  bootstrap: 5
+  bslib:
+    primary: '#2E5F8E'
+    base_font:
+      google: Source Sans 3
+    heading_font:
+      google: Source Sans 3
+    code_font:
+      google: Source Code Pro
+home:
+  title: INSTAR reporting of invertebrate welfare
+  description: |
+    Tools for applying INSTAR (INvertebrate Standards for Treatment And Reporting), an 18-item reporting standard for invertebrate welfare in research.
+navbar:
+  structure:
+    left:
+    - intro
+    - reference
+    - articles
+    - news
+    right:
+    - webtool
+    - github
+  components:
+    webtool:
+      text: Web tool
+      href: app/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: Getting started
+        href: articles/usage.html
+reference:
+- title: The framework
+  desc: |
+    The 18 reporting items, and how to get a blank set of them to fill in.
+  contents:
+  - instar_items
+  - instar_template
+  - instar_na
+- title: Completing a report
+  desc: |
+    Three routes to the same items table: the INSTAR.csv sheet, an interactive prompt, or direct assignment in a script.
+  contents:
+  - read_items
+  - write_template
+  - write_items
+  - instar_fill
+  - instar_edit
+  - print.instar_items
+- title: Reports and figures
+  desc: |
+    Turning completed items into a report object, and from there into the standardised one-page figure or a depositable sheet.
+  contents:
+  - instar_report
+  - print.instar_report
+  - summary.instar_report
+  - plot.instar_report
+  - autoplot.instar_report
+  - save_figure
+  - write_report
+- title: Auditing many studies
+  desc: |
+    Reading a corpus of deposited sheets, and summarising reporting coverage across a literature rather than a single study.
+  contents:
+  - read_instar
+  - print.instar_corpus
+  - summary.instar_corpus
+  - '[.instar_corpus'
+  - c.instar_corpus
+  - instar_audit
+  - audit_from_matrix
+  - print.instar_audit
+  - summary.instar_audit
+  - plot.instar_audit
+  - autoplot.instar_audit
+- title: Validation and the web tool
+  contents:
+  - validate_items
+  - instar_app
+- title: Package
+  contents: instarreport-package
+

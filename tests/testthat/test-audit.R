@@ -173,6 +173,33 @@ test_that("an unrecognised score warns rather than failing silently", {
   expect_warning(.score_status(c("Y", "maybe")), "Unrecognised score")
 })
 
+test_that("a duplicated study id warns before being made unique", {
+  scores <- data.frame(
+    doi = c("10.1/a", "10.1/a"), subjects_taxon = c("Y", "N"),
+    stringsAsFactors = FALSE
+  )
+  expect_warning(
+    audit <- suppressMessages(audit_from_matrix(scores, id = "doi")),
+    "Duplicate study identifier"
+  )
+  # Still two studies: disambiguated, not merged or dropped.
+  expect_equal(audit$n, 2L)
+})
+
+test_that("blank study ids get their own advice", {
+  # The real case: DOI extraction failed for some rows, so they share an
+  # empty id despite being different papers.
+  scores <- data.frame(
+    doi = c("10.1/a", "", ""), subjects_taxon = c("Y", "N", "Y"),
+    stringsAsFactors = FALSE
+  )
+  expect_warning(
+    audit <- suppressMessages(audit_from_matrix(scores, id = "doi")),
+    "column is incomplete"
+  )
+  expect_equal(audit$n, 3L)
+})
+
 test_that("a matrix with no recognisable items errors", {
   expect_error(
     audit_from_matrix(data.frame(a = 1, b = 2)),
