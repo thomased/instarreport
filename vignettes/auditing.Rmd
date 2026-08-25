@@ -15,37 +15,144 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(instarreport)
 ```
 
-The other vignette covers one study. This one covers many: reading a set
-of completed sheets, or a set of scored papers, and asking what a field
-reports and what it does not.
+The introductory vignette covers working with a single study. This one covers many. You assemble a set of studies, then ask what a
+field reports, what it does not, and how that changes.
 
-There are two ways in, depending on whether the studies have INSTAR
-sheets of their own.
+## Use cases
 
-* **Prospective.** Studies deposit completed sheets, and a corpus is
-  just a folder of them. Read them with `read_instar()`.
-* **Retrospective.** The studies predate the framework, so someone reads
-  the papers and scores them by hand into a table. Hand that to
-  `audit_from_matrix()`.
+If you are writing a review, a meta-analysis, or
+a methods paper, you probably want to say something about how the
+animals in your corpus were handled, and at the moment that means
+reading every methods section yourself and keeping notes in a
+spreadsheet you invented. A shared item set means those notes are
+comparable with everyone else's, and the arithmetic is done for you.
 
-Both produce the same `instar_audit` object, so everything downstream is
-identical.
+Beyond that, a good deal opens up, and most of it is not about reporting
+at all. A completed sheet records *what was done*. The actual
+temperatures, diets, acclimation periods, anaesthetics, killing methods.
+A set of them is a structured record of husbandry and methods practice,
+not just a tally of what got mentioned.
 
-## Reading a folder of sheets
+**What the field actually does.** Nobody has a good description of how
+invertebrates are typically kept and handled in research. What is the
+modal housing temperature for *Drosophila* behavioural work? How often
+is anything used for analgesia in a procedure that would warrant it in a
+vertebrate? What proportion of field-collected animals are released, and
+on what reasoning? These are answerable questions that currently are not
+answered, because the information is scattered through prose.
+
+**Methods as moderators.** Housing density, photoperiod, acclimation and
+handling regime all shape outcomes. Extracting them across a corpus
+gives a meta-analyst covariates rather than unexplained heterogeneity,
+and may explain why two labs asking the same question of the same
+species disagree.
+
+**Refinement, and whether it spreads.** A better practice appears from
+time to time. A humane endpoint, an anaesthetic protocol, a less
+damaging trap design. A structured record makes it possible to watch
+whether it diffuses, how fast, and where it stalls.
+
+**Change over time.** Both practice and reporting move. Scoring a
+comparable sample at intervals, or either side of a policy change,
+turns an impression into a measurement.
+
+**Comparison across whatever unit you care about.** Taxon, subdiscipline,
+lab versus field, question type, jurisdiction, funder, decade,
+institution, journal. Norms differ along all of these, and the
+differences are often the interesting result rather than a nuisance.
+
+**Where the evidence is missing.** An item almost nobody reports is
+either being overlooked or is something the field genuinely does not know
+how to answer. Both are worth knowing. The first is an advocacy problem,
+the second a research agenda.
+
+**Evidence for policy.** Journals, funders and ethics bodies weighing a
+requirement reasonably ask what it would cost and what it would change.
+Coverage data answers that far better than a principle does.
+
+**Teaching.** Handing students a folder of sheets and asking what is
+missing, or what they would have done differently, is a fast way into
+both research ethics and methods criticism.
+
+None of this needs the whole literature, or a whole journal. A
+well-chosen sample of one taxon, one technique or one question is enough
+to say something.
+
+## Compiling a corpus
+
+Three realistic routes, in rough order of how common they will be.
+
+### Manual scoring
+
+Read the methods sections and record, for each paper and each item,
+whether it was reported. This is the main path and will stay that way.
+Most published work has no INSTAR sheet, and careful reading is still
+the most reliable way to decide whether an item was genuinely addressed.
+
+Record it as a wide table, one row per paper and one column per
+`item_id`, then hand it to `audit_from_matrix()`. Section
+[From a scoring table](#from-a-scoring-table) covers the mechanics.
+
+Worth doing regardless of scale. Score a subset twice, or have a second
+reader do it, and check agreement before trusting the totals. Reporting
+is not always a clean yes or no, and the boundary cases are where two
+readers diverge.
+
+### Deposited sheets
+
+Where authors have completed and deposited a sheet, the work is already
+done and no reading is required. Point `read_instar()` at the folder.
+
+This is the smallest number of studies today and will grow slowly. It is
+also the reason the sheet is plain text rather than only a figure. A
+deposited sheet can be read back, a deposited figure cannot.
+
+### Assisted extraction
+
+Large language models can be used to pull structured answers out of
+methods text, and for a corpus of a few hundred papers that is a large
+saving. It is also easy to do badly. If you go this way, then:
+
+* **Validate against hand-scoring.** Score a random subset yourself and
+  compare, item by item. Report the agreement. Without this you have
+  numbers of unknown quality.
+* **Give the model the item descriptions**, not just the item names.
+  `instar_items$description` is written to be exactly this kind of
+  prompt material.
+* **Allow an "uncertain" response** as well as yes, no, and not
+  applicable. Forcing a binary choice on ambiguous text manufactures
+  confidence that is not there. Resolve the uncertain ones by hand.
+* **Report what you did** in your methods. Which model and version, the
+  prompt or rubric, how many papers were re-scored by hand, and the
+  agreement you found. This is a methods choice like any other and
+  should be reproducible.
+* **Feed it the methods section**, not the whole paper. Precision
+  improves and cost falls.
+
+The output is the same wide table as manual scoring, so it reaches
+`audit_from_matrix()` the same way. The survey reported in the INSTAR
+paper was built this way, and its methods section documents the model,
+the rubric, and the hand-validation.
+
+Whichever route you take, the resulting object is the same and
+everything downstream is identical.
+
+## Reading deposited sheets
 
 `read_instar()` takes a file, a directory, or a vector of either. Let's
-build a small corpus to work with, so the examples run.
+build a small corpus so the examples run.
 
 ```{r}
 corpus_dir <- file.path(tempdir(), "supplements")
 dir.create(corpus_dir, showWarnings = FALSE)
 
-make_sheet <- function(n_reported, title, journal, doi) {
+make_sheet <- function(n_reported, title, journal, doi, housing) {
   # instar_set() takes item_id = value pairs. Building them programmatically
   # means assembling a named list and using do.call().
   ids <- instar_items$item_id[seq_len(n_reported)]
   filled <- stats::setNames(as.list(rep("Reported in the paper", length(ids))),
                             ids)
+  filled$env_housing <- housing
   items <- do.call(instar_set, c(list(instar_template()), filled))
 
   rep <- instar_report(items, paper = list(
@@ -60,7 +167,12 @@ invisible(Map(make_sheet,
   n_reported = c(4, 9, 14, 6, 11),
   title      = paste("Study", 1:5),
   journal    = c("J Alpha", "J Alpha", "J Beta", "J Beta", "J Beta"),
-  doi        = paste0("10.1234/study", 1:5)))
+  doi        = paste0("10.1234/study", 1:5),
+  housing    = c("25 +/- 1 C, 12:12 L:D, 60% RH",
+                 "23 C, 14:10 L:D, group housed at 20 per container",
+                 "Ambient (18-26 C), natural photoperiod",
+                 "25 C, 12:12 L:D, individually housed",
+                 "27 +/- 0.5 C, 16:8 L:D, 70% RH")))
 
 list.files(corpus_dir)
 ```
@@ -82,7 +194,7 @@ summary(corpus)[, c("study", "title", "journal", "reported", "percent_reported")
 
 ### When a file will not read
 
-Pointed at a real directory you will meet malformed files: a deleted
+Pointed at a real directory you will meet malformed files. A deleted
 column, a semicolon-delimited export, a stray spreadsheet someone left
 in the folder. `read_instar()` does not stop on those. It warns, skips
 them, and records what went wrong.
@@ -102,8 +214,8 @@ useful than getting nothing.
 
 Every sheet records the version it was completed against. A corpus that
 mixes versions is warned about, because coverage across them is not
-comparable: an item missing from half the sheets because it did not exist
-yet is not the same as an item those studies failed to report.
+comparable. An item missing from half the sheets because it did not
+exist yet is not the same as an item those studies failed to report.
 
 ```{r}
 table(summary(corpus)$version, useNA = "ifany")
@@ -117,9 +229,74 @@ v1 <- corpus[s$version == "1.0"]
 instar_audit(v1)
 ```
 
+## From a scoring table {#from-a-scoring-table}
+
+However you produced it, whether by reading papers yourself, a second
+coder, or assisted extraction, the shape is one row per paper and one
+column per `item_id`.
+
+```{r}
+scores <- data.frame(
+  doi            = c("10.1/a", "10.1/b", "10.1/c", "10.1/d"),
+  journal        = c("J Alpha", "J Alpha", "J Beta", "J Beta"),
+  year           = c(2024, 2025, 2025, 2026),
+  subjects_taxon = c("Y", "Y", "Y", "Y"),
+  subjects_n     = c("Y", "N", "N", "Y"),
+  env_housing    = c("Y", "Y", "NA", "N"),
+  env_field      = c("NA", "NA", "Y", "-"),
+  stringsAsFactors = FALSE
+)
+
+audit2 <- audit_from_matrix(scores, id = "doi")
+summary(audit2)[, c("item", "reported", "applicable", "percent_reported")]
+```
+
+Three things there are worth spelling out.
+
+**Cell values are read leniently**, because scoring sheets are made by
+people. `Y`, `yes`, `TRUE`, `1` and `C` all mean reported. `N`, `no`,
+`FALSE` and `0` mean not. `NA`, `N/A`, `-` and blanks mean not
+applicable. Anything unrecognised warns rather than being silently
+counted, so a stray `?` or `U` from an uncertain call will not slip
+through as a decision you did not make.
+
+**Non-item columns become study metadata.** `journal` and `year` are not
+`item_id`s, so they ride along and are immediately available for
+grouping:
+
+```{r}
+subset(summary(audit2, by = "year"), item_id == "subjects_n")
+```
+
+**Items absent from the table are left out**, not counted as unreported.
+The message above says which. Recording an unscored item as a failure to
+report would assert something the scoring never checked, which matters
+if you scored a subset of items deliberately.
+
+### Choosing the identifier
+
+`id` should name a column that identifies every row. If it does not, you
+get told rather than finding out later:
+
+```{r}
+incomplete <- data.frame(
+  doi = c("10.1/a", "", ""),          # DOI extraction failed for two
+  subjects_taxon = c("Y", "N", "Y"),
+  stringsAsFactors = FALSE
+)
+audit3 <- suppressMessages(audit_from_matrix(incomplete, id = "doi"))
+audit3$n
+```
+
+That warns about the blank ids and still counts three studies. It is a
+real case. In the survey reported in the INSTAR paper, DOI extraction
+failed for 25 of 150 PDFs, and keying on DOI would have collapsed them
+into one repeated blank identifier. The fix was to key on a per-file
+slug instead and keep DOI as metadata.
+
 ## Auditing
 
-`instar_audit()` takes the corpus, or the path directly:
+`instar_audit()` takes a corpus, a scoring table, or a path directly.
 
 ```{r}
 audit <- instar_audit(corpus)
@@ -132,9 +309,9 @@ audit
 head(summary(audit), 4)
 ```
 
-The columns worth knowing: `applicable` is the denominator, excluding
-studies that marked the item not applicable, and `percent_reported` is
-`reported / applicable`. An item that genuinely does not apply to a study
+Two columns are worth knowing. `applicable` is the denominator, which
+excludes studies that marked the item not applicable, and
+`percent_reported` is `reported / applicable`. An item that genuinely does not apply to a study
 is never counted against it.
 
 Which items does this literature handle worst?
@@ -148,8 +325,9 @@ head(s[order(s$percent_reported), c("item", "reported", "applicable",
 ### Grouping
 
 Any study-level column can be a grouping variable. For a corpus read from
-sheets that means anything the reserved rows carry — `journal`, `doi`,
-`version` — plus `folder`, the directory each sheet came from.
+sheets that means anything the reserved rows carry, so `journal`, `doi`
+and `version`, plus `folder`, the directory each sheet came from. For a
+scoring table it means any column that was not an item.
 
 ```{r}
 by_journal <- summary(audit, by = "journal")
@@ -181,78 +359,49 @@ plot(audit)
 ```
 
 `autoplot()` returns the ggplot object instead of drawing it, so you can
-modify it. `plot(audit, by = "journal")` facets.
+modify it before rendering. `plot(audit, by = "journal")` facets.
 
-## Studies with no sheet
+## Beyond coverage, to what the studies actually did
 
-Which is every study published before the framework existed. Score the
-papers into a wide table: one row per paper, one column per `item_id`.
-
-```{r}
-scores <- data.frame(
-  doi            = c("10.1/a", "10.1/b", "10.1/c", "10.1/d"),
-  journal        = c("J Alpha", "J Alpha", "J Beta", "J Beta"),
-  year           = c(2024, 2025, 2025, 2026),
-  subjects_taxon = c("Y", "Y", "Y", "Y"),
-  subjects_n     = c("Y", "N", "N", "Y"),
-  env_housing    = c("Y", "Y", "NA", "N"),
-  env_field      = c("NA", "NA", "Y", "-"),
-  stringsAsFactors = FALSE
-)
-
-audit2 <- audit_from_matrix(scores, id = "doi")
-summary(audit2)[, c("item", "reported", "applicable", "percent_reported")]
-```
-
-Three things are happening there worth spelling out.
-
-**Cell values are read leniently**, because scoring sheets are made by
-people. `Y`, `yes`, `TRUE`, `1` and `C` mean reported; `N`, `no`,
-`FALSE` and `0` mean not; `NA`, `N/A`, `-` and blanks mean not
-applicable. Anything unrecognised warns rather than being silently
-counted.
-
-**Non-item columns become study metadata.** `journal` and `year` are not
-`item_id`s, so they ride along and are immediately available for
-grouping:
+Coverage tells you whether an item was addressed. The sheet also carries
+*what was said*, which for most of the questions in
+[Use cases](#use-cases) is the part you want. Each report keeps the text
+in its items table, so pulling one item across a corpus is a one-liner:
 
 ```{r}
-subset(summary(audit2, by = "year"), item_id == "subjects_n")
+housing <- vapply(corpus, function(r) {
+  v <- r$items$value[r$items$item_id == "env_housing"]
+  if (length(v) == 0 || is.na(v)) NA_character_ else v
+}, character(1))
+
+data.frame(study = names(housing), housing = unname(housing),
+           row.names = NULL)
 ```
 
-**Items absent from the table are left out**, not counted as unreported.
-The message above says which. Recording an unscored item as a failure to
-report would assert something the scoring never checked.
+From there it is ordinary text work. Parse temperatures out, tabulate
+photoperiods, count how many housed animals individually. The framework
+does not standardise the content, deliberately, since forcing husbandry
+into fixed fields would lose more than it gained. It does guarantee that
+the housing description sits in the housing row of every sheet, which is
+most of the battle.
 
-### Choosing the identifier
+The same applies to any item. `fate_end` across a corpus tells you how
+often animals are released, killed, or kept. `proc_anaesthesia` tells
+you what is actually used, and how often nothing is. `ethics_review`
+tells you how often review applied at all, and what reasoning was
+offered when it did not.
 
-`id` should name a column that identifies every row. If it does not,
-you get told rather than finding out later:
+To get everything at once, in long form:
 
 ```{r}
-incomplete <- data.frame(
-  doi = c("10.1/a", "", ""),          # DOI extraction failed for two
-  subjects_taxon = c("Y", "N", "Y"),
-  stringsAsFactors = FALSE
-)
-audit3 <- suppressMessages(audit_from_matrix(incomplete, id = "doi"))
-audit3$n
+all_values <- do.call(rbind, lapply(names(corpus), function(nm) {
+  d <- as.data.frame(corpus[[nm]]$items)
+  data.frame(study = nm, item_id = d$item_id, value = d$value,
+             status = as.character(d$status), stringsAsFactors = FALSE)
+}))
+
+head(subset(all_values, status == "reported", select = -status), 4)
 ```
-
-That warns about the blank ids and still counts three studies. It is a
-real case: in the survey reported in the INSTAR paper, DOI extraction
-failed for 25 of 150 PDFs, and keying on DOI would have collapsed them
-into one repeated blank identifier. The fix was to key on a per-file
-slug instead and keep DOI as metadata.
-
-## A note on what this is for
-
-The point of depositing the sheet as structured text rather than only as
-a figure is that the second direction becomes possible at all. Once
-sheets are routinely deposited, questions like which items a field
-handles worst, whether reporting differs between laboratory and field
-work, or whether it improves after a journal adopts the framework, are a
-matter of reading files rather than of re-reading papers.
 
 ```{r, include = FALSE}
 unlink(corpus_dir, recursive = TRUE)

@@ -85,9 +85,9 @@ value. It can save partway and resume later.
 items <- instar_fill(save_to = "INSTAR.csv")
 ```
 
-At any prompt, type the value, or one of: `[enter]` to keep current,
+At any prompt, type the value, or one of `[enter]` to keep current,
 `NA` for not applicable, `skip` to leave blank, `back` to step back,
-`save` to write progress, `quit` to stop.
+`save` to write progress, or `quit` to stop.
 
 To resume:
 
@@ -96,8 +96,8 @@ items <- instar_fill(read_items("INSTAR.csv"),
                     save_to = "INSTAR.csv")
 ```
 
-To edit a single item afterwards (no need to know `item_id`s — pass no
-`item_id` and you'll be shown a numbered menu):
+To edit a single item afterwards, with no need to know `item_id`s. Pass
+no `item_id` and you will be shown a numbered menu.
 
 ```{r, eval = FALSE}
 items <- instar_edit(items)
@@ -109,7 +109,7 @@ items <- instar_edit(items, "subjects_n")   # or by id
 Useful in scripts and pipelines.
 
 `instar_set()` takes `item_id = "what the study reports"` pairs, as many
-as you like at once:
+as you like at once.
 
 ```{r, eval = FALSE}
 items <- instar_set(
@@ -124,10 +124,10 @@ items <- instar_set(
 A string reports the item, `NA` marks it not applicable, and `""` leaves
 it unreported. The same three states as the `report` column of the sheet.
 
-Set `value` directly and it will not work — and will not tell you so.
+Set `value` directly and it will not work, and will not tell you so.
 `status` is the single source of truth, and `instar_report()` blanks
 `value` for any item whose status is not `"reported"`, so a table filled
-in that way renders as an entirely unreported study:
+in that way renders as an entirely unreported study.
 
 ```{r, eval = FALSE}
 # Does nothing useful: status is still "not_reported", so the text is
@@ -149,7 +149,7 @@ prints all 18 items grouped by domain, marking each as reported (`*`),
 not applicable (`-`), or blank (`o`), with the current value shown
 underneath.
 
-Every item carries a `status`, which is the single source of truth:
+Every item carries a `status`, which is the single source of truth.
 
 | `status`           | Meaning                         | Renders as             |
 |--------------------|---------------------------------|------------------------|
@@ -159,13 +159,14 @@ Every item carries a `status`, which is the single source of truth:
 
 `value` carries substantive content only, and is `NA` whenever `status`
 is not `"reported"`, so the two can never disagree. Reading a CSV with no
-`status` column derives it from `value`: blanks become `"not_reported"`,
-and `"NA"` or `"N/A"` are honoured as shorthand for `"not_applicable"`.
+`status` column derives it from `value`. Blanks become
+`"not_reported"`, and `"NA"` or `"N/A"` are honoured as shorthand for
+`"not_applicable"`.
 
 ## Build the report
 
-`instar_report()` returns *data*, not a plot: the paper metadata, the
-resolved item table, and a coverage summary. Rendering is a separate
+`instar_report()` returns *data*, not a plot. It carries the paper
+metadata, the resolved item table, and a coverage summary. Rendering is a separate
 step, so you can compute on a report before (or without) drawing it.
 
 ```{r}
@@ -200,7 +201,7 @@ plot(report)
 ```
 
 If you want to modify the figure before rendering, `autoplot()` returns
-the underlying patchwork composition instead of drawing it:
+the underlying patchwork composition instead of drawing it.
 
 ```{r, eval = FALSE}
 autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
@@ -208,7 +209,7 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 
 ## Save it
 
-A finished report has two deposit artifacts: the completed sheet and the
+A finished report has two deposit artifacts, the completed sheet and the
 figure. The naming convention is that `write_` produces text and `save_`
 produces figures.
 
@@ -221,7 +222,7 @@ save_figure(report,  "INSTAR.png", dpi = 300)
 `write_report()` writes the same file shape an author would have filled
 in by hand, with the paper's details in the reserved rows, so it reads
 straight back through `read_items()`. This is the machine-readable
-artifact worth depositing; the figure is for human readers.
+artifact worth depositing. The figure is for human readers.
 
 `save_figure()` renders the report and writes it via `ggplot2::ggsave()`,
 choosing a compact page height from the figure's natural content size
@@ -232,11 +233,11 @@ to override.
 
 Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study. This is a sketch; see
+summarises a literature rather than a study. This is a sketch. See
 `vignette("auditing")` for the full treatment.
 
 `read_instar()` is the loader. Point it at a file, a directory, or a
-vector of either; it works out the format from the extension and always
+vector of either. It works out the format from the extension and always
 returns an `instar_corpus`, whether it found one sheet or two hundred.
 
 ```{r, eval = FALSE}
@@ -300,7 +301,7 @@ audit <- audit_from_matrix(scores, id = "doi")
 summary(audit)
 ```
 
-Columns matching an `item_id` are treated as items; every other column
+Columns matching an `item_id` are treated as items. Every other column
 is carried through as study metadata, so `journal` here is immediately
 available to `summary(by = )` without building a lookup table. Cell
 values are read leniently, because scoring sheets are made by people:
@@ -315,7 +316,7 @@ than counted as unreported, since the scoring never checked them.
 
 Each sheet records the INSTAR version it was completed against. Reading
 a corpus that mixes versions warns, because coverage is not comparable
-across them: an item missing from half the sheets because it did not
+across them. An item missing from half the sheets because it did not
 exist yet is not the same as an item those studies failed to report.
 
 ```{r, eval = FALSE}
