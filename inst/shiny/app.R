@@ -2,7 +2,8 @@
 # instarreport — Shiny web tool
 #
 # Lets users fill out the 18-item welfare reporting framework
-# interactively, preview the figure, and download as PDF or PNG.
+# interactively (or by uploading a filled INSTAR.csv), preview the
+# figure, and download both the figure and the completed INSTAR.csv.
 # --------------------------------------------------------------------
 
 library(shiny)
@@ -34,9 +35,15 @@ nzchar_or <- function(x, default) if (is.null(x) || !nzchar(x)) default else x
 # ---------- UI ----------
 sidebar_content <- function() {
   tagList(
+    fileInput("upload", "Load a filled INSTAR.csv",
+              accept = c(".csv", "text/csv")),
+    downloadButton("download_blank", "Download blank INSTAR.csv",
+                   class = "btn-sm"),
+    tags$hr(),
     textInput("paper_title",   "Title",          value = ""),
     textInput("paper_authors", "Authors",        value = ""),
     textInput("paper_journal", "Journal / venue", value = ""),
+    textInput("paper_doi",     "DOI",            value = ""),
     selectInput("study_type", "Study type",
                 choices = c("Both" = "both", "Laboratory" = "lab",
                             "Field" = "field"),
@@ -70,8 +77,10 @@ sidebar_content <- function() {
       )
     }),
     tags$hr(),
-    downloadButton("download_pdf", "Download PDF", class = "btn-primary"),
-    downloadButton("download_png", "Download PNG")
+    downloadButton("download_csv", "Download INSTAR.csv",
+                   class = "btn-primary"),
+    downloadButton("download_pdf", "Download figure (PDF)"),
+    downloadButton("download_png", "Download figure (PNG)")
   )
 }
 
@@ -150,10 +159,11 @@ server <- function(input, output, session) {
     paper <- list(
       title   = nzchar_or(input$paper_title,   "Untitled study"),
       authors = nzchar_or(input$paper_authors, "Author(s) not given"),
-      journal = nzchar_or(input$paper_journal, NULL)
+      journal = nzchar_or(input$paper_journal, NULL),
+      doi     = nzchar_or(input$paper_doi,     NULL)
     )
     tryCatch(
-      instar_report(paper = paper, items = current_items(), strict = FALSE),
+      instar_report(current_items(), paper = paper, strict = FALSE),
       error = function(e) {
         showNotification(paste("Error building figure:",
                                conditionMessage(e)),
@@ -166,6 +176,11 @@ server <- function(input, output, session) {
   # Render the figure. instar_report() returns data, so go through
   # autoplot() to get the patchwork composition and print that.
   #
+  # NOTE the ggplot2:: prefix. This app sources R/ into globalenv rather
+  # than loading the package namespace, so the `autoplot` generic is not
+  # on the search path -- only the autoplot.instar_report *method* is.
+  # A bare autoplot() call is an undefined function here.
+  #
   # Safari is sensitive to two things here: (1) the default `res` value
   # was too high and pushed the rendered bitmap past Safari's canvas
   # limits, leaving the preview area blank; (2) the initial-load
@@ -175,14 +190,65 @@ server <- function(input, output, session) {
     input$study_type  # force a non-NULL reactive dep for Safari
     rep <- current_report()
     if (is.null(rep)) return(NULL)
-    print(autoplot(rep))
+    print(ggplot2::autoplot(rep))
   }, bg = "white")
+
+  # ---- Upload: populate every input from a filled INSTAR.csv ----------
+  observeEvent(input$upload, {
+    tryCatch({
+      items <- read_items(input$upload$datapath)
+
+      # Item text areas. Flatten back to the free-text convention the
+      # boxes use: "NA" for not-applicable, empty for not-reported.
+      for (i in seq_len(nrow(items))) {
+        st <- as.character(items$status[i])
+        txt <- if (identical(st, "not_applicable")) "NA"
+               else if (identical(st, "reported") && !is.na(items$value[i]))
+                 items$value[i]
+               else ""
+        updateTextAreaInput(session, paste0("val_", items$item_id[i]),
+                            value = txt)
+      }
+
+      # Paper details, if the reserved rows were filled in.
+      paper <- attr(items, "paper")
+      if (!is.null(paper)) {
+        for (f in c("title", "authors", "journal", "doi")) {
+          if (!is.null(paper[[f]])) {
+            updateTextInput(session, paste0("paper_", f), value = paper[[f]])
+          }
+        }
+      }
+
+      showNotification("Loaded INSTAR.csv.", type = "message", duration = 4)
+    }, error = function(e) {
+      showNotification(paste("Could not read that file:",
+                             conditionMessage(e)),
+                       type = "error", duration = 10)
+    })
+  })
+
+  # ---- Downloads ------------------------------------------------------
+  output$download_blank <- downloadHandler(
+    filename = function() "INSTAR.csv",
+    content  = function(file) {
+      suppressMessages(write_template(file, study_type = input$study_type))
+    }
+  )
+
+  output$download_csv <- downloadHandler(
+    filename = function() "INSTAR.csv",
+    content  = function(file) {
+      rep <- current_report()
+      if (!is.null(rep)) write_report(rep, file)
+    }
+  )
 
   output$download_pdf <- downloadHandler(
     filename = function() "welfare_reporting.pdf",
     content = function(file) {
       rep <- current_report()
-      if (!is.null(rep)) instar_save(rep, file)
+      if (!is.null(rep)) save_figure(rep, file)
     }
   )
 
@@ -190,7 +256,7 @@ server <- function(input, output, session) {
     filename = function() "welfare_reporting.png",
     content = function(file) {
       rep <- current_report()
-      if (!is.null(rep)) instar_save(rep, file)
+      if (!is.null(rep)) save_figure(rep, file)
     }
   )
 }

@@ -166,12 +166,12 @@ step, so you can compute on a report before (or without) drawing it.
 
 ```{r}
 report <- instar_report(
+  items,
   paper = list(
     title   = "Field collection and laboratory choice trials in Bombus terrestris",
     authors = "Smith, Jones, & Lee (2025)",
     journal = "Behavioral Ecology, 36(4): 451-462"
-  ),
-  items = items
+  )
 )
 
 report
@@ -205,11 +205,11 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 ## Save it
 
 ```{r, eval = FALSE}
-instar_save(report, "fig_S1_welfare_reporting.pdf")
-instar_save(report, "fig_S1_welfare_reporting.png", dpi = 300)
+save_figure(report, "fig_S1_welfare_reporting.pdf")
+save_figure(report, "fig_S1_welfare_reporting.png", dpi = 300)
 ```
 
-`instar_save()` renders the report and writes it via
+`save_figure()` renders the report and writes it via
 `ggplot2::ggsave()`, choosing a compact page height from the figure's
 natural content size (white background, 300 dpi for raster formats).
 Pass an explicit `height` to override.

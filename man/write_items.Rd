@@ -2,7 +2,7 @@
 % Please edit documentation in R/fill.R
 \name{write_items}
 \alias{write_items}
-\title{Save items to a CSV file}
+\title{Write a filled-in items table to an INSTAR CSV}
 \usage{
 write_items(items, path)
 }
@@ -15,12 +15,14 @@ write_items(items, path)
 The path, invisibly.
 }
 \description{
-Writes a CSV with at minimum \code{item_id} and \code{value} columns, suitable for
-loading later with \code{\link[=read_items]{read_items()}}.
+Writes the same file shape as \code{\link[=write_template]{write_template()}}, with your content in
+the \code{report} column. Use this to save and resume a partly-finished
+table; use \code{\link[=write_report]{write_report()}} when you have a full report object and
+want the paper's details written in too.
 }
 \examples{
 \dontrun{
-write_items(items, "my_study_items.csv")
+write_items(items, "INSTAR.csv")
 }
 
 }

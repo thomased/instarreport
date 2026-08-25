@@ -4,16 +4,20 @@
 #' framework and returns a report object. The result is *data*, not a
 #' plot: it carries the paper metadata, the resolved item table, and a
 #' coverage summary. Call [plot()][plot.instar_report] to draw the
-#' standardised figure, or [instar_save()] to write it to disk. If you
-#' want the figure as an object to modify further, use
+#' standardised figure, [save_figure()] to write that figure to disk, or
+#' [write_report()] to write the deposit-ready CSV. If you want the
+#' figure as an object to modify further, use
 #' [autoplot()][autoplot.instar_report].
 #'
-#' @param paper A named list of paper metadata. Required: `title`,
-#'   `authors`. Optional: `journal`, `version`, `doi`.
-#' @param items A data frame with at least `item_id` and `value` columns,
-#'   optionally a `status` column. Use [instar_template()] to obtain a
-#'   ready-to-fill template and [instar_na()] to mark items that do not
+#' @param items A data frame with at least `item_id` and a `report` (or
+#'   `value`) column, optionally a `status` column. Use
+#'   [instar_template()] for an in-session template, [write_template()]
+#'   for a fillable CSV, and [instar_na()] to mark items that do not
 #'   apply.
+#' @param paper A named list of paper metadata. Required: `title`,
+#'   `authors`. Optional: `journal`, `version`, `doi`. May be omitted if
+#'   `items` came from [read_items()] on a file carrying the reserved
+#'   metadata rows, in which case those details are used.
 #' @param value_wrap Integer; approximate characters per line for the
 #'   value text when the report is plotted. Defaults to `75`.
 #' @param strict Logical; if `TRUE`, unknown `item_id`s in `items` raise
@@ -31,16 +35,27 @@
 #' tmpl <- instar_na(tmpl, "proc_anaesthesia")
 #'
 #' rep <- instar_report(
-#'   paper = list(title = "Demo", authors = "Smith et al. (2026)"),
-#'   items = tmpl
+#'   tmpl,
+#'   paper = list(title = "Demo", authors = "Smith et al. (2026)")
 #' )
 #' rep
 #' summary(rep)
 #'
 #' @export
-instar_report <- function(paper, items, value_wrap = 75, strict = TRUE) {
+instar_report <- function(items, paper = NULL, value_wrap = 75,
+                          strict = TRUE) {
+  # A file written by write_template() carries the paper's own details in
+  # reserved rows, which read_items() peels off into an attribute. Fall
+  # back to those when `paper` is not supplied.
+  if (is.null(paper)) paper <- attr(items, "paper")
+  if (is.null(paper)) {
+    stop("No paper metadata. Either pass `paper = list(title = , authors = )`,",
+         " or read items from a file whose title and authors rows are filled in.",
+         call. = FALSE)
+  }
   validate_paper(paper)
   items <- validate_items(items, strict = strict)
+  items <- items[!items$item_id %in% .PAPER_FIELDS, , drop = FALSE]
 
   # Join onto the canonical framework so every item has exactly one row,
   # in canonical order, whether or not the user supplied it.
@@ -80,7 +95,8 @@ print.instar_report <- function(x, ...) {
     "  %d of %d applicable items reported (%.0f%%); %d not applicable.\n",
     cov$reported, cov$applicable, cov$percent_reported, cov$not_applicable
   ))
-  cat("  Use plot() to draw it, or instar_save() to write it to disk.\n")
+  cat("  plot() to draw it; save_figure() for a PDF/PNG;",
+      "write_report() for a depositable CSV.\n")
   invisible(x)
 }
 
@@ -115,7 +131,7 @@ summary.instar_report <- function(object, ...) {
 #' Renders a report to the current graphics device. This is the usual way
 #' to look at a report. To capture the figure as an object you can modify
 #' or compose with, use [autoplot()][autoplot.instar_report] instead; to
-#' write it straight to a file, use [instar_save()].
+#' write it straight to a file, use [save_figure()].
 #'
 #' @param x An object of class `instar_report`.
 #' @param ... Passed to [autoplot()][autoplot.instar_report].
@@ -124,13 +140,13 @@ summary.instar_report <- function(object, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' rep <- instar_report(list(title = "T", authors = "A"), instar_template())
+#' rep <- instar_report(instar_template(), list(title = "T", authors = "A"))
 #' plot(rep)
 #' }
 #'
 #' @export
 plot.instar_report <- function(x, ...) {
-  print(autoplot(x, ...))
+  print(ggplot2::autoplot(x, ...))
   invisible(x)
 }
 
@@ -152,7 +168,7 @@ plot.instar_report <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' rep <- instar_report(list(title = "T", authors = "A"), instar_template())
+#' rep <- instar_report(instar_template(), list(title = "T", authors = "A"))
 #' p <- autoplot(rep)
 #' }
 #'
@@ -183,12 +199,14 @@ autoplot.instar_report <- function(object, ...) {
 }
 
 
-#' Save a report figure to disk
+#' Save a report's figure to disk
 #'
-#' Renders a report and writes it via [ggplot2::ggsave()]. The default
-#' page height is computed from the figure's natural content size, so the
-#' saved file is as compact as the content allows with no large blank
-#' regions. Pass an explicit `height` to override.
+#' Renders a report's figure and writes it via [ggplot2::ggsave()]. For
+#' the report as a depositable CSV instead, use [write_report()].
+#'
+#' The default page height is computed from the figure's natural content
+#' size, so the saved file is as compact as the content allows with no
+#' large blank regions. Pass an explicit `height` to override.
 #'
 #' @param report An object of class `instar_report`.
 #' @param filename Output file path (extension determines format; .pdf or
@@ -203,18 +221,18 @@ autoplot.instar_report <- function(object, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' rep <- instar_report(list(title = "T", authors = "A"), instar_template())
-#' instar_save(rep, "welfare_reporting.pdf")
+#' rep <- instar_report(instar_template(), list(title = "T", authors = "A"))
+#' save_figure(rep, "welfare_reporting.pdf")
 #' }
 #'
 #' @export
-instar_save <- function(report, filename, width = 8.5, height = NULL,
+save_figure <- function(report, filename, width = 8.5, height = NULL,
                         dpi = 300, ...) {
   if (!inherits(report, "instar_report")) {
     stop("`report` must be an object created by instar_report().",
          call. = FALSE)
   }
-  fig <- autoplot(report)
+  fig <- ggplot2::autoplot(report)
   if (is.null(height)) {
     # ~0.18" per line at body text size, clamped to a sensible range.
     nat <- attr(fig, "natural_lines")

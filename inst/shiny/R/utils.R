@@ -19,6 +19,67 @@
   panel_edge = "#d0d0d0"
 )
 
+#' Reserved item id carrying the usage note
+#'
+#' A single row at the top of the fillable CSV explaining the file's
+#' conventions. It travels with the file, so someone handed the sheet by
+#' a co-author, or pulling it out of a repository years later, does not
+#' need the paper open to know what a blank cell means. [read_items()]
+#' drops it.
+#'
+#' @keywords internal
+.HELP_FIELDS <- "_how_to_use"
+
+
+#' Content of the usage-note row
+#' @keywords internal
+.HELP_ROWS <- list(
+  `_how_to_use` = c(
+    "How to fill this in",
+    paste(
+      "Write a sentence or two in the `report` column for each item your",
+      "study reports; leave it blank if the study does not report it;",
+      "write NA if the item does not apply. Do not edit the other columns,",
+      "or add or remove rows. Upload the completed file at",
+      "https://thomas-white.shinyapps.io/instar/ to generate the summary",
+      "figure (save as CSV first if you are in a spreadsheet)."
+    )
+  )
+)
+
+
+#' Reserved item ids carrying paper metadata
+#'
+#' The fillable CSV template carries the paper's own details as four
+#' reserved rows at the top of the item table, so that a single deposited
+#' file identifies the study it belongs to. [read_items()] splits these
+#' out into a `paper` attribute; they are never treated as framework
+#' items.
+#'
+#' @keywords internal
+.PAPER_FIELDS <- c("title", "authors", "journal", "doi")
+
+
+#' Human-facing labels for the reserved metadata rows
+#' @keywords internal
+.PAPER_LABELS <- c(
+  title   = "Title",
+  authors = "Authors",
+  journal = "Journal or venue",
+  doi     = "DOI"
+)
+
+
+#' Prompts for the reserved metadata rows
+#' @keywords internal
+.PAPER_PROMPTS <- c(
+  title   = "Title of the paper this report accompanies.",
+  authors = "Author list, as it appears on the paper.",
+  journal = "Journal or venue, with volume and pages if known.",
+  doi     = "DOI of the paper, if it has one."
+)
+
+
 #' Canonical item status levels
 #'
 #' Every item is in exactly one of three states. `status` is the single

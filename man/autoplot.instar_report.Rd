@@ -25,7 +25,7 @@ the patchwork composition so you can modify it before rendering:
 }
 \examples{
 \dontrun{
-rep <- instar_report(list(title = "T", authors = "A"), instar_template())
+rep <- instar_report(instar_template(), list(title = "T", authors = "A"))
 p <- autoplot(rep)
 }
 

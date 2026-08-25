@@ -2,33 +2,49 @@
 % Please edit documentation in R/fill.R
 \name{write_template}
 \alias{write_template}
-\title{Write a blank CSV template for the framework}
+\title{Write a blank CSV for authors to fill in}
 \usage{
 write_template(path, study_type = c("both", "lab", "field"))
 }
 \arguments{
-\item{path}{Output file path.}
+\item{path}{Output file path. \code{INSTAR.csv} is the suggested name.}
 
 \item{study_type}{Optional. One of \code{"both"}, \code{"lab"}, or \code{"field"}.
-If supplied, items not applicable in that context have their
-\code{value} pre-set to \code{"NA"}.}
+If supplied, items that do not apply in that context are pre-filled
+with \code{NA} in the \code{report} column.}
 }
 \value{
 The path, invisibly.
 }
 \description{
-Writes a CSV file with one row per framework item, with \code{item_id},
-\code{item}, \code{domain}, \code{description}, and an empty \code{value} column. Hand
-this to a collaborator, fill it in in Excel or any spreadsheet, then
-load it back with \code{\link[=read_items]{read_items()}}. Extra columns (\code{item}, \code{domain},
-\code{description}) are ignored on load and exist only as in-spreadsheet
-reminders of what each item asks for.
+Writes the fillable INSTAR report: one row per framework item, with a
+\code{description} of what to report and an empty \code{report} column at the
+far right to type into. Reserved rows at the top carry a usage note
+and the paper's own details, so a completed file explains itself and
+identifies the study it belongs to.
+}
+\details{
+The file is a plain CSV and is meant to be opened in a spreadsheet,
+filled in, and deposited alongside the paper as supplementary
+material. Read it back with \code{\link[=read_items]{read_items()}}.
+
+Conventions for the \code{report} column:
+\itemize{
+\item write a sentence or two of substantive content for items the study
+reports;
+\item leave it blank for items the study does not report;
+\item write \code{NA} for items that do not apply to the study.
+}
+
+There is deliberately no \code{status} column: status is derived from what
+you write, so the two can never disagree. \code{\link[=write_items]{write_items()}} does include
+it, for saving and resuming your own work.
 }
 \examples{
 \dontrun{
-write_template("my_study_template.csv", study_type = "field")
-# ...fill in the value column in Excel...
-items <- read_items("my_study_template.csv")
+write_template("INSTAR.csv", study_type = "field")
+# ...fill in the report column in Excel, Numbers, or any editor...
+items <- read_items("INSTAR.csv")
 }
 
 }

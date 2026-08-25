@@ -19,7 +19,7 @@
 #' validate_items(tmpl)
 #'
 #' @export
-validate_items <- function(items, items_ref = instarreport::instar_items,
+validate_items <- function(items, items_ref = instar_items,
                            strict = TRUE) {
   if (!is.data.frame(items)) {
     stop("`items` must be a data frame.", call. = FALSE)
@@ -30,7 +30,9 @@ validate_items <- function(items, items_ref = instarreport::instar_items,
     stop("`items` is missing required column(s): ",
          paste(missing_cols, collapse = ", "), call. = FALSE)
   }
-  unknown <- setdiff(items$item_id, items_ref$item_id)
+  # Reserved metadata ids are stripped by read_items(), but tolerate them
+  # here so a hand-built table carrying them does not trip the check.
+  unknown <- setdiff(items$item_id, c(items_ref$item_id, .PAPER_FIELDS))
   if (length(unknown) > 0) {
     msg <- paste0("Unknown item_id(s): ", paste(unknown, collapse = ", "),
                   ". Run `instar_items$item_id` to see the canonical list.")

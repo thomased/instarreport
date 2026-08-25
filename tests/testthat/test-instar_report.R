@@ -4,8 +4,8 @@ test_that("instar_report returns data, not a plot", {
   tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
 
   rep <- instar_report(
-    paper = list(title = "Demo", authors = "Author et al."),
-    items = tmpl
+    tmpl,
+    paper = list(title = "Demo", authors = "Author et al.")
   )
   expect_s3_class(rep, "instar_report")
   expect_type(rep, "list")
@@ -25,8 +25,8 @@ test_that("report items cover the framework exactly once, in order", {
 
 test_that("instar_report errors on missing paper fields", {
   tmpl <- instar_template()
-  expect_error(instar_report(list(authors = "x"), tmpl), "title")
-  expect_error(instar_report(list(title = "x"), tmpl), "authors")
+  expect_error(instar_report(tmpl, list(authors = "x")), "title")
+  expect_error(instar_report(tmpl, list(title = "x")), "authors")
 })
 
 test_that("coverage counts statuses correctly", {
@@ -37,8 +37,8 @@ test_that("coverage counts statuses correctly", {
   tmpl <- instar_na(tmpl, tmpl$item_id[11:12])
 
   rep <- instar_report(
-    paper = list(title = "Demo", authors = "Author et al."),
-    items = tmpl
+    tmpl,
+    paper = list(title = "Demo", authors = "Author et al.")
   )
   cov <- rep$coverage
   expect_equal(cov$reported, 10L)
@@ -82,6 +82,6 @@ test_that("print() reports coverage without drawing", {
   expect_output(print(rep), "applicable items reported")
 })
 
-test_that("instar_save rejects non-report input", {
-  expect_error(instar_save(instar_template(), tempfile()), "instar_report")
+test_that("save_figure rejects non-report input", {
+  expect_error(save_figure(instar_template(), tempfile()), "instar_report")
 })

@@ -25,7 +25,7 @@
 
 # Vertical budgets, all expressed in "body line-heights" so the
 # whole figure scales together. One body line ~= 0.18" in the saved
-# figure (see instar_save()). Header/footer/strip text is larger than
+# figure (see save_figure()). Header/footer/strip text is larger than
 # body text, so their line budgets are bigger than they look on paper.
 # Card budgets are tuned so the patchwork allocation matches the actual
 # rendered title + content height; over-budgeting creates trailing
@@ -250,7 +250,7 @@
     ggplot2::theme(plot.margin = ggplot2::margin(0, 2, 0, 2, "pt"))
 
   # Stash the natural total height (in line-units) on the figure so
-  # instar_save() can pick a sensible default page height.
+  # save_figure() can pick a sensible default page height.
   attr(fig, "natural_lines") <- .HEADER_LINES + col_total + .FOOTER_LINES
   fig
 }

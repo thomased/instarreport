@@ -46,12 +46,12 @@ demo_report <- function() {
   items <- instar_na(items, c("env_field", "proc_anaesthesia"))
 
   instar_report(
+    items,
     paper = list(
       title   = "Flexible self-protection in house crickets",
       authors = "Demo, Author, & Example (2026)",
       journal = "Journal of Examples 1: 1-10"
-    ),
-    items = items
+    )
   )
 }
 
@@ -105,8 +105,8 @@ test_that("card heights grow with content", {
           collapse = " ")
   long_items$status[long_items$item_id == "env_housing"] <- "reported"
   long <- instar_report(
-    paper = list(title = "T", authors = "A"),
-    items = long_items
+    long_items,
+    paper = list(title = "T", authors = "A")
   )
   expect_gt(attr(autoplot(long), "natural_lines"),
             attr(autoplot(short), "natural_lines"))

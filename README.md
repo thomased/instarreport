@@ -125,19 +125,19 @@ there:
 
 ```r
 report <- instar_report(
+  items,
   paper = list(
     title   = "My study title",
     authors = "Smith et al. (2026)",
     journal = "Some Journal"
-  ),
-  items = items
+  )
 )
 
 report
 #> <instar_report>
 #>   My study title
 #>   14 of 17 applicable items reported (82%); 1 not applicable.
-#>   Use plot() to draw it, or instar_save() to write it to disk.
+#>   Use plot() to draw it, or save_figure() to write it to disk.
 
 # `report` is data, not a plot. Compute on it:
 summary(report)                 # one row per item, with status
@@ -145,7 +145,7 @@ subset(summary(report), status == "not_reported")
 
 # ...or render it:
 plot(report)                                  # draw it
-instar_save(report, "fig_S1_welfare_reporting.pdf")   # or write to file
+save_figure(report, "fig_S1_welfare_reporting.pdf")   # or write to file
 ```
 
 If you want the figure as an object to modify before rendering, use

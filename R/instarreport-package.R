@@ -37,7 +37,7 @@
 #'   paper = list(title = "My study", authors = "Smith et al. (2026)"),
 #'   items = items
 #' )
-#' instar_save(report, "fig_S1_welfare_reporting.pdf")
+#' save_figure(report, "fig_S1_welfare_reporting.pdf")
 #' ```
 #'
 #' @section Web tool:

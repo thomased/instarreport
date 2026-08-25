@@ -5,6 +5,6 @@ account: thomas-white
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 17545113
-bundleId: 12455382
+bundleId: 12459808
 url: https://thomas-white.shinyapps.io/instar/
 version: 1

@@ -141,6 +141,12 @@ instar_items <- (function() {
 #' @keywords internal
 new_instar_items <- function(x) {
   x <- as.data.frame(x, stringsAsFactors = FALSE)
+  # The fillable CSV names the free-text column `report`, which reads
+  # better on a spreadsheet than `value`. Normalise it on the way in.
+  if (is.null(x$value) && !is.null(x$report)) {
+    x$value <- x$report
+    x$report <- NULL
+  }
   if (is.null(x$status)) {
     x$status <- .derive_status(x$value)
   } else {
@@ -245,22 +251,73 @@ instar_template <- function(study_type = c("both", "lab", "field")) {
 #'
 #' @export
 read_items <- function(path, ...) {
-  # `na.strings = character(0)` matters: with the default, read.csv turns
-  # the literal string "NA" into a real NA, which would silently downgrade
-  # a not-applicable item to not-reported. Empty cells arrive as "" and
-  # are handled by .derive_status().
+  # Two read.csv defaults have to be overridden here:
+  #
+  #   na.strings = character(0)  -- otherwise the literal string "NA" is
+  #     turned into a real NA, silently downgrading a not-applicable item
+  #     to not-reported.
+  #   colClasses = "character"   -- otherwise type.convert() types a
+  #     wholly blank `report` column (a freshly written template) as
+  #     logical, making every cell NA rather than "".
   args <- utils::modifyList(
-    list(file = path, stringsAsFactors = FALSE, na.strings = character(0)),
+    list(file = path, stringsAsFactors = FALSE,
+         na.strings = character(0), colClasses = "character"),
     list(...)
   )
   df <- do.call(utils::read.csv, args)
+
+  if (is.null(df$value) && !is.null(df$report)) {
+    df$value <- df$report
+    df$report <- NULL
+  }
+  if (!is.null(df$value)) {
+    df$value <- as.character(df$value)
+    df$value[is.na(df$value)] <- ""
+  }
   required <- c("item_id", "value")
   missing <- setdiff(required, names(df))
   if (length(missing) > 0) {
     stop("File `", path, "` is missing required column(s): ",
-         paste(missing, collapse = ", "), call. = FALSE)
+         paste(missing, collapse = ", "),
+         ". Expected an `item_id` column and a `report` (or `value`) column.",
+         call. = FALSE)
   }
-  new_instar_items(df)
+
+  # Usage notes are for the human filling the sheet in; drop them.
+  df <- df[!df$item_id %in% .HELP_FIELDS, , drop = FALSE]
+
+  # If the item_id column was deleted or emptied, fall back to matching on
+  # the display name so the file still reads.
+  blank_id <- !nzchar(trimws(df$item_id))
+  if (any(blank_id) && !is.null(df$item)) {
+    key <- tolower(gsub("\\s+", " ", trimws(df$item)))
+    ref <- stats::setNames(
+      c(instar_items$item_id, .PAPER_FIELDS),
+      tolower(gsub("\\s+", " ",
+                   c(instar_items$item, unname(.PAPER_LABELS[.PAPER_FIELDS]))))
+    )
+    df$item_id[blank_id] <- unname(ref[key[blank_id]])
+    df <- df[!is.na(df$item_id), , drop = FALSE]
+  }
+
+  # Reserved rows carry the paper's own details rather than framework
+  # items. Peel them off into an attribute so a single file identifies
+  # the study it belongs to.
+  is_meta <- df$item_id %in% .PAPER_FIELDS
+  paper <- NULL
+  if (any(is_meta)) {
+    vals <- stats::setNames(
+      trimws(as.character(df$value[is_meta])),
+      df$item_id[is_meta]
+    )
+    vals <- vals[nzchar(vals)]
+    if (length(vals) > 0) paper <- as.list(vals)
+    df <- df[!is_meta, , drop = FALSE]
+  }
+
+  out <- new_instar_items(df)
+  attr(out, "paper") <- paper
+  out
 }
 
 

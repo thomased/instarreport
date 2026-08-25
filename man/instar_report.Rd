@@ -4,16 +4,19 @@
 \alias{instar_report}
 \title{Build an invertebrate welfare report}
 \usage{
-instar_report(paper, items, value_wrap = 75, strict = TRUE)
+instar_report(items, paper = NULL, value_wrap = 75, strict = TRUE)
 }
 \arguments{
-\item{paper}{A named list of paper metadata. Required: \code{title},
-\code{authors}. Optional: \code{journal}, \code{version}, \code{doi}.}
-
-\item{items}{A data frame with at least \code{item_id} and \code{value} columns,
-optionally a \code{status} column. Use \code{\link[=instar_template]{instar_template()}} to obtain a
-ready-to-fill template and \code{\link[=instar_na]{instar_na()}} to mark items that do not
+\item{items}{A data frame with at least \code{item_id} and a \code{report} (or
+\code{value}) column, optionally a \code{status} column. Use
+\code{\link[=instar_template]{instar_template()}} for an in-session template, \code{\link[=write_template]{write_template()}}
+for a fillable CSV, and \code{\link[=instar_na]{instar_na()}} to mark items that do not
 apply.}
+
+\item{paper}{A named list of paper metadata. Required: \code{title},
+\code{authors}. Optional: \code{journal}, \code{version}, \code{doi}. May be omitted if
+\code{items} came from \code{\link[=read_items]{read_items()}} on a file carrying the reserved
+metadata rows, in which case those details are used.}
 
 \item{value_wrap}{Integer; approximate characters per line for the
 value text when the report is plotted. Defaults to \code{75}.}
@@ -31,8 +34,9 @@ Joins a study's filled-in items against the canonical \link{instar_items}
 framework and returns a report object. The result is \emph{data}, not a
 plot: it carries the paper metadata, the resolved item table, and a
 coverage summary. Call \link[=plot.instar_report]{plot()} to draw the
-standardised figure, or \code{\link[=instar_save]{instar_save()}} to write it to disk. If you
-want the figure as an object to modify further, use
+standardised figure, \code{\link[=save_figure]{save_figure()}} to write that figure to disk, or
+\code{\link[=write_report]{write_report()}} to write the deposit-ready CSV. If you want the
+figure as an object to modify further, use
 \link[=autoplot.instar_report]{autoplot()}.
 }
 \examples{
@@ -43,8 +47,8 @@ tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
 tmpl <- instar_na(tmpl, "proc_anaesthesia")
 
 rep <- instar_report(
-  paper = list(title = "Demo", authors = "Smith et al. (2026)"),
-  items = tmpl
+  tmpl,
+  paper = list(title = "Demo", authors = "Smith et al. (2026)")
 )
 rep
 summary(rep)

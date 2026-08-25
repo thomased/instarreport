@@ -215,10 +215,84 @@ instar_edit <- function(items, item_id = NULL) {
 }
 
 
-#' Save items to a CSV file
+#' Build the INSTAR CSV as a data frame
 #'
-#' Writes a CSV with at minimum `item_id` and `value` columns, suitable for
-#' loading later with [read_items()].
+#' The single on-disk shape, used by [write_template()], [write_items()]
+#' and [write_report()]: four reserved metadata rows, then one row per
+#' framework item, with the free-text `report` column last.
+#'
+#' @param items An items table, or `NULL` for a blank sheet.
+#' @param paper Optional named list of paper details.
+#' @param study_type Used only when `items` is `NULL`.
+#' @return A data frame ready to write with [utils::write.csv()].
+#' @keywords internal
+.instar_csv <- function(items = NULL, paper = NULL,
+                        study_type = c("both", "lab", "field")) {
+  if (is.null(items)) {
+    study_type <- match.arg(study_type)
+    items <- instar_template(study_type)
+  } else {
+    items <- validate_items(items)
+    if (is.null(paper)) paper <- attr(items, "paper")
+  }
+  items <- items[!items$item_id %in% .PAPER_FIELDS, , drop = FALSE]
+
+  help <- data.frame(
+    domain      = "How to use",
+    item        = vapply(.HELP_ROWS, `[`, character(1), 1L, USE.NAMES = FALSE),
+    item_id     = .HELP_FIELDS,
+    description = vapply(.HELP_ROWS, `[`, character(1), 2L, USE.NAMES = FALSE),
+    lab         = "",
+    field       = "",
+    report      = "",
+    stringsAsFactors = FALSE
+  )
+
+  meta_report <- vapply(.PAPER_FIELDS, function(f) {
+    v <- if (is.null(paper)) NULL else paper[[f]]
+    if (is.null(v) || is.na(v)) "" else as.character(v)
+  }, character(1), USE.NAMES = FALSE)
+
+  meta <- data.frame(
+    domain      = "Paper details",
+    item        = unname(.PAPER_LABELS[.PAPER_FIELDS]),
+    item_id     = .PAPER_FIELDS,
+    description = unname(.PAPER_PROMPTS[.PAPER_FIELDS]),
+    lab         = "",
+    field       = "",
+    report      = meta_report,
+    stringsAsFactors = FALSE
+  )
+
+  # One row per framework item, in canonical order, whatever was supplied.
+  ref <- instar_items
+  idx <- match(ref$item_id, items$item_id)
+  status <- .as_status(ifelse(is.na(idx), "not_reported",
+                              as.character(items$status)[idx]))
+  value  <- ifelse(is.na(idx), NA_character_, items$value[idx])
+  report <- ifelse(status == "not_applicable", "NA",
+                   ifelse(status == "reported" & !is.na(value), value, ""))
+
+  body <- data.frame(
+    domain      = ref$domain,
+    item        = ref$item,
+    item_id     = ref$item_id,
+    description = ref$description,
+    lab         = ref$lab,
+    field       = ref$field,
+    report      = report,
+    stringsAsFactors = FALSE
+  )
+  rbind(help, meta, body)
+}
+
+
+#' Write a filled-in items table to an INSTAR CSV
+#'
+#' Writes the same file shape as [write_template()], with your content in
+#' the `report` column. Use this to save and resume a partly-finished
+#' table; use [write_report()] when you have a full report object and
+#' want the paper's details written in too.
 #'
 #' @param items A data frame of items.
 #' @param path Output file path.
@@ -227,58 +301,90 @@ instar_edit <- function(items, item_id = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#' write_items(items, "my_study_items.csv")
+#' write_items(items, "INSTAR.csv")
 #' }
 #'
 #' @export
 write_items <- function(items, path) {
-  items <- validate_items(items)
-  out <- as.data.frame(items)[, c("item_id", "value", "status"), drop = FALSE]
-  out$value <- ifelse(is.na(out$value), "", out$value)
-  out$status <- as.character(out$status)
-  utils::write.csv(out, path, row.names = FALSE)
+  utils::write.csv(.instar_csv(items), path, row.names = FALSE)
   invisible(path)
 }
 
 
-#' Write a blank CSV template for the framework
+#' Write a completed INSTAR report to CSV
 #'
-#' Writes a CSV file with one row per framework item, with `item_id`,
-#' `item`, `domain`, `description`, and an empty `value` column. Hand
-#' this to a collaborator, fill it in in Excel or any spreadsheet, then
-#' load it back with [read_items()]. Extra columns (`item`, `domain`,
-#' `description`) are ignored on load and exist only as in-spreadsheet
-#' reminders of what each item asks for.
+#' Writes the deposit-ready INSTAR report: the same CSV an author would
+#' have filled in by hand, with their content in the `report` column and
+#' the paper's own details in the four reserved rows at the top. This is
+#' the file to lodge as supplementary material.
 #'
-#' @param path Output file path.
-#' @param study_type Optional. One of `"both"`, `"lab"`, or `"field"`.
-#'   If supplied, items not applicable in that context have their
-#'   `value` pre-set to `"NA"`.
+#' Use [save_figure()] for the graphical version of the same report.
+#'
+#' @param report An object of class `instar_report`.
+#' @param path Output file path. `INSTAR.csv` is the suggested name.
 #'
 #' @return The path, invisibly.
 #'
 #' @examples
 #' \dontrun{
-#' write_template("my_study_template.csv", study_type = "field")
-#' # ...fill in the value column in Excel...
-#' items <- read_items("my_study_template.csv")
+#' rep <- instar_report(read_items("INSTAR.csv"))
+#' write_report(rep, "INSTAR_completed.csv")
+#' }
+#'
+#' @export
+write_report <- function(report, path) {
+  if (!inherits(report, "instar_report")) {
+    stop("`report` must be an object created by instar_report().",
+         call. = FALSE)
+  }
+  utils::write.csv(.instar_csv(report$items, report$paper), path,
+                   row.names = FALSE)
+  invisible(path)
+}
+
+
+#' Write a blank CSV for authors to fill in
+#'
+#' Writes the fillable INSTAR report: one row per framework item, with a
+#' `description` of what to report and an empty `report` column at the
+#' far right to type into. Reserved rows at the top carry a usage note
+#' and the paper's own details, so a completed file explains itself and
+#' identifies the study it belongs to.
+#'
+#' The file is a plain CSV and is meant to be opened in a spreadsheet,
+#' filled in, and deposited alongside the paper as supplementary
+#' material. Read it back with [read_items()].
+#'
+#' Conventions for the `report` column:
+#' * write a sentence or two of substantive content for items the study
+#'   reports;
+#' * leave it blank for items the study does not report;
+#' * write `NA` for items that do not apply to the study.
+#'
+#' There is deliberately no `status` column: status is derived from what
+#' you write, so the two can never disagree. [write_items()] does include
+#' it, for saving and resuming your own work.
+#'
+#' @param path Output file path. `INSTAR.csv` is the suggested name.
+#' @param study_type Optional. One of `"both"`, `"lab"`, or `"field"`.
+#'   If supplied, items that do not apply in that context are pre-filled
+#'   with `NA` in the `report` column.
+#'
+#' @return The path, invisibly.
+#'
+#' @examples
+#' \dontrun{
+#' write_template("INSTAR.csv", study_type = "field")
+#' # ...fill in the report column in Excel, Numbers, or any editor...
+#' items <- read_items("INSTAR.csv")
 #' }
 #'
 #' @export
 write_template <- function(path, study_type = c("both", "lab", "field")) {
   study_type <- match.arg(study_type)
-  tmpl <- instar_template(study_type)
-  out <- data.frame(
-    item_id     = tmpl$item_id,
-    item        = tmpl$item,
-    domain      = tmpl$domain,
-    description = tmpl$description,
-    value       = ifelse(is.na(tmpl$value), "", tmpl$value),
-    status      = as.character(tmpl$status),
-    stringsAsFactors = FALSE
-  )
-  utils::write.csv(out, path, row.names = FALSE)
-  message(sprintf("Wrote template to %s", path))
+  utils::write.csv(.instar_csv(NULL, study_type = study_type), path,
+                   row.names = FALSE)
+  message(sprintf("Wrote INSTAR template to %s", path))
   invisible(path)
 }
 

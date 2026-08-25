@@ -18,11 +18,11 @@
 Renders a report to the current graphics device. This is the usual way
 to look at a report. To capture the figure as an object you can modify
 or compose with, use \link[=autoplot.instar_report]{autoplot()} instead; to
-write it straight to a file, use \code{\link[=instar_save]{instar_save()}}.
+write it straight to a file, use \code{\link[=save_figure]{save_figure()}}.
 }
 \examples{
 \dontrun{
-rep <- instar_report(list(title = "T", authors = "A"), instar_template())
+rep <- instar_report(instar_template(), list(title = "T", authors = "A"))
 plot(rep)
 }
 
