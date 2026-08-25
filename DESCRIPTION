@@ -1,19 +1,21 @@
 Package: instarreport
 Type: Package
 Title: INSTAR: Reporting of Invertebrate Welfare in Research
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Thomas E.", "White", email = "thomas.white@sydney.edu.au",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3976-1734")),
     person("Eleanor", "Drinkwater", role = "aut"))
-Description: An R implementation of the INSTAR framework (INvertebrate
+Description: Tools for applying the INSTAR framework (INvertebrate
     Standards for Treatment And Reporting; White et al., in prep), an
-    18-item reporting standard for invertebrate welfare in research. The
-    package produces a standardised, publication-ready summary figure in
-    which each cell carries the substantive content for the corresponding
-    item (species and provenance, housing conditions, ethics permits, and
-    so on), in the same spirit as a PRISMA flow diagram for systematic
-    reviews.
+    18-item reporting standard for invertebrate welfare in research.
+    Provides the framework as data, interactive and spreadsheet-based
+    workflows for recording what a study reported, validation against the
+    canonical item set, and coverage summaries. Reports render to a
+    standardised, publication-ready figure in which each cell carries the
+    substantive content for the corresponding item (species and
+    provenance, housing conditions, ethics permits, and so on), in the
+    same spirit as a PRISMA flow diagram for systematic reviews.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,6 +29,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    vdiffr,
     shiny,
     bslib,
     readr
@@ -35,4 +38,4 @@ Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 URL: https://github.com/thomased/instarreport
 BugReports: https://github.com/thomased/instarreport/issues
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

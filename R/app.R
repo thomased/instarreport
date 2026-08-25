@@ -11,11 +11,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' run_shiny_app()
+#' instar_app()
 #' }
 #'
 #' @export
-run_shiny_app <- function(launch.browser = TRUE, ...) {
+instar_app <- function(launch.browser = TRUE, ...) {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Install shiny: install.packages('shiny')", call. = FALSE)
   }

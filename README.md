@@ -23,13 +23,13 @@ remotes::install_github("thomased/instarreport")
 ## Three ways to fill out the framework
 
 Pick whichever fits your workflow. All three produce the same kind of
-`items` object that `invert_report()` consumes.
+`items` object that `instar_report()` consumes.
 
 ### 1. Interactive prompt (recommended for first-time users)
 
 ```r
 library(instarreport)
-items <- fill_items(save_to = "my_study_items.csv")
+items <- instar_fill(save_to = "my_study_items.csv")
 ```
 
 This walks through the 18 items in order, showing each one's name,
@@ -46,21 +46,21 @@ prompt you can type:
 To resume later, load the saved CSV back in:
 
 ```r
-items <- fill_items(load_items("my_study_items.csv"),
+items <- instar_fill(read_items("my_study_items.csv"),
                     save_to = "my_study_items.csv")
 ```
 
 To tweak a single item afterwards:
 
 ```r
-items <- edit_item(items, "subjects_n")   # by item_id
-items <- edit_item(items)                 # numbered menu of all 18 items
+items <- instar_edit(items, "subjects_n")   # by item_id
+items <- instar_edit(items)                 # numbered menu of all 18 items
 ```
 
 To check your progress at any point:
 
 ```r
-show_items(items)
+print(items)
 ```
 
 ### 2. Fill out a CSV template
@@ -69,9 +69,9 @@ For collaborators who'd rather work in Excel, or when items are spread
 across several people, write a blank template and fill the `value` column:
 
 ```r
-save_template("my_study_items.csv", study_type = "field")
+write_template("my_study_items.csv", study_type = "field")
 # ...edit the file in Excel / Numbers / a text editor...
-items <- load_items("my_study_items.csv")
+items <- read_items("my_study_items.csv")
 ```
 
 The template CSV has one row per item with `item_id`, `item`, `domain`,
@@ -97,10 +97,18 @@ system.file("extdata", "example_items.csv", package = "instarreport")
 ### 3. Programmatic fill (for scripts)
 
 ```r
-items <- framework_template(study_type = "field")
-items$value[items$item_id == "subjects_taxon"]  <- "Bombus terrestris (worker female); COI"
-items$value[items$item_id == "subjects_source"] <- "Wild-collected, Royal NP, May 2025"
-items$value[items$item_id == "subjects_n"]      <- "n=80; n=72 analysed (10% attrition)"
+items <- instar_template(study_type = "field")
+
+report_item <- function(items, id, text) {
+  items$value[items$item_id == id]  <- text
+  items$status[items$item_id == id] <- "reported"
+  items
+}
+
+items <- report_item(items, "subjects_taxon",  "Bombus terrestris (worker female); COI")
+items <- report_item(items, "subjects_source", "Wild-collected, Royal NP, May 2025")
+items <- report_item(items, "subjects_n",      "n=80; n=72 analysed (10% attrition)")
+items <- instar_na(items, "proc_anaesthesia")   # mark items that don't apply
 # ...and so on
 ```
 
@@ -110,7 +118,7 @@ Once `items` is filled, the rest is the same regardless of how you got
 there:
 
 ```r
-report <- invert_report(
+report <- instar_report(
   paper = list(
     title   = "My study title",
     authors = "Smith et al. (2026)",
@@ -120,11 +128,25 @@ report <- invert_report(
 )
 
 report
-#> <invert_report>
-#>   14 of 17 applicable items reported (82%); 1 items not applicable.
-#>   Use plot() or save_report() to render.
+#> <instar_report>
+#>   My study title
+#>   14 of 17 applicable items reported (82%); 1 not applicable.
+#>   Use plot() to draw it, or instar_save() to write it to disk.
 
-save_report(report, "fig_S1_welfare_reporting.pdf")
+# `report` is data, not a plot. Compute on it:
+summary(report)                 # one row per item, with status
+subset(summary(report), status == "not_reported")
+
+# ...or render it:
+plot(report)                                  # draw it
+instar_save(report, "fig_S1_welfare_reporting.pdf")   # or write to file
+```
+
+If you want the figure as an object to modify before rendering, use
+`autoplot()`, which returns the underlying patchwork composition:
+
+```r
+autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 ```
 
 ## Web tool
@@ -137,7 +159,7 @@ For a local copy with live preview (and no shinyapps.io free-tier
 sleep), launch the bundled Shiny app:
 
 ```r
-run_shiny_app()
+instar_app()
 ```
 
 ## The framework
@@ -149,15 +171,25 @@ End-of-study disposition lives within the Health welfare domain. See
 `?framework` for the full table, or:
 
 ```r
-table(framework$domain, framework$group)
+table(instar_items$domain, instar_items$group)
 ```
 
 ## Conventions
 
-- Leave `value` as `""` (empty) for items not reported by the study; the
-  figure renders those cells as *Not reported* in muted italic.
-- Set `value` to `"NA"` for items not applicable to the study; the figure
-  renders *Not applicable* in grey italic.
+Every item carries a `status`, which is the single source of truth:
+
+| `status`           | Meaning                          | Renders as                |
+|--------------------|----------------------------------|---------------------------|
+| `"reported"`       | The study reports this item      | The text in `value`       |
+| `"not_reported"`   | The study is silent on it        | *Not reported*, muted     |
+| `"not_applicable"` | It does not apply to this study  | *Not applicable*, grey    |
+
+- `value` carries substantive content only, and is `NA` whenever `status`
+  is not `"reported"`. The two can never disagree.
+- Use `instar_na(items, "item_id")` to mark items that do not apply.
+- Reading a CSV with no `status` column derives it from `value`: blanks
+  become `"not_reported"`, and the strings `"NA"` or `"N/A"` are honoured
+  as shorthand for `"not_applicable"`.
 - Otherwise, write a concise sentence or two of substantive content per
   cell, exactly as you would in the methods paragraph.
 

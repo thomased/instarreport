@@ -25,10 +25,11 @@ library(instarreport)
 
 ## The INSTAR framework
 
-The package ships with the 18-item INSTAR framework as an exported data frame.
+The package ships with the 18-item INSTAR framework as the exported
+data frame `instar_items`.
 
 ```{r}
-framework
+instar_items
 ```
 
 Items are grouped into five welfare domains (Mellor *et al.* 2020, with
@@ -39,16 +40,16 @@ domain.
 ## Three ways to fill out the items
 
 Pick whichever fits how you work. All three produce the same kind of
-`items` data frame that `invert_report()` consumes.
+`items` data frame that `instar_report()` consumes.
 
 ### Interactive prompt
 
-The most forgiving workflow for first-time users. `fill_items()` walks
+The most forgiving workflow for first-time users. `instar_fill()` walks
 through each item, showing its name and description, and prompts for a
 value. It can save partway and resume later.
 
 ```{r, eval = FALSE}
-items <- fill_items(save_to = "my_study.csv")
+items <- instar_fill(save_to = "my_study.csv")
 ```
 
 At any prompt, type the value, or one of: `[enter]` to keep current,
@@ -58,7 +59,7 @@ At any prompt, type the value, or one of: `[enter]` to keep current,
 To resume:
 
 ```{r, eval = FALSE}
-items <- fill_items(load_items("my_study.csv"),
+items <- instar_fill(read_items("my_study.csv"),
                     save_to = "my_study.csv")
 ```
 
@@ -66,8 +67,8 @@ To edit a single item afterwards (no need to know `item_id`s — pass no
 `item_id` and you'll be shown a numbered menu):
 
 ```{r, eval = FALSE}
-items <- edit_item(items)
-items <- edit_item(items, "subjects_n")   # or by id
+items <- instar_edit(items)
+items <- instar_edit(items, "subjects_n")   # or by id
 ```
 
 ### CSV template
@@ -77,9 +78,9 @@ are spread across multiple people. Write a blank template, fill it in in
 Excel (or any spreadsheet or text editor), then load it back.
 
 ```{r, eval = FALSE}
-save_template("my_study.csv", study_type = "field")
+write_template("my_study.csv", study_type = "field")
 # ...edit the value column...
-items <- load_items("my_study.csv")
+items <- read_items("my_study.csv")
 ```
 
 The template CSV has one row per item with `item_id`, `item`, `domain`,
@@ -102,7 +103,7 @@ And a filled example to look at:
 ```{r}
 example_path <- system.file("extdata", "example_items.csv",
                             package = "instarreport")
-items <- load_items(example_path)
+items <- read_items(example_path)
 head(items)
 ```
 
@@ -111,25 +112,60 @@ head(items)
 Useful in scripts and pipelines.
 
 ```{r, eval = FALSE}
-items <- framework_template()
+items <- instar_template()
+
+# Reporting an item means setting both `value` and `status`.
 items$value[items$item_id == "subjects_taxon"] <-
   "Bombus terrestris (worker female); morphology + COI"
+items$status[items$item_id == "subjects_taxon"] <- "reported"
+
+# Items that do not apply to the study:
+items <- instar_na(items, c("env_field", "proc_anaesthesia"))
+```
+
+A small helper keeps this tidy if you are filling many items at once:
+
+```{r, eval = FALSE}
+report_item <- function(items, id, text) {
+  items$value[items$item_id == id]  <- text
+  items$status[items$item_id == id] <- "reported"
+  items
+}
+
+items <- report_item(items, "subjects_n", "n = 80; 72 analysed")
 ```
 
 ## Checking progress
 
 ```{r, eval = FALSE}
-show_items(items)
+print(items)
 ```
 
 prints all 18 items grouped by domain, marking each as reported (`*`),
 not applicable (`-`), or blank (`o`), with the current value shown
 underneath.
 
-## Build the figure
+Every item carries a `status`, which is the single source of truth:
 
-```{r, fig.alt = "Example welfare reporting figure"}
-report <- invert_report(
+| `status`           | Meaning                         | Renders as             |
+|--------------------|---------------------------------|------------------------|
+| `"reported"`       | The study reports this item     | The text in `value`    |
+| `"not_reported"`   | The study is silent on it       | *Not reported*, muted  |
+| `"not_applicable"` | It does not apply to this study | *Not applicable*, grey |
+
+`value` carries substantive content only, and is `NA` whenever `status`
+is not `"reported"`, so the two can never disagree. Reading a CSV with no
+`status` column derives it from `value`: blanks become `"not_reported"`,
+and `"NA"` or `"N/A"` are honoured as shorthand for `"not_applicable"`.
+
+## Build the report
+
+`instar_report()` returns *data*, not a plot: the paper metadata, the
+resolved item table, and a coverage summary. Rendering is a separate
+step, so you can compute on a report before (or without) drawing it.
+
+```{r}
+report <- instar_report(
   paper = list(
     title   = "Field collection and laboratory choice trials in Bombus terrestris",
     authors = "Smith, Jones, & Lee (2025)",
@@ -141,25 +177,49 @@ report <- invert_report(
 report
 ```
 
-`print()` (or just typing the object's name) shows a one-line coverage
-summary. `plot()` renders the figure inline.
+`summary()` gives one row per framework item, with its domain, group, and
+status. This is the handle to use for anything programmatic.
+
+```{r}
+head(summary(report))
+
+# Which items did this study not report?
+subset(summary(report), status == "not_reported", select = c(domain, item))
+```
+
+## Render the figure
+
+`plot()` draws the standardised figure.
+
+```{r, fig.alt = "Example welfare reporting figure"}
+plot(report)
+```
+
+If you want to modify the figure before rendering, `autoplot()` returns
+the underlying patchwork composition instead of drawing it:
+
+```{r, eval = FALSE}
+autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
+```
 
 ## Save it
 
 ```{r, eval = FALSE}
-save_report(report, "fig_S1_welfare_reporting.pdf")
-save_report(report, "fig_S1_welfare_reporting.png", dpi = 300)
+instar_save(report, "fig_S1_welfare_reporting.pdf")
+instar_save(report, "fig_S1_welfare_reporting.png", dpi = 300)
 ```
 
-`save_report()` is a thin wrapper around `ggplot2::ggsave()` with sensible
-defaults (US Letter, 300 dpi, white background).
+`instar_save()` renders the report and writes it via
+`ggplot2::ggsave()`, choosing a compact page height from the figure's
+natural content size (white background, 300 dpi for raster formats).
+Pass an explicit `height` to override.
 
 ## Web tool
 
 For a clickable interface, run:
 
 ```{r, eval = FALSE}
-run_shiny_app()
+instar_app()
 ```
 
 The Shiny app lets you fill in each framework item interactively, preview

@@ -19,21 +19,21 @@ evidence synthesis.
 \section{Three ways to fill out the framework}{
 
 
-\strong{Interactive prompt} (see \code{\link[=fill_items]{fill_items()}}):
+\strong{Interactive prompt} (see \code{\link[=instar_fill]{instar_fill()}}):
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{items <- fill_items(save_to = "my_study.csv")
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{items <- instar_fill(save_to = "my_study.csv")
 }\if{html}{\out{</div>}}
 
-\strong{CSV template} (see \code{\link[=save_template]{save_template()}}, \code{\link[=load_items]{load_items()}}):
+\strong{CSV template} (see \code{\link[=write_template]{write_template()}}, \code{\link[=read_items]{read_items()}}):
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{save_template("my_study.csv")
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{write_template("my_study.csv")
 # ...edit the value column in Excel...
-items <- load_items("my_study.csv")
+items <- read_items("my_study.csv")
 }\if{html}{\out{</div>}}
 
 \strong{Programmatic}:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{items <- framework_template()
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{items <- instar_template()
 items$value[items$item_id == "subjects_taxon"] <-
   "Bombus terrestris (worker female); morphology + COI"
 }\if{html}{\out{</div>}}
@@ -42,17 +42,17 @@ items$value[items$item_id == "subjects_taxon"] <-
 \section{Building the figure}{
 
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{report <- invert_report(
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{report <- instar_report(
   paper = list(title = "My study", authors = "Smith et al. (2026)"),
   items = items
 )
-save_report(report, "fig_S1_welfare_reporting.pdf")
+instar_save(report, "fig_S1_welfare_reporting.pdf")
 }\if{html}{\out{</div>}}
 }
 
 \section{Web tool}{
 
-\code{\link[=run_shiny_app]{run_shiny_app()}} launches a local web interface for filling out the
+\code{\link[=instar_app]{instar_app()}} launches a local web interface for filling out the
 framework with a live preview.
 }
 

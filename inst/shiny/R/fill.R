@@ -18,15 +18,15 @@
 #' Walks through the 18 framework items in canonical order, prompting for a
 #' value for each. Designed for use at the R or RStudio console. You can
 #' stop at any point with `quit`, save with `save path/to/file.csv`, and
-#' resume later by passing the saved file back in (via [load_items()]) or
+#' resume later by passing the saved file back in (via [read_items()]) or
 #' the returned object directly.
 #'
 #' Each prompt shows the item's domain, name, and description so you do
 #' not need to remember `item_id`s or indexing.
 #'
 #' @param items A data frame of items to start from. If `NULL`, starts from
-#'   a blank [framework_template()]. Pass an existing fill in to resume.
-#' @param study_type Passed to [framework_template()] if `items` is `NULL`.
+#'   a blank [instar_template()]. Pass an existing fill in to resume.
+#' @param study_type Passed to [instar_template()] if `items` is `NULL`.
 #' @param save_to Optional path to save to on `save` (without an argument)
 #'   and on normal exit.
 #'
@@ -35,36 +35,36 @@
 #' @examples
 #' \dontrun{
 #' # Start fresh
-#' items <- fill_items()
+#' items <- instar_fill()
 #'
 #' # Save partway and resume later
-#' items <- fill_items(save_to = "my_study.csv")
+#' items <- instar_fill(save_to = "my_study.csv")
 #' # ...later...
-#' items <- fill_items(load_items("my_study.csv"), save_to = "my_study.csv")
+#' items <- instar_fill(read_items("my_study.csv"), save_to = "my_study.csv")
 #' }
 #'
 #' @export
-fill_items <- function(items = NULL,
+instar_fill <- function(items = NULL,
                        study_type = c("both", "lab", "field"),
                        save_to = NULL) {
   if (!interactive()) {
-    stop("fill_items() requires an interactive R session.", call. = FALSE)
+    stop("instar_fill() requires an interactive R session.", call. = FALSE)
   }
   if (is.null(items)) {
     study_type <- match.arg(study_type)
-    items <- framework_template(study_type)
+    items <- instar_template(study_type)
   } else {
-    validate_items(items)
+    items <- validate_items(items)
   }
 
   # Build the working table with description metadata for prompts.
   full <- merge(
-    framework[, c("order", "domain", "item_id", "item", "description")],
-    items[, c("item_id", "value")],
+    instar_items[, c("order", "domain", "item_id", "item", "description")],
+    as.data.frame(items)[, c("item_id", "value", "status")],
     by = "item_id", all.x = TRUE, sort = FALSE
   )
   full <- full[order(full$order), , drop = FALSE]
-  full$value[is.na(full$value)] <- ""
+  full$status <- .as_status(full$status)
 
   .show_help()
 
@@ -77,11 +77,8 @@ fill_items <- function(items = NULL,
     cat(sprintf("\n[%d/%d] %s -- %s\n", i, nrow(full), row$domain, row$item))
     cat(paste(strwrap(row$description, width = 76, prefix = "    "),
               collapse = "\n"), "\n\n", sep = "")
-    if (nzchar(row$value)) {
-      cat("  current: ", row$value, "\n", sep = "")
-    } else {
-      cat("  current: (empty)\n")
-    }
+    cat("  current: ", .describe_current(row$value, row$status), "\n",
+        sep = "")
 
     inp <- readline("  value > ")
     inp_trim <- trimws(inp)
@@ -95,15 +92,23 @@ fill_items <- function(items = NULL,
     if (cmd == "show")               { .print_state(full); next }
     if (cmd == "quit" || cmd == "q") { break }
     if (cmd == "back" || cmd == "b") { i <- max(1L, i - 1L); next }
-    if (cmd == "skip" || cmd == "s") { full$value[i] <- ""; i <- i + 1L; next }
-    if (cmd == "na" || cmd == "n/a") { full$value[i] <- "NA"; i <- i + 1L; next }
+    if (cmd == "skip" || cmd == "s") {
+      full$value[i]  <- NA_character_
+      full$status[i] <- "not_reported"
+      i <- i + 1L; next
+    }
+    if (cmd == "na" || cmd == "n/a") {
+      full$value[i]  <- NA_character_
+      full$status[i] <- "not_applicable"
+      i <- i + 1L; next
+    }
     if (startsWith(cmd, "save")) {
       parts <- strsplit(inp_trim, "\\s+", perl = TRUE)[[1]]
       path <- if (length(parts) > 1) parts[2] else last_path
       if (is.null(path) || !nzchar(path)) {
         cat("  ! No save path. Use: save my_study.csv\n")
       } else {
-        save_items(full[, c("item_id", "value")], path)
+        write_items(full[, c("item_id", "value", "status")], path)
         last_path <- path
         cat(sprintf("  saved -> %s\n", path))
       }
@@ -111,13 +116,14 @@ fill_items <- function(items = NULL,
     }
 
     # Treat anything else as the new value
-    full$value[i] <- inp_trim
+    full$value[i]  <- inp_trim
+    full$status[i] <- "reported"
     i <- i + 1L
   }
 
-  out <- full[, c("item_id", "value")]
+  out <- new_instar_items(full[, c("item_id", "value", "status")])
   if (!is.null(last_path) && nzchar(last_path)) {
-    save_items(out, last_path)
+    write_items(out, last_path)
     cat(sprintf("\nSaved to %s\n", last_path))
   }
   .print_summary(out)
@@ -139,71 +145,70 @@ fill_items <- function(items = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' items <- edit_item(items, "subjects_taxon")
-#' items <- edit_item(items)   # numbered menu
+#' items <- instar_edit(items, "subjects_taxon")
+#' items <- instar_edit(items)   # numbered menu
 #' }
 #'
 #' @export
-edit_item <- function(items, item_id = NULL) {
+instar_edit <- function(items, item_id = NULL) {
   if (!interactive()) {
-    stop("edit_item() requires an interactive R session.", call. = FALSE)
+    stop("instar_edit() requires an interactive R session.", call. = FALSE)
   }
-  validate_items(items)
+  items <- validate_items(items)
 
   if (is.null(item_id)) {
     cat("Pick an item to edit:\n")
     last_domain <- ""
-    for (i in seq_len(nrow(framework))) {
-      if (framework$domain[i] != last_domain) {
-        cat(sprintf("\n  %s\n", framework$domain[i]))
-        last_domain <- framework$domain[i]
+    for (i in seq_len(nrow(instar_items))) {
+      if (instar_items$domain[i] != last_domain) {
+        cat(sprintf("\n  %s\n", instar_items$domain[i]))
+        last_domain <- instar_items$domain[i]
       }
-      cat(sprintf("    %2d. %s\n", i, framework$item[i]))
+      cat(sprintf("    %2d. %s\n", i, instar_items$item[i]))
     }
     sel <- readline("\n  number > ")
     n <- suppressWarnings(as.integer(trimws(sel)))
-    if (is.na(n) || n < 1 || n > nrow(framework)) {
+    if (is.na(n) || n < 1 || n > nrow(instar_items)) {
       cat("  ! Invalid choice. No change.\n")
       return(invisible(items))
     }
-    item_id <- framework$item_id[n]
+    item_id <- instar_items$item_id[n]
   }
-  if (!item_id %in% framework$item_id) {
+  if (!item_id %in% instar_items$item_id) {
     stop("Unknown item_id: ", item_id, call. = FALSE)
   }
 
-  meta <- framework[framework$item_id == item_id, ]
+  meta <- instar_items[instar_items$item_id == item_id, ]
   cat(sprintf("\n[%s] %s\n", meta$domain, meta$item))
   cat(paste(strwrap(meta$description, width = 76, prefix = "    "),
             collapse = "\n"), "\n\n", sep = "")
 
-  current <- items$value[items$item_id == item_id]
-  if (length(current) == 0L || is.na(current)) current <- ""
-  if (nzchar(current)) {
-    cat("  current: ", current, "\n", sep = "")
-  } else {
-    cat("  current: (empty)\n")
-  }
+  cur_val <- items$value[items$item_id == item_id]
+  cur_st  <- items$status[items$item_id == item_id]
+  if (length(cur_val) == 0L) { cur_val <- NA_character_; cur_st <- "not_reported" }
+  cat("  current: ", .describe_current(cur_val, cur_st), "\n", sep = "")
   cat("  ([enter] keeps current, 'skip' clears, 'NA' marks not applicable)\n")
   inp <- readline("  new value > ")
   inp_trim <- trimws(inp)
 
   if (identical(inp, "")) return(invisible(items))
-  new_val <- if (tolower(inp_trim) == "skip") {
-    ""
+  if (tolower(inp_trim) == "skip") {
+    new_val <- NA_character_; new_st <- "not_reported"
   } else if (tolower(inp_trim) %in% c("na", "n/a")) {
-    "NA"
+    new_val <- NA_character_; new_st <- "not_applicable"
   } else {
-    inp_trim
+    new_val <- inp_trim;      new_st <- "reported"
   }
 
   if (item_id %in% items$item_id) {
-    items$value[items$item_id == item_id] <- new_val
+    items$value[items$item_id == item_id]  <- new_val
+    items$status[items$item_id == item_id] <- new_st
   } else {
-    items <- rbind(
-      items[, c("item_id", "value")],
-      data.frame(item_id = item_id, value = new_val, stringsAsFactors = FALSE)
-    )
+    items <- new_instar_items(rbind(
+      as.data.frame(items)[, c("item_id", "value", "status")],
+      data.frame(item_id = item_id, value = new_val, status = new_st,
+                 stringsAsFactors = FALSE)
+    ))
   }
   cat("  updated.\n")
   invisible(items)
@@ -213,7 +218,7 @@ edit_item <- function(items, item_id = NULL) {
 #' Save items to a CSV file
 #'
 #' Writes a CSV with at minimum `item_id` and `value` columns, suitable for
-#' loading later with [load_items()].
+#' loading later with [read_items()].
 #'
 #' @param items A data frame of items.
 #' @param path Output file path.
@@ -222,13 +227,15 @@ edit_item <- function(items, item_id = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#' save_items(items, "my_study_items.csv")
+#' write_items(items, "my_study_items.csv")
 #' }
 #'
 #' @export
-save_items <- function(items, path) {
-  validate_items(items)
-  out <- items[, c("item_id", "value"), drop = FALSE]
+write_items <- function(items, path) {
+  items <- validate_items(items)
+  out <- as.data.frame(items)[, c("item_id", "value", "status"), drop = FALSE]
+  out$value <- ifelse(is.na(out$value), "", out$value)
+  out$status <- as.character(out$status)
   utils::write.csv(out, path, row.names = FALSE)
   invisible(path)
 }
@@ -239,7 +246,7 @@ save_items <- function(items, path) {
 #' Writes a CSV file with one row per framework item, with `item_id`,
 #' `item`, `domain`, `description`, and an empty `value` column. Hand
 #' this to a collaborator, fill it in in Excel or any spreadsheet, then
-#' load it back with [load_items()]. Extra columns (`item`, `domain`,
+#' load it back with [read_items()]. Extra columns (`item`, `domain`,
 #' `description`) are ignored on load and exist only as in-spreadsheet
 #' reminders of what each item asks for.
 #'
@@ -252,21 +259,22 @@ save_items <- function(items, path) {
 #'
 #' @examples
 #' \dontrun{
-#' save_template("my_study_template.csv", study_type = "field")
+#' write_template("my_study_template.csv", study_type = "field")
 #' # ...fill in the value column in Excel...
-#' items <- load_items("my_study_template.csv")
+#' items <- read_items("my_study_template.csv")
 #' }
 #'
 #' @export
-save_template <- function(path, study_type = c("both", "lab", "field")) {
+write_template <- function(path, study_type = c("both", "lab", "field")) {
   study_type <- match.arg(study_type)
-  tmpl <- framework_template(study_type)
+  tmpl <- instar_template(study_type)
   out <- data.frame(
     item_id     = tmpl$item_id,
     item        = tmpl$item,
     domain      = tmpl$domain,
     description = tmpl$description,
-    value       = tmpl$value,
+    value       = ifelse(is.na(tmpl$value), "", tmpl$value),
+    status      = as.character(tmpl$status),
     stringsAsFactors = FALSE
   )
   utils::write.csv(out, path, row.names = FALSE)
@@ -275,43 +283,30 @@ save_template <- function(path, study_type = c("both", "lab", "field")) {
 }
 
 
-#' Pretty-print the state of items, grouped by domain
-#'
-#' Useful for taking stock partway through a fill, or for printing the
-#' current state before deciding which items to edit. Reported items show
-#' as `●`, items marked NA as `-`, and empty items as `o`.
-#'
-#' @param items A data frame of items.
-#'
-#' @return The items, invisibly.
-#'
-#' @examples
-#' \dontrun{
-#' show_items(items)
-#' }
-#'
-#' @export
-show_items <- function(items) {
-  validate_items(items)
-  .print_state(merge_for_state(items))
-  invisible(items)
-}
-
-
 # ---------- internal helpers ----------
+
+.describe_current <- function(value, status) {
+  switch(as.character(status),
+         not_applicable = "(not applicable)",
+         not_reported   = "(empty)",
+         if (is.na(value)) "(empty)" else value)
+}
 
 .show_help <- function() cat(paste(.HELP_TEXT, collapse = "\n"), "\n", sep = "")
 
 merge_for_state <- function(items) {
+  items <- new_instar_items(items)
   full <- merge(
-    framework[, c("order", "domain", "item", "item_id")],
-    items[, c("item_id", "value")],
+    instar_items[, c("order", "domain", "item", "item_id")],
+    as.data.frame(items)[, c("item_id", "value", "status")],
     by = "item_id", all.x = TRUE, sort = FALSE
   )
   full <- full[order(full$order), , drop = FALSE]
-  full$value[is.na(full$value)] <- ""
+  full$status <- .as_status(full$status)
   full
 }
+
+.STATUS_GLYPH <- c(reported = "*", not_reported = "o", not_applicable = "-")
 
 .print_state <- function(full) {
   last_domain <- ""
@@ -320,9 +315,10 @@ merge_for_state <- function(items) {
       cat(sprintf("\n  %s\n", full$domain[i]))
       last_domain <- full$domain[i]
     }
-    status <- if (full$value[i] == "") "o" else if (full$value[i] == "NA") "-" else "*"
-    cat(sprintf("    %s  %s\n", status, full$item[i]))
-    if (nzchar(full$value[i]) && full$value[i] != "NA") {
+    glyph <- .STATUS_GLYPH[[as.character(full$status[i])]]
+    cat(sprintf("    %s  %s\n", glyph, full$item[i]))
+    if (identical(as.character(full$status[i]), "reported") &&
+        !is.na(full$value[i])) {
       lines <- strwrap(full$value[i], width = 70, prefix = "         ")
       cat(paste(lines, collapse = "\n"), "\n", sep = "")
     }
@@ -331,9 +327,7 @@ merge_for_state <- function(items) {
 }
 
 .print_summary <- function(items) {
-  n_rep <- sum(items$value != "" & items$value != "NA")
-  n_na  <- sum(items$value == "NA")
-  n_emp <- sum(items$value == "")
+  cov <- .coverage(new_instar_items(items)$status)
   cat(sprintf("\nDone. %d items filled, %d not applicable, %d blank.\n",
-              n_rep, n_na, n_emp))
+              cov$reported, cov$not_applicable, cov$not_reported))
 }

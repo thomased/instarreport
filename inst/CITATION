@@ -1,0 +1,47 @@
+citHeader(
+  "To cite instarreport in publications, please cite the INSTAR paper.",
+  "If you also want to cite the software specifically, cite both."
+)
+
+bibentry(
+  bibtype  = "Article",
+  key      = "white2026instar",
+  title    = "{INSTAR}: Reporting items for invertebrate welfare in research",
+  author   = c(
+    person("Thomas E.", "White"),
+    person("Kate", "Lynch"),
+    person("Adam G.", "Hart"),
+    person("Tanya", "Latty"),
+    person("Caitlyn Y.", "Forster"),
+    person("Jonathan", "Amory"),
+    person("Kate", "Umbers"),
+    person("Eleanor", "Drinkwater")
+  ),
+  year     = "2026",
+  journal  = "Manuscript in preparation",
+  textVersion = paste(
+    "White, T. E., Lynch, K., Hart, A. G., Latty, T., Forster, C. Y.,",
+    "Amory, J., Umbers, K., & Drinkwater, E. (2026).",
+    "INSTAR: Reporting items for invertebrate welfare in research.",
+    "Manuscript in preparation."
+  )
+)
+
+bibentry(
+  bibtype  = "Manual",
+  key      = "instarreport-pkg",
+  title    = "{instarreport}: {INSTAR} reporting of invertebrate welfare in research",
+  author   = c(
+    person("Thomas E.", "White"),
+    person("Eleanor", "Drinkwater")
+  ),
+  year     = "2026",
+  note     = "R package version 0.2.0",
+  url      = "https://github.com/thomased/instarreport",
+  textVersion = paste(
+    "White, T. E., & Drinkwater, E. (2026).",
+    "instarreport: INSTAR reporting of invertebrate welfare in research.",
+    "R package version 0.2.0.",
+    "https://github.com/thomased/instarreport"
+  )
+)

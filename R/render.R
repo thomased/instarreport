@@ -1,6 +1,6 @@
-# Figure-building internals. The public API is invert_report().
+# Figure-building internals. The public API is instar_report().
 
-#' Wrap text to a width, returning a single string with embedded "\n"
+#' Wrap text to a width, returning a single string with embedded newlines
 #'
 #' Drop-in replacement for stringr::str_wrap using base strwrap.
 #' @keywords internal
@@ -25,7 +25,7 @@
 
 # Vertical budgets, all expressed in "body line-heights" so the
 # whole figure scales together. One body line ~= 0.18" in the saved
-# figure (see save_report()). Header/footer/strip text is larger than
+# figure (see instar_save()). Header/footer/strip text is larger than
 # body text, so their line budgets are bigger than they look on paper.
 # Card budgets are tuned so the patchwork allocation matches the actual
 # rendered title + content height; over-budgeting creates trailing
@@ -229,7 +229,7 @@
     ggplot2::annotate("text", x = 0, y = 0.5,
                       label = paste0(
                         "Empty fields = item not reported    ",
-                        "·    \"Not applicable\" = not relevant to ",
+                        "\u00b7    \"Not applicable\" = not relevant to ",
                         "this study"
                       ),
                       size = 2.8, hjust = 0, vjust = 0.5,
@@ -250,7 +250,7 @@
     ggplot2::theme(plot.margin = ggplot2::margin(0, 2, 0, 2, "pt"))
 
   # Stash the natural total height (in line-units) on the figure so
-  # save_report() can pick a sensible default page height.
+  # instar_save() can pick a sensible default page height.
   attr(fig, "natural_lines") <- .HEADER_LINES + col_total + .FOOTER_LINES
   fig
 }

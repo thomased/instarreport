@@ -44,7 +44,7 @@ id_map <- c(
   "Welfare and 3Rs statement"                           = "ethics_statement"
 )
 
-framework <- raw %>%
+instar_items <- raw %>%
   mutate(
     item_id = unname(id_map[item]),
     group = ifelse(domain %in% welfare_set, "welfare", "foundation"),
@@ -53,7 +53,7 @@ framework <- raw %>%
   select(order, group, domain, item_id, item, description, lab, field) %>%
   as_tibble()
 
-stopifnot(!any(is.na(framework$item_id)))
-stopifnot(!any(duplicated(framework$item_id)))
+stopifnot(!any(is.na(instar_items$item_id)))
+stopifnot(!any(duplicated(instar_items$item_id)))
 
-usethis::use_data(framework, overwrite = TRUE)
+usethis::use_data(instar_items, overwrite = TRUE)

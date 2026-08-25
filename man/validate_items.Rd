@@ -2,28 +2,31 @@
 % Please edit documentation in R/validate.R
 \name{validate_items}
 \alias{validate_items}
-\title{Validate user inputs to invert_report()}
+\title{Validate user inputs to instar_report()}
 \usage{
-validate_items(items, framework_df = instarreport::framework, strict = TRUE)
+validate_items(items, items_ref = instarreport::instar_items, strict = TRUE)
 }
 \arguments{
 \item{items}{A data frame with at least \code{item_id} and \code{value} columns.}
 
-\item{framework_df}{The framework to validate against. Defaults to
-\link{framework}.}
+\item{items_ref}{The framework to validate against. Defaults to
+\link{instar_items}.}
 
 \item{strict}{Logical. If \code{TRUE} (the default), unknown \code{item_id}s
 raise an error. If \code{FALSE}, they are warned about and dropped.}
 }
 \value{
-Invisibly, the validated items data frame. Errors if validation fails.
+The validated items table, with the \code{instar_items} class and a
+canonical \code{status} column. Errors if validation fails.
 }
 \description{
-Checks that the items data frame is well-formed and that every
-\code{item_id} it references exists in \link{framework}.
+Checks that the items table is well-formed, that every \code{item_id} it
+references exists in \link{instar_items}, and that any \code{status} column uses
+the canonical levels. Returns the table in canonical form, with
+\code{status} derived from \code{value} if it was absent.
 }
 \examples{
-tmpl <- framework_template()
+tmpl <- instar_template()
 validate_items(tmpl)
 
 }

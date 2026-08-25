@@ -10,7 +10,7 @@ library(shiny)
 local({
   # Source the bundled R files into globalenv. The same R/ directory
   # ships inside inst/shiny/ both when the app is run locally via
-  # instarreport::run_shiny_app() (working directory points at the
+  # instarreport::instar_app() (working directory points at the
   # installed package's inst/shiny) and when it's run under shinylive
   # (where the directory is bundled into the static export). Sourcing
   # always avoids any library() call for the package — which is
@@ -25,7 +25,7 @@ local({
 
 use_bslib <- requireNamespace("bslib", quietly = TRUE)
 
-domains_ordered <- unique(framework$domain)
+domains_ordered <- unique(instar_items$domain)
 
 # Internal helper
 `%||%` <- function(a, b) if (is.null(a) || is.na(a) || identical(a, "")) b else a
@@ -46,7 +46,7 @@ sidebar_content <- function() {
     tags$hr(),
     # Build the item inputs ONCE on app start.
     lapply(domains_ordered, function(dom) {
-      dom_items <- framework[framework$domain == dom, , drop = FALSE]
+      dom_items <- instar_items[instar_items$domain == dom, , drop = FALSE]
       controls <- lapply(seq_len(nrow(dom_items)), function(i) {
         id    <- dom_items$item_id[i]
         label <- dom_items$item[i]
@@ -102,18 +102,27 @@ server <- function(input, output, session) {
   # Read all item inputs into a data frame. This reactive depends on every
   # val_<id> input, so it invalidates whenever any text area changes.
   current_items <- reactive({
-    vals <- vapply(framework$item_id, function(id) {
+    vals <- vapply(instar_items$item_id, function(id) {
       v <- input[[paste0("val_", id)]]
       if (is.null(v)) "" else v
     }, character(1))
-    data.frame(item_id = framework$item_id, value = vals,
+    data.frame(item_id = instar_items$item_id, value = vals,
                stringsAsFactors = FALSE)
   })
+
+  # The text areas are free text, so a template row has to be flattened
+  # back to the string convention the boxes use: "NA" for not-applicable,
+  # empty for not-reported. new_instar_items() reverses this on the way in.
+  tmpl_string <- function(tmpl, i) {
+    if (identical(as.character(tmpl$status[i]), "not_applicable")) return("NA")
+    if (is.na(tmpl$value[i])) return("")
+    tmpl$value[i]
+  }
 
   # Push study-type defaults into the existing inputs when the dropdown
   # changes (or on initial load).
   observeEvent(input$study_type, ignoreInit = FALSE, {
-    tmpl <- framework_template(input$study_type)
+    tmpl <- instar_template(input$study_type)
     for (i in seq_len(nrow(tmpl))) {
       id <- tmpl$item_id[i]
       # Only overwrite items that are currently empty, so the user doesn't
@@ -121,17 +130,17 @@ server <- function(input, output, session) {
       current_val <- isolate(input[[paste0("val_", id)]]) %||% ""
       if (current_val == "" || current_val == "NA") {
         updateTextAreaInput(session, paste0("val_", id),
-                            value = tmpl$value[i])
+                            value = tmpl_string(tmpl, i))
       }
     }
   })
 
   # Reset all inputs to template defaults
   observeEvent(input$apply_template, {
-    tmpl <- framework_template(input$study_type)
+    tmpl <- instar_template(input$study_type)
     for (i in seq_len(nrow(tmpl))) {
       updateTextAreaInput(session, paste0("val_", tmpl$item_id[i]),
-                          value = tmpl$value[i])
+                          value = tmpl_string(tmpl, i))
     }
   })
 
@@ -144,7 +153,7 @@ server <- function(input, output, session) {
       journal = nzchar_or(input$paper_journal, NULL)
     )
     tryCatch(
-      invert_report(paper = paper, items = current_items(), strict = FALSE),
+      instar_report(paper = paper, items = current_items(), strict = FALSE),
       error = function(e) {
         showNotification(paste("Error building figure:",
                                conditionMessage(e)),
@@ -154,11 +163,8 @@ server <- function(input, output, session) {
     )
   })
 
-  # Render the figure. CRITICAL: strip the `invert_report` S3 class so the
-  # default patchwork print method draws to the graphics device. If we
-  # leave the class attached, print() dispatches to print.invert_report,
-  # which only writes a coverage summary to the console — and the preview
-  # ends up blank.
+  # Render the figure. instar_report() returns data, so go through
+  # autoplot() to get the patchwork composition and print that.
   #
   # Safari is sensitive to two things here: (1) the default `res` value
   # was too high and pushed the rendered bitmap past Safari's canvas
@@ -169,15 +175,14 @@ server <- function(input, output, session) {
     input$study_type  # force a non-NULL reactive dep for Safari
     rep <- current_report()
     if (is.null(rep)) return(NULL)
-    class(rep) <- setdiff(class(rep), "invert_report")
-    print(rep)
+    print(autoplot(rep))
   }, bg = "white")
 
   output$download_pdf <- downloadHandler(
     filename = function() "welfare_reporting.pdf",
     content = function(file) {
       rep <- current_report()
-      if (!is.null(rep)) save_report(rep, file)
+      if (!is.null(rep)) instar_save(rep, file)
     }
   )
 
@@ -185,7 +190,7 @@ server <- function(input, output, session) {
     filename = function() "welfare_reporting.png",
     content = function(file) {
       rep <- current_report()
-      if (!is.null(rep)) save_report(rep, file)
+      if (!is.null(rep)) instar_save(rep, file)
     }
   )
 }

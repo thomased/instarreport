@@ -1,22 +1,25 @@
-#' Validate user inputs to invert_report()
+#' Validate user inputs to instar_report()
 #'
-#' Checks that the items data frame is well-formed and that every
-#' `item_id` it references exists in [framework].
+#' Checks that the items table is well-formed, that every `item_id` it
+#' references exists in [instar_items], and that any `status` column uses
+#' the canonical levels. Returns the table in canonical form, with
+#' `status` derived from `value` if it was absent.
 #'
 #' @param items A data frame with at least `item_id` and `value` columns.
-#' @param framework_df The framework to validate against. Defaults to
-#'   [framework].
+#' @param items_ref The framework to validate against. Defaults to
+#'   [instar_items].
 #' @param strict Logical. If `TRUE` (the default), unknown `item_id`s
 #'   raise an error. If `FALSE`, they are warned about and dropped.
 #'
-#' @return Invisibly, the validated items data frame. Errors if validation fails.
+#' @return The validated items table, with the `instar_items` class and a
+#'   canonical `status` column. Errors if validation fails.
 #'
 #' @examples
-#' tmpl <- framework_template()
+#' tmpl <- instar_template()
 #' validate_items(tmpl)
 #'
 #' @export
-validate_items <- function(items, framework_df = instarreport::framework,
+validate_items <- function(items, items_ref = instarreport::instar_items,
                            strict = TRUE) {
   if (!is.data.frame(items)) {
     stop("`items` must be a data frame.", call. = FALSE)
@@ -27,14 +30,13 @@ validate_items <- function(items, framework_df = instarreport::framework,
     stop("`items` is missing required column(s): ",
          paste(missing_cols, collapse = ", "), call. = FALSE)
   }
-  items$value[is.na(items$value)] <- ""
-  unknown <- setdiff(items$item_id, framework_df$item_id)
+  unknown <- setdiff(items$item_id, items_ref$item_id)
   if (length(unknown) > 0) {
     msg <- paste0("Unknown item_id(s): ", paste(unknown, collapse = ", "),
-                  ". Run `framework$item_id` to see the canonical list.")
+                  ". Run `instar_items$item_id` to see the canonical list.")
     if (strict) stop(msg, call. = FALSE) else {
       warning(msg, call. = FALSE)
-      items <- items[items$item_id %in% framework_df$item_id, , drop = FALSE]
+      items <- items[items$item_id %in% items_ref$item_id, , drop = FALSE]
     }
   }
   duplicated_ids <- items$item_id[duplicated(items$item_id)]
@@ -42,7 +44,7 @@ validate_items <- function(items, framework_df = instarreport::framework,
     stop("Duplicate item_id(s) in `items`: ",
          paste(unique(duplicated_ids), collapse = ", "), call. = FALSE)
   }
-  invisible(as.data.frame(items, stringsAsFactors = FALSE))
+  new_instar_items(items)
 }
 
 

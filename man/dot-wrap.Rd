@@ -2,7 +2,7 @@
 % Please edit documentation in R/render.R
 \name{.wrap}
 \alias{.wrap}
-\title{Wrap text to a width, returning a single string with embedded "\n"}
+\title{Wrap text to a width, returning a single string with embedded newlines}
 \usage{
 .wrap(x, width = 50)
 }

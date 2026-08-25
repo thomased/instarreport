@@ -1,5 +1,5 @@
 test_that("validate_items accepts a fresh template", {
-  expect_silent(validate_items(framework_template()))
+  expect_silent(validate_items(instar_template()))
 })
 
 test_that("validate_items errors on missing columns", {

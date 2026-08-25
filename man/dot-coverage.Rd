@@ -2,18 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{.coverage}
 \alias{.coverage}
-\title{Compute simple coverage summary}
+\title{Compute a coverage summary from a status vector}
 \usage{
-.coverage(items_with_status)
+.coverage(status)
 }
 \arguments{
-\item{items_with_status}{A data frame containing a \code{status} column with
-values in \code{c("reported", "missing", "na")}.}
+\item{status}{A factor or character vector of item statuses.}
 }
 \value{
-A list with counts and a percentage of applicable items reported.
+A list with counts and the percentage of applicable items
+reported. Not-applicable items are excluded from the denominator.
 }
 \description{
-Compute simple coverage summary
+Compute a coverage summary from a status vector
 }
 \keyword{internal}
