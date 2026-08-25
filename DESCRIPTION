@@ -30,6 +30,7 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     vdiffr,
+    covr,
     shiny,
     bslib,
     readr

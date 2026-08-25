@@ -1,5 +1,11 @@
 # instarreport
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/thomased/instarreport/graph/badge.svg)](https://app.codecov.io/gh/thomased/instarreport)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
 A small R toolkit implementing **INSTAR** (**IN**vertebrate **S**tandards
 for **T**reatment **A**nd **R**eporting), an 18-item reporting framework
 for invertebrate welfare in research (White et al., in prep). The
