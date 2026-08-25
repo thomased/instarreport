@@ -146,6 +146,20 @@ test_that("every bundled R file parses", {
 # Drives the real app in a headless browser: load it, upload a filled
 # INSTAR.csv, and confirm the preview renders rather than erroring. This
 # is the test that would have caught the bare autoplot() bug.
+#
+# shinytest2 must stay declared in Suggests: R CMD check inspects test
+# files for `::` calls and raises a WARNING for any package not declared,
+# which would block a CRAN submission.
+#
+# The cost of declaring it is that CI installs chromote, which needs a
+# `chromium` system package. Ubuntu 24.04 has none in its main archive,
+# so pak adds the third-party xtradeb PPA -- which has failed at least
+# once when Launchpad 500'd fetching its signing key. If that recurs
+# often, the fix is to pin the CI dependency set in R-CMD-check.yaml
+# rather than to undeclare the package here.
+#
+# To run this test locally:  install.packages("shinytest2")
+# It skips cleanly when absent, which is the state on a fresh checkout.
 
 test_that("the app loads, accepts an upload, and renders a preview", {
   skip_if_not_installed("shinytest2")

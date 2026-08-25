@@ -1,5 +1,7 @@
 # instarreport
 
+**https://instar-statement.org**
+
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/thomased/instarreport/graph/badge.svg)](https://app.codecov.io/gh/thomased/instarreport)
@@ -27,10 +29,14 @@ ROSES flow diagrams for evidence synthesis.
 
 ## Quick start: no installation
 
-Open the web tool at **https://thomas-white.shinyapps.io/instar/**. You
+Open the web tool at **https://instar-statement.org/app/**. You
 can either fill the items in the browser and download both the figure and
 the completed `INSTAR.csv`, or download the blank `INSTAR.csv`, fill it in
 a spreadsheet, and upload it to get the figure back.
+
+(A second copy runs at https://thomas-white.shinyapps.io/instar/. Both
+serve the same app; the shinyapps.io one is a full R session, the one
+above runs entirely in your browser.)
 
 Everything below is the R package, for scripted or reproducible use.
 
@@ -179,7 +185,7 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 
 ## Web tool
 
-**https://thomas-white.shinyapps.io/instar/** — no installation required.
+**https://instar-statement.org/app/** — no installation required.
 Fill the items in the browser with a live preview, or upload a filled
 `INSTAR.csv` to render it. Downloads the figure (PDF or PNG) and the
 completed `INSTAR.csv`.
@@ -299,7 +305,7 @@ And the package directly:
 
 > White, T. E., & Drinkwater, E. (2026). `instarreport`: INSTAR reporting
 > of invertebrate welfare in research. R package version 0.2.0.
-> https://github.com/thomased/instarreport
+> https://instar-statement.org/
 
 `citation("instarreport")` prints both.
 

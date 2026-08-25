@@ -329,4 +329,4 @@ instar_app()
 The Shiny app lets you fill in each framework item interactively with a
 live preview, or upload a filled `INSTAR.csv` to render it. It downloads
 the figure (PDF or PNG) and the completed `INSTAR.csv`. A hosted copy is
-at <https://thomas-white.shinyapps.io/instar/>, needing no installation.
+at <https://instar-statement.org/app/>, needing no installation.

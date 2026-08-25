@@ -37,11 +37,11 @@ bibentry(
   ),
   year     = "2026",
   note     = "R package version 0.2.0",
-  url      = "https://github.com/thomased/instarreport",
+  url      = "https://instar-statement.org/",
   textVersion = paste(
     "White, T. E., & Drinkwater, E. (2026).",
     "instarreport: INSTAR reporting of invertebrate welfare in research.",
     "R package version 0.2.0.",
-    "https://github.com/thomased/instarreport"
+    "https://instar-statement.org/"
   )
 )
