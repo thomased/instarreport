@@ -32,7 +32,7 @@ validate_items <- function(items, items_ref = instar_items,
   }
   # Reserved metadata ids are stripped by read_items(), but tolerate them
   # here so a hand-built table carrying them does not trip the check.
-  unknown <- setdiff(items$item_id, c(items_ref$item_id, .PAPER_FIELDS))
+  unknown <- setdiff(items$item_id, c(items_ref$item_id, .RESERVED_FIELDS))
   if (length(unknown) > 0) {
     msg <- paste0("Unknown item_id(s): ", paste(unknown, collapse = ", "),
                   ". Run `instar_items$item_id` to see the canonical list.")

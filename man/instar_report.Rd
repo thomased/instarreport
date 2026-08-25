@@ -27,7 +27,8 @@ an error. If \code{FALSE}, they are warned about and ignored.}
 \value{
 An object of class \code{instar_report}: a list with elements
 \code{paper}, \code{items} (one row per framework item, with \code{value} and
-\code{status}), \code{coverage}, and \code{value_wrap}.
+\code{status}), \code{coverage}, \code{version} (the framework version the items
+declared, or \code{NA}), and \code{value_wrap}.
 }
 \description{
 Joins a study's filled-in items against the canonical \link{instar_items}

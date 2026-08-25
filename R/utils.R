@@ -48,6 +48,39 @@
 )
 
 
+#' Current version of the INSTAR framework
+#'
+#' The version of the item set defined in [instar_items]. Stamped into
+#' every sheet written by [write_template()] and [write_report()], so a
+#' deposited file records which framework it was completed against.
+#'
+#' This matters most when auditing a corpus: if a later version adds,
+#' removes, or redefines an item, coverage figures computed across a
+#' mixed-version corpus are not comparable. An item absent from half the
+#' sheets because it did not exist yet is not the same as an item those
+#' studies failed to report. [read_instar()] warns when a corpus mixes
+#' versions.
+#'
+#' @keywords internal
+.INSTAR_VERSION <- "1.0"
+
+
+#' Reserved item id carrying the framework version
+#' @keywords internal
+.VERSION_FIELD <- "instar_version"
+
+
+#' Content of the framework-version row
+#' @keywords internal
+.VERSION_ROW <- c(
+  "INSTAR framework version",
+  paste(
+    "Version of the INSTAR framework this sheet was written against.",
+    "Filled in automatically; please do not edit or delete this row."
+  )
+)
+
+
 #' Reserved item ids carrying paper metadata
 #'
 #' The fillable CSV template carries the paper's own details as four
@@ -58,6 +91,16 @@
 #'
 #' @keywords internal
 .PAPER_FIELDS <- c("title", "authors", "journal", "doi")
+
+
+#' Every reserved item id, in the order they appear in the sheet
+#'
+#' Rows the sheet carries that are not framework items: the usage note,
+#' the framework version, and the paper's own details. [read_items()]
+#' peels all of them off before returning items.
+#'
+#' @keywords internal
+.RESERVED_FIELDS <- c(.HELP_FIELDS, .VERSION_FIELD, .PAPER_FIELDS)
 
 
 #' Human-facing labels for the reserved metadata rows

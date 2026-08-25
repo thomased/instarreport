@@ -50,6 +50,15 @@ save_figure(report, "fig_S1_welfare_reporting.pdf")
 }\if{html}{\out{</div>}}
 }
 
+\section{Auditing many studies}{
+
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{corpus <- read_instar("supplements/")
+audit  <- instar_audit(corpus)
+summary(audit, by = "journal")
+}\if{html}{\out{</div>}}
+}
+
 \section{Web tool}{
 
 \code{\link[=instar_app]{instar_app()}} launches a local web interface for filling out the

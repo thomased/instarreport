@@ -1,5 +1,6 @@
 domain,item,item_id,description,lab,field,report
 How to use,How to fill this in,_how_to_use,"Write a sentence or two in the `report` column for each item your study reports; leave it blank if the study does not report it; write NA if the item does not apply. Do not edit the other columns, or add or remove rows. Upload the completed file at https://thomas-white.shinyapps.io/instar/ to generate the summary figure (save as CSV first if you are in a spreadsheet).",,,
+Framework,INSTAR framework version,instar_version,Version of the INSTAR framework this sheet was written against. Filled in automatically; please do not edit or delete this row.,,,1.0
 Paper details,Title,title,Title of the paper this report accompanies.,,,
 Paper details,Authors,authors,"Author list, as it appears on the paper.",,,
 Paper details,Journal or venue,journal,"Journal or venue, with volume and pages if known.",,,

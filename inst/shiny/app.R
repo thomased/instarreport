@@ -35,6 +35,30 @@ nzchar_or <- function(x, default) if (is.null(x) || !nzchar(x)) default else x
 # ---------- UI ----------
 sidebar_content <- function() {
   tagList(
+    tags$div(
+      style = paste(
+        "background:#f3f6f9; border-left:3px solid #2E5F8E;",
+        "padding:10px 12px; margin-bottom:14px;",
+        "font-size:0.88em; line-height:1.45;"
+      ),
+      tags$p(style = "margin:0 0 8px 0;",
+             tags$strong("Two ways to use this.")),
+      tags$p(style = "margin:0 0 6px 0;",
+             tags$strong("In the browser: "),
+             "fill in the fields below. The figure updates as you type. ",
+             "When you are done, download the figure and the completed ",
+             tags$code("INSTAR.csv"), "."),
+      tags$p(style = "margin:0 0 8px 0;",
+             tags$strong("In a spreadsheet: "),
+             "download the blank ", tags$code("INSTAR.csv"),
+             ", fill in the ", tags$code("report"),
+             " column in Excel or similar, save as CSV, then upload it ",
+             "here to get the figure."),
+      tags$p(style = "margin:0; color:#555;",
+             "For each item, write a sentence or two of what your study ",
+             "reports. Leave it blank if the study does not report it. ",
+             "Write ", tags$code("NA"), " if the item does not apply.")
+    ),
     fileInput("upload", "Load a filled INSTAR.csv",
               accept = c(".csv", "text/csv")),
     downloadButton("download_blank", "Download blank INSTAR.csv",
@@ -86,7 +110,7 @@ sidebar_content <- function() {
 
 ui <- if (use_bslib) {
   bslib::page_sidebar(
-    title = "Invertebrate welfare reporting",
+    title = "INSTAR: INvertebrate Standards for Treatment And Reporting",
     sidebar = bslib::sidebar(width = 440, sidebar_content()),
     bslib::card(
       bslib::card_header("Preview"),
@@ -95,7 +119,7 @@ ui <- if (use_bslib) {
   )
 } else {
   fluidPage(
-    titlePanel("Invertebrate welfare reporting"),
+    titlePanel("INSTAR: INvertebrate Standards for Treatment And Reporting"),
     sidebarLayout(
       sidebarPanel(width = 5, sidebar_content()),
       mainPanel(width = 7,

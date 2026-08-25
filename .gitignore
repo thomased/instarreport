@@ -45,3 +45,5 @@ vignettes/*.pdf
 *.knit.md
 
 *archive*
+/doc/
+/Meta/

@@ -12,7 +12,8 @@ read_items(path, ...)
 \item{...}{Additional arguments passed to \code{\link[utils:read.csv]{utils::read.csv()}}.}
 }
 \value{
-An \code{instar_items} table with \code{item_id}, \code{value}, and \code{status}.
+An \code{instar_items} table with \code{item_id}, \code{value}, and \code{status},
+carrying \code{paper} and \code{version} attributes.
 }
 \description{
 Reads a CSV file with at minimum an \code{item_id} and \code{value} column. If
@@ -21,6 +22,14 @@ status is derived from \code{value}, with \code{"NA"} or \code{"N/A"} read as
 not-applicable for compatibility with hand-edited templates. Blank
 cells are read as empty strings rather than \code{NA}, so that the literal
 text \code{"NA"} keeps its not-applicable meaning.
+}
+\details{
+Reserved rows are peeled off rather than returned as items: the usage
+note is dropped, the paper's details become a \code{paper} attribute, and
+the declared framework version becomes a \code{version} attribute (\code{NA} if
+the sheet predates versioning).
+
+To read many sheets at once, use \code{\link[=read_instar]{read_instar()}}.
 }
 \examples{
 \dontrun{

@@ -40,6 +40,13 @@
 #' save_figure(report, "fig_S1_welfare_reporting.pdf")
 #' ```
 #'
+#' @section Auditing many studies:
+#' ```r
+#' corpus <- read_instar("supplements/")
+#' audit  <- instar_audit(corpus)
+#' summary(audit, by = "journal")
+#' ```
+#'
 #' @section Web tool:
 #' [instar_app()] launches a local web interface for filling out the
 #' framework with a live preview.

@@ -9,7 +9,7 @@ test_that("instar_report returns data, not a plot", {
   )
   expect_s3_class(rep, "instar_report")
   expect_type(rep, "list")
-  expect_named(rep, c("paper", "items", "coverage", "value_wrap"))
+  expect_named(rep, c("paper", "items", "coverage", "version", "value_wrap"))
   expect_false(inherits(rep, "ggplot"))
   expect_false(inherits(rep, "patchwork"))
 })

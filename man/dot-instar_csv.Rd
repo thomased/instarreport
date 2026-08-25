@@ -4,12 +4,23 @@
 \alias{.instar_csv}
 \title{Build the INSTAR CSV as a data frame}
 \usage{
-.instar_csv(items = NULL, paper = NULL, study_type = c("both", "lab", "field"))
+.instar_csv(
+  items = NULL,
+  paper = NULL,
+  version = NULL,
+  study_type = c("both", "lab", "field")
+)
 }
 \arguments{
 \item{items}{An items table, or \code{NULL} for a blank sheet.}
 
 \item{paper}{Optional named list of paper details.}
+
+\item{version}{Framework version to stamp. If \code{NULL}, a version
+declared by \code{items} is preserved, and failing that the current
+\link{.INSTAR_VERSION} is written. Round-tripping an older sheet keeps
+its declared version rather than silently upgrading it: the content
+was written against that framework, not this one.}
 
 \item{study_type}{Used only when \code{items} is \code{NULL}.}
 }
@@ -18,7 +29,8 @@ A data frame ready to write with \code{\link[utils:write.csv]{utils::write.csv()
 }
 \description{
 The single on-disk shape, used by \code{\link[=write_template]{write_template()}}, \code{\link[=write_items]{write_items()}}
-and \code{\link[=write_report]{write_report()}}: four reserved metadata rows, then one row per
-framework item, with the free-text \code{report} column last.
+and \code{\link[=write_report]{write_report()}}: the reserved rows (usage note, framework
+version, paper details), then one row per framework item, with the
+free-text \code{report} column last.
 }
 \keyword{internal}

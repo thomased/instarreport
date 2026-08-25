@@ -1,7 +1,7 @@
 # Row counts and the reserved-row block are derived from the package
 # constants, so adding or removing a reserved row updates these tests
 # rather than staling them.
-.reserved_ids <- function() c(.HELP_FIELDS, .PAPER_FIELDS)
+.reserved_ids <- function() .RESERVED_FIELDS
 .n_csv_rows   <- function() length(.reserved_ids()) + nrow(instar_items)
 
 test_that("write_items writes the INSTAR CSV shape and round-trips", {
@@ -92,14 +92,18 @@ test_that("write_template writes the fillable INSTAR CSV", {
   df <- read.csv(tmp, stringsAsFactors = FALSE, na.strings = character(0),
                  colClasses = "character")
 
-  # usage note + paper-detail rows + the framework items
+  # usage note + version + paper-detail rows + the framework items
   expect_equal(nrow(df), .n_csv_rows())
   expect_equal(names(df),
                c("domain", "item", "item_id", "description",
                  "lab", "field", "report"))
   # no status column: status is derived from `report`, so they cannot disagree
   expect_false("status" %in% names(df))
-  expect_true(all(df$report == ""))
+  # Everything the author is asked to fill in starts blank. The version
+  # row is the one reserved row carrying content, because it is written
+  # by the package rather than by the author.
+  expect_true(all(df$report[!df$item_id %in% .VERSION_FIELD] == ""))
+  expect_equal(df$report[df$item_id == .VERSION_FIELD], .INSTAR_VERSION)
   # reserved rows come first, in a fixed order
   expect_equal(df$item_id[seq_along(.reserved_ids())], .reserved_ids())
   # ...and everything after them is a framework item, in canonical order

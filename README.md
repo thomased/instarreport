@@ -13,11 +13,26 @@ empirical baseline and primary intended audience are ecological and
 evolutionary research, but the framework applies wherever invertebrates
 are used.
 
-The package produces a standardised, publication-ready summary figure in
-which each cell carries the substantive content for the corresponding
-item (species and provenance, housing conditions, ethics permits, 3Rs
-reasoning, and so on), in the same spirit as the PRISMA and ROSES flow
-diagrams for evidence synthesis.
+The unit of work is a single file, `INSTAR.csv`: one row per reporting
+item, with a `report` column you fill in. Deposit it alongside your paper
+as supplementary material. It is plain text, so it stays readable and
+machine-readable indefinitely; a formatted `INSTAR.xlsx` with the same
+rows is available if you would rather work in a spreadsheet.
+
+From that file the package renders a standardised, publication-ready
+summary figure in which each cell carries the substantive content for the
+corresponding item (species and provenance, housing conditions, ethics
+permits, 3Rs reasoning, and so on), in the same spirit as the PRISMA and
+ROSES flow diagrams for evidence synthesis.
+
+## Quick start: no installation
+
+Open the web tool at **https://thomas-white.shinyapps.io/instar/**. You
+can either fill the items in the browser and download both the figure and
+the completed `INSTAR.csv`, or download the blank `INSTAR.csv`, fill it in
+a spreadsheet, and upload it to get the figure back.
+
+Everything below is the R package, for scripted or reproducible use.
 
 ## Installation
 
@@ -26,16 +41,49 @@ diagrams for evidence synthesis.
 remotes::install_github("thomased/instarreport")
 ```
 
-## Three ways to fill out the framework
+## Filling out the framework
 
-Pick whichever fits your workflow. All three produce the same kind of
-`items` object that `instar_report()` consumes.
+Three workflows, all producing the same `items` object that
+`instar_report()` consumes.
 
-### 1. Interactive prompt (recommended for first-time users)
+### 1. The INSTAR.csv sheet (the usual route)
+
+Write the blank sheet, fill in the `report` column, read it back:
 
 ```r
 library(instarreport)
-items <- instar_fill(save_to = "my_study_items.csv")
+
+write_template("INSTAR.csv")
+# ...fill the `report` column in Excel, Numbers, or any editor...
+items <- read_items("INSTAR.csv")
+```
+
+The sheet has one row per reporting item, carrying the item's `domain`,
+`item`, `description`, and applicability flags, plus an empty `report`
+column at the far right to type into. Reserved rows at the top hold a
+usage note, the framework version, and the paper's own details (title,
+authors, journal, DOI), so a completed file explains itself and
+identifies both the study it belongs to and the framework it was
+completed against.
+
+Because the sheet carries the paper's details, `instar_report()` can pick
+them up without being told:
+
+```r
+report <- instar_report(read_items("INSTAR.csv"))
+```
+
+Copies are bundled with the package if you would rather not write one:
+
+```r
+system.file("extdata", "INSTAR.csv", package = "instarreport")
+```
+
+### 2. Interactive prompt
+
+```r
+library(instarreport)
+items <- instar_fill(save_to = "INSTAR.csv")
 ```
 
 This walks through the 18 items in order, showing each one's name,
@@ -52,8 +100,8 @@ prompt you can type:
 To resume later, load the saved CSV back in:
 
 ```r
-items <- instar_fill(read_items("my_study_items.csv"),
-                    save_to = "my_study_items.csv")
+items <- instar_fill(read_items("INSTAR.csv"),
+                    save_to = "INSTAR.csv")
 ```
 
 To tweak a single item afterwards:
@@ -67,37 +115,6 @@ To check your progress at any point:
 
 ```r
 print(items)
-```
-
-### 2. Fill out a CSV template
-
-For collaborators who'd rather work in Excel, or when items are spread
-across several people, write a blank template and fill the `value` column:
-
-```r
-write_template("my_study_items.csv", study_type = "field")
-# ...edit the file in Excel / Numbers / a text editor...
-items <- read_items("my_study_items.csv")
-```
-
-The template CSV has one row per item with `item_id`, `item`, `domain`,
-`description`, and an empty `value` column. The `item`, `domain`, and
-`description` columns are there as on-page reminders of what each item
-asks for; they're ignored when the CSV is loaded back, so only `item_id`
-and `value` are strictly required.
-
-A bundled blank template is also available without writing anything:
-
-```r
-template_path <- system.file("extdata", "template_items.csv",
-                             package = "instarreport")
-file.copy(template_path, "my_study_items.csv")
-```
-
-A filled example (a notional bumblebee study) is at:
-
-```r
-system.file("extdata", "example_items.csv", package = "instarreport")
 ```
 
 ### 3. Programmatic fill (for scripts)
@@ -143,10 +160,15 @@ report
 summary(report)                 # one row per item, with status
 subset(summary(report), status == "not_reported")
 
-# ...or render it:
-plot(report)                                  # draw it
-save_figure(report, "fig_S1_welfare_reporting.pdf")   # or write to file
+# ...or write the two deposit artifacts:
+write_report(report, "INSTAR.csv")     # the completed sheet
+save_figure(report, "INSTAR.pdf")      # the figure
 ```
+
+`write_` produces text, `save_` produces figures. `write_report()` writes
+the same file shape an author would have filled in by hand, with the
+paper's details in the reserved rows, so it round-trips back through
+`read_items()`.
 
 If you want the figure as an object to modify before rendering, use
 `autoplot()`, which returns the underlying patchwork composition:
@@ -157,16 +179,78 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 
 ## Web tool
 
-A hosted version of the app is available at
-**https://thomas-white.shinyapps.io/instar/** — no installation
-required, just open it in any browser.
+**https://thomas-white.shinyapps.io/instar/** — no installation required.
+Fill the items in the browser with a live preview, or upload a filled
+`INSTAR.csv` to render it. Downloads the figure (PDF or PNG) and the
+completed `INSTAR.csv`.
 
-For a local copy with live preview (and no shinyapps.io free-tier
-sleep), launch the bundled Shiny app:
+For a local copy (and no shinyapps.io free-tier sleep):
 
 ```r
 instar_app()
 ```
+
+## Auditing many studies
+
+Once sheets are being deposited, a corpus of them is just a folder.
+`read_instar()` takes a file, a directory, or a vector of either, works
+out the format from the extension, and always returns the same thing:
+
+```r
+corpus <- read_instar("supplements/")
+#> Reading 47 files...
+#> ================================================================== 47/47
+#> Imported 45 sheets; 2 failed.
+
+corpus
+#> <instar_corpus>
+#>   45 sheets, INSTAR v1.0
+#>   median coverage 71% (range 22-100%)
+#>   2 files failed to read; see attr(., "failed")
+```
+
+A file it cannot read does not stop the run: it warns, skips, and records
+the error in `attr(corpus, "failed")` for you to go and look at. Sheets
+are named by DOI where they carry one, and duplicate DOIs are flagged,
+since the same study counted twice will skew any audit.
+
+`instar_audit()` turns that into coverage per framework item:
+
+```r
+audit <- instar_audit(corpus)     # or instar_audit("supplements/")
+
+summary(audit)                    # one row per item
+summary(audit, by = "journal")    # ...per item per journal
+plot(audit)                       # coverage barchart
+
+# Which items does the literature handle worst?
+head(summary(audit)[order(summary(audit)$percent_reported), ])
+```
+
+Not-applicable items stay out of the denominator throughout, so an item
+that genuinely does not apply to a study is never counted against it.
+
+For studies that predate the framework and have no sheets, score them
+into a wide table instead and hand that over:
+
+```r
+# one row per paper, one column per item_id, plus any metadata columns
+audit <- audit_from_matrix(scores, id = "doi")
+```
+
+Columns matching an `item_id` are treated as items; everything else
+(`journal`, `year`) rides along as study metadata and becomes available
+to `summary(by = )`. Scores are read leniently: `Y`/`yes`/`TRUE`/`1`/`C`
+mean reported, `N`/`no`/`FALSE`/`0` mean not, and `NA`/`-`/blank mean not
+applicable.
+
+### Framework versions
+
+Every sheet records the INSTAR version it was completed against, in a
+reserved row. Reading a corpus that mixes versions warns, because
+coverage is not comparable across them: an item absent from half the
+sheets because it did not exist yet is not the same as an item those
+studies failed to report.
 
 ## The framework
 
@@ -174,7 +258,7 @@ The 18 items are split into five welfare domains adapted from Mellor *et al.*
 (2020) (Nutrition, Environment, Health, Behaviour, Affective state) and
 three cross-cutting foundations (Subjects, Procedures, Ethics & compliance).
 End-of-study disposition lives within the Health welfare domain. See
-`?framework` for the full table, or:
+`?instar_items` for the full table, or:
 
 ```r
 table(instar_items$domain, instar_items$group)
@@ -182,7 +266,12 @@ table(instar_items$domain, instar_items$group)
 
 ## Conventions
 
-Every item carries a `status`, which is the single source of truth:
+In the sheet, the `report` column is all you fill in: write a sentence or
+two for items your study reports, leave it blank for items it does not,
+and write `NA` for items that do not apply.
+
+In R, that resolves to a `status` column, which is the single source of
+truth:
 
 | `status`           | Meaning                          | Renders as                |
 |--------------------|----------------------------------|---------------------------|
@@ -193,11 +282,11 @@ Every item carries a `status`, which is the single source of truth:
 - `value` carries substantive content only, and is `NA` whenever `status`
   is not `"reported"`. The two can never disagree.
 - Use `instar_na(items, "item_id")` to mark items that do not apply.
-- Reading a CSV with no `status` column derives it from `value`: blanks
-  become `"not_reported"`, and the strings `"NA"` or `"N/A"` are honoured
-  as shorthand for `"not_applicable"`.
-- Otherwise, write a concise sentence or two of substantive content per
-  cell, exactly as you would in the methods paragraph.
+- Reading a sheet derives `status` from the `report` column: blanks
+  become `"not_reported"`, and `"NA"` or `"N/A"` are honoured as shorthand
+  for `"not_applicable"`.
+- There is deliberately no `status` column in the sheet, so the two can
+  never disagree.
 
 ## Citation
 
@@ -208,9 +297,11 @@ If you use `instarreport`, please cite:
 
 And the package directly:
 
-> White, T. E. ... & Drinkwater, E. (2026). `instarreport`: An R
-> implementation of the INSTAR framework. R package version 0.1.0.
-> https://github.com/thomased/instarreport.
+> White, T. E., & Drinkwater, E. (2026). `instarreport`: INSTAR reporting
+> of invertebrate welfare in research. R package version 0.2.0.
+> https://github.com/thomased/instarreport
+
+`citation("instarreport")` prints both.
 
 ## Licence
 

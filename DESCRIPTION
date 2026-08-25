@@ -11,7 +11,8 @@ Description: Tools for applying the INSTAR framework (INvertebrate
     18-item reporting standard for invertebrate welfare in research.
     Provides the framework as data, interactive and spreadsheet-based
     workflows for recording what a study reported, validation against the
-    canonical item set, and coverage summaries. Reports render to a
+    canonical item set, coverage summaries, and bulk loading and auditing
+    of many completed sheets at once. Reports render to a
     standardised, publication-ready figure in which each cell carries the
     substantive content for the corresponding item (species and
     provenance, housing conditions, ethics permits, and so on), in the
@@ -24,16 +25,22 @@ Depends:
 Imports:
     ggplot2,
     ggtext,
-    patchwork
+    patchwork,
+    stats,
+    tools,
+    utils
 Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
     vdiffr,
     covr,
+    shinytest2,
     shiny,
     bslib,
-    readr
+    readr,
+    readxl,
+    writexl
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3

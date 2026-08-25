@@ -25,7 +25,8 @@
 #'
 #' @return An object of class `instar_report`: a list with elements
 #'   `paper`, `items` (one row per framework item, with `value` and
-#'   `status`), `coverage`, and `value_wrap`.
+#'   `status`), `coverage`, `version` (the framework version the items
+#'   declared, or `NA`), and `value_wrap`.
 #'
 #' @examples
 #' tmpl <- instar_template()
@@ -54,8 +55,10 @@ instar_report <- function(items, paper = NULL, value_wrap = 75,
          call. = FALSE)
   }
   validate_paper(paper)
+  version <- attr(items, "version")
+  if (is.null(version)) version <- NA_character_
   items <- validate_items(items, strict = strict)
-  items <- items[!items$item_id %in% .PAPER_FIELDS, , drop = FALSE]
+  items <- items[!items$item_id %in% .RESERVED_FIELDS, , drop = FALSE]
 
   # Join onto the canonical framework so every item has exactly one row,
   # in canonical order, whether or not the user supplied it.
@@ -72,6 +75,7 @@ instar_report <- function(items, paper = NULL, value_wrap = 75,
       paper      = paper,
       items      = new_instar_items(data),
       coverage   = .coverage(data$status),
+      version    = version,
       value_wrap = value_wrap
     ),
     class = "instar_report"

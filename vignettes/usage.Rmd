@@ -37,10 +37,43 @@ Items are grouped into five welfare domains (Mellor *et al.* 2020, with
 foundations. End-of-study disposition lives within the Health welfare
 domain.
 
-## Three ways to fill out the items
+## Filling out the items
 
-Pick whichever fits how you work. All three produce the same kind of
-`items` data frame that `instar_report()` consumes.
+Three workflows, all producing the same `items` data frame that
+`instar_report()` consumes.
+
+### The INSTAR.csv sheet
+
+The usual route, and the one the framework is designed around. Write the
+blank sheet, fill in the `report` column, read it back.
+
+```{r, eval = FALSE}
+write_template("INSTAR.csv")
+# ...fill the `report` column in Excel, Numbers, or any editor...
+items <- read_items("INSTAR.csv")
+```
+
+One row per reporting item, carrying its `domain`, `item`, `description`
+and applicability flags, with an empty `report` column at the far right
+to type into. Reserved rows at the top hold a usage note, the framework
+version, and the paper's own details, so a completed file explains
+itself and identifies both the study it belongs to and the framework it
+was completed against. That also means `instar_report()` can take it
+whole:
+
+```{r, eval = FALSE}
+report <- instar_report(read_items("INSTAR.csv"))
+```
+
+A copy ships with the package:
+
+```{r}
+system.file("extdata", "INSTAR.csv", package = "instarreport")
+```
+
+The same rows are available as a formatted spreadsheet (`INSTAR.xlsx`)
+for anyone who would rather not look at a CSV. Save it back out as CSV to
+read it into R.
 
 ### Interactive prompt
 
@@ -49,7 +82,7 @@ through each item, showing its name and description, and prompts for a
 value. It can save partway and resume later.
 
 ```{r, eval = FALSE}
-items <- instar_fill(save_to = "my_study.csv")
+items <- instar_fill(save_to = "INSTAR.csv")
 ```
 
 At any prompt, type the value, or one of: `[enter]` to keep current,
@@ -59,8 +92,8 @@ At any prompt, type the value, or one of: `[enter]` to keep current,
 To resume:
 
 ```{r, eval = FALSE}
-items <- instar_fill(read_items("my_study.csv"),
-                    save_to = "my_study.csv")
+items <- instar_fill(read_items("INSTAR.csv"),
+                    save_to = "INSTAR.csv")
 ```
 
 To edit a single item afterwards (no need to know `item_id`s — pass no
@@ -69,42 +102,6 @@ To edit a single item afterwards (no need to know `item_id`s — pass no
 ```{r, eval = FALSE}
 items <- instar_edit(items)
 items <- instar_edit(items, "subjects_n")   # or by id
-```
-
-### CSV template
-
-Easier when you want to hand the form to a collaborator, or when items
-are spread across multiple people. Write a blank template, fill it in in
-Excel (or any spreadsheet or text editor), then load it back.
-
-```{r, eval = FALSE}
-write_template("my_study.csv", study_type = "field")
-# ...edit the value column...
-items <- read_items("my_study.csv")
-```
-
-The template CSV has one row per item with `item_id`, `item`, `domain`,
-`description`, and a blank `value` column. The `item`, `domain`, and
-`description` columns are in the file as on-page reminders of what each
-item asks for. They are ignored on load, so only `item_id` and `value`
-are strictly required.
-
-A bundled blank template is also available as a static file you can
-hand-copy:
-
-```{r}
-template_path <- system.file("extdata", "template_items.csv",
-                             package = "instarreport")
-template_path
-```
-
-And a filled example to look at:
-
-```{r}
-example_path <- system.file("extdata", "example_items.csv",
-                            package = "instarreport")
-items <- read_items(example_path)
-head(items)
 ```
 
 ### Programmatic
@@ -137,7 +134,11 @@ items <- report_item(items, "subjects_n", "n = 80; 72 analysed")
 
 ## Checking progress
 
-```{r, eval = FALSE}
+```{r}
+# A part-filled example to look at.
+items <- read_items(
+  system.file("extdata", "example_items.csv", package = "instarreport")
+)
 print(items)
 ```
 
@@ -204,15 +205,118 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 
 ## Save it
 
+A finished report has two deposit artifacts: the completed sheet and the
+figure. The naming convention is that `write_` produces text and `save_`
+produces figures.
+
 ```{r, eval = FALSE}
-save_figure(report, "fig_S1_welfare_reporting.pdf")
-save_figure(report, "fig_S1_welfare_reporting.png", dpi = 300)
+write_report(report, "INSTAR.csv")   # the completed sheet
+save_figure(report,  "INSTAR.pdf")   # the figure
+save_figure(report,  "INSTAR.png", dpi = 300)
 ```
 
-`save_figure()` renders the report and writes it via
-`ggplot2::ggsave()`, choosing a compact page height from the figure's
-natural content size (white background, 300 dpi for raster formats).
-Pass an explicit `height` to override.
+`write_report()` writes the same file shape an author would have filled
+in by hand, with the paper's details in the reserved rows, so it reads
+straight back through `read_items()`. This is the machine-readable
+artifact worth depositing; the figure is for human readers.
+
+`save_figure()` renders the report and writes it via `ggplot2::ggsave()`,
+choosing a compact page height from the figure's natural content size
+(white background, 300 dpi for raster formats). Pass an explicit `height`
+to override.
+
+## Many studies at once
+
+Everything above describes one study. Once sheets are being deposited
+alongside papers, a set of them is a corpus, and the same machinery
+summarises a literature rather than a study.
+
+`read_instar()` is the loader. Point it at a file, a directory, or a
+vector of either; it works out the format from the extension and always
+returns an `instar_corpus`, whether it found one sheet or two hundred.
+
+```{r, eval = FALSE}
+corpus <- read_instar("supplements/")
+corpus
+#> <instar_corpus>
+#>   45 sheets, INSTAR v1.0
+#>   median coverage 71% (range 22-100%)
+#>   2 files failed to read; see attr(., "failed")
+```
+
+A file it cannot read is reported and skipped rather than aborting the
+run, with the error kept in `attr(corpus, "failed")`. In a corpus of any
+size some fraction of files will be malformed, and the useful behaviour
+is to get the other 199 and a list of what to go and fix.
+
+Sheets are named by DOI where the reserved rows carry one, and by file
+name otherwise. A corpus is a plain named list underneath, so `lapply()`,
+`Filter()` and `[` all work on it as you would expect, and `summary()`
+gives one row per sheet.
+
+`instar_audit()` computes coverage per framework item across the corpus:
+
+```{r, eval = FALSE}
+audit <- instar_audit(corpus)      # or instar_audit("supplements/")
+
+summary(audit)                     # one row per item
+summary(audit, by = "journal")     # ...per item per journal
+plot(audit)
+```
+
+Not-applicable items stay out of the denominator, per study and per
+item, so an item that genuinely does not apply is never counted against
+a study.
+
+If a corpus is filed into folders that mean something, read it
+recursively and the folder survives as a grouping variable:
+
+```{r, eval = FALSE}
+corpus <- read_instar("corpus/", recursive = TRUE)
+summary(instar_audit(corpus), by = "folder")
+```
+
+### Studies that never filled in a sheet
+
+Which is every study published before the framework existed. Score them
+into a wide table instead, one row per paper and one column per
+`item_id`:
+
+```{r, message = FALSE}
+scores <- data.frame(
+  doi            = c("10.1234/a", "10.1234/b", "10.1234/c"),
+  journal        = c("J Alpha", "J Beta", "J Beta"),
+  subjects_taxon = c("Y", "Y", "Y"),
+  subjects_n     = c("Y", "N", "N"),
+  env_field      = c("NA", "Y", "-"),
+  stringsAsFactors = FALSE
+)
+
+audit <- audit_from_matrix(scores, id = "doi")
+summary(audit)
+```
+
+Columns matching an `item_id` are treated as items; every other column
+is carried through as study metadata, so `journal` here is immediately
+available to `summary(by = )` without building a lookup table. Cell
+values are read leniently, because scoring sheets are made by people:
+`Y`, `yes`, `TRUE`, `1` and `C` all mean reported, `N`, `no`, `FALSE`
+and `0` mean not reported, and `NA`, `N/A`, `-` and blanks mean not
+applicable.
+
+Framework items absent from the matrix are left out of the audit rather
+than counted as unreported, since the scoring never checked them.
+
+### Framework versions
+
+Each sheet records the INSTAR version it was completed against. Reading
+a corpus that mixes versions warns, because coverage is not comparable
+across them: an item missing from half the sheets because it did not
+exist yet is not the same as an item those studies failed to report.
+
+```{r, eval = FALSE}
+table(summary(corpus)$version)
+```
 
 ## Web tool
 
@@ -222,5 +326,7 @@ For a clickable interface, run:
 instar_app()
 ```
 
-The Shiny app lets you fill in each framework item interactively, preview
-the figure, and download the PDF or PNG.
+The Shiny app lets you fill in each framework item interactively with a
+live preview, or upload a filled `INSTAR.csv` to render it. It downloads
+the figure (PDF or PNG) and the completed `INSTAR.csv`. A hosted copy is
+at <https://thomas-white.shinyapps.io/instar/>, needing no installation.

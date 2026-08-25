@@ -218,15 +218,21 @@ instar_edit <- function(items, item_id = NULL) {
 #' Build the INSTAR CSV as a data frame
 #'
 #' The single on-disk shape, used by [write_template()], [write_items()]
-#' and [write_report()]: four reserved metadata rows, then one row per
-#' framework item, with the free-text `report` column last.
+#' and [write_report()]: the reserved rows (usage note, framework
+#' version, paper details), then one row per framework item, with the
+#' free-text `report` column last.
 #'
 #' @param items An items table, or `NULL` for a blank sheet.
 #' @param paper Optional named list of paper details.
+#' @param version Framework version to stamp. If `NULL`, a version
+#'   declared by `items` is preserved, and failing that the current
+#'   [.INSTAR_VERSION] is written. Round-tripping an older sheet keeps
+#'   its declared version rather than silently upgrading it: the content
+#'   was written against that framework, not this one.
 #' @param study_type Used only when `items` is `NULL`.
 #' @return A data frame ready to write with [utils::write.csv()].
 #' @keywords internal
-.instar_csv <- function(items = NULL, paper = NULL,
+.instar_csv <- function(items = NULL, paper = NULL, version = NULL,
                         study_type = c("both", "lab", "field")) {
   if (is.null(items)) {
     study_type <- match.arg(study_type)
@@ -234,8 +240,12 @@ instar_edit <- function(items, item_id = NULL) {
   } else {
     items <- validate_items(items)
     if (is.null(paper)) paper <- attr(items, "paper")
+    if (is.null(version)) version <- attr(items, "version")
   }
-  items <- items[!items$item_id %in% .PAPER_FIELDS, , drop = FALSE]
+  if (is.null(version) || is.na(version) || !nzchar(as.character(version))) {
+    version <- .INSTAR_VERSION
+  }
+  items <- items[!items$item_id %in% .RESERVED_FIELDS, , drop = FALSE]
 
   help <- data.frame(
     domain      = "How to use",
@@ -245,6 +255,17 @@ instar_edit <- function(items, item_id = NULL) {
     lab         = "",
     field       = "",
     report      = "",
+    stringsAsFactors = FALSE
+  )
+
+  ver <- data.frame(
+    domain      = "Framework",
+    item        = .VERSION_ROW[1],
+    item_id     = .VERSION_FIELD,
+    description = .VERSION_ROW[2],
+    lab         = "",
+    field       = "",
+    report      = as.character(version),
     stringsAsFactors = FALSE
   )
 
@@ -283,7 +304,7 @@ instar_edit <- function(items, item_id = NULL) {
     report      = report,
     stringsAsFactors = FALSE
   )
-  rbind(help, meta, body)
+  rbind(help, ver, meta, body)
 }
 
 
@@ -337,8 +358,8 @@ write_report <- function(report, path) {
     stop("`report` must be an object created by instar_report().",
          call. = FALSE)
   }
-  utils::write.csv(.instar_csv(report$items, report$paper), path,
-                   row.names = FALSE)
+  utils::write.csv(.instar_csv(report$items, report$paper, report$version),
+                   path, row.names = FALSE)
   invisible(path)
 }
 

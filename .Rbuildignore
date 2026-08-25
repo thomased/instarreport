@@ -8,5 +8,8 @@
 ^pkgdown$
 ^rsconnect$
 ^inst/shiny/rsconnect$
+^inst/shiny/\.rscignore$
 ^_problems$
 ^codecov\.yml$
+^doc$
+^Meta$

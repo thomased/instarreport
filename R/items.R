@@ -239,10 +239,18 @@ instar_template <- function(study_type = c("both", "lab", "field")) {
 #' cells are read as empty strings rather than `NA`, so that the literal
 #' text `"NA"` keeps its not-applicable meaning.
 #'
+#' Reserved rows are peeled off rather than returned as items: the usage
+#' note is dropped, the paper's details become a `paper` attribute, and
+#' the declared framework version becomes a `version` attribute (`NA` if
+#' the sheet predates versioning).
+#'
+#' To read many sheets at once, use [read_instar()].
+#'
 #' @param path Path to a CSV file.
 #' @param ... Additional arguments passed to [utils::read.csv()].
 #'
-#' @return An `instar_items` table with `item_id`, `value`, and `status`.
+#' @return An `instar_items` table with `item_id`, `value`, and `status`,
+#'   carrying `paper` and `version` attributes.
 #'
 #' @examples
 #' \dontrun{
@@ -292,12 +300,25 @@ read_items <- function(path, ...) {
   if (any(blank_id) && !is.null(df$item)) {
     key <- tolower(gsub("\\s+", " ", trimws(df$item)))
     ref <- stats::setNames(
-      c(instar_items$item_id, .PAPER_FIELDS),
+      c(instar_items$item_id, .VERSION_FIELD, .PAPER_FIELDS),
       tolower(gsub("\\s+", " ",
-                   c(instar_items$item, unname(.PAPER_LABELS[.PAPER_FIELDS]))))
+                   c(instar_items$item, .VERSION_ROW[1],
+                     unname(.PAPER_LABELS[.PAPER_FIELDS]))))
     )
     df$item_id[blank_id] <- unname(ref[key[blank_id]])
     df <- df[!is.na(df$item_id), , drop = FALSE]
+  }
+
+  # The framework version the sheet was completed against. Absent in
+  # sheets written before versioning, which read as NA rather than being
+  # assumed current: a corpus audit needs to know the difference between
+  # "declared v1.0" and "did not say".
+  version <- NA_character_
+  is_ver <- df$item_id %in% .VERSION_FIELD
+  if (any(is_ver)) {
+    v <- trimws(as.character(df$value[is_ver]))[1]
+    if (!is.na(v) && nzchar(v)) version <- v
+    df <- df[!is_ver, , drop = FALSE]
   }
 
   # Reserved rows carry the paper's own details rather than framework
@@ -317,6 +338,7 @@ read_items <- function(path, ...) {
 
   out <- new_instar_items(df)
   attr(out, "paper") <- paper
+  attr(out, "version") <- version
   out
 }
 
