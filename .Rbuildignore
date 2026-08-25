@@ -9,6 +9,7 @@
 ^rsconnect$
 ^inst/shiny/rsconnect$
 ^inst/shiny/\.rscignore$
+^dev$
 ^_problems$
 ^codecov\.yml$
 ^doc$
