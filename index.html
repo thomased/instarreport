@@ -55,244 +55,107 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="instarreport">instarreport<a class="anchor" aria-label="anchor" href="#instarreport"></a>
+<div class="page-header"><h1 id="instar">INSTAR<a class="anchor" aria-label="anchor" href="#instar"></a>
 </h1></div>
-<p><strong><a href="https://instar-statement.org" class="uri">https://instar-statement.org</a></strong></p>
-<!-- badges: start -->
-
-<p>A small R toolkit implementing <strong>INSTAR</strong> (<strong>IN</strong>vertebrate <strong>S</strong>tandards for <strong>T</strong>reatment <strong>A</strong>nd <strong>R</strong>eporting), an 18-item reporting framework for invertebrate welfare in research (White et al., in prep). The empirical baseline and primary intended audience are ecological and evolutionary research, but the framework applies wherever invertebrates are used.</p>
-<p>The unit of work is a single file, <code>INSTAR.csv</code>: one row per reporting item, with a <code>report</code> column you fill in. Deposit it alongside your paper as supplementary material. It is plain text, so it stays readable and machine-readable indefinitely; a formatted <code>INSTAR.xlsx</code> with the same rows is available if you would rather work in a spreadsheet.</p>
-<p>From that file the package renders a standardised, publication-ready summary figure in which each cell carries the substantive content for the corresponding item (species and provenance, housing conditions, ethics permits, 3Rs reasoning, and so on), in the same spirit as the PRISMA and ROSES flow diagrams for evidence synthesis.</p>
+<p><strong>IN</strong>vertebrate <strong>S</strong>tandards for <strong>T</strong>reatment <strong>A</strong>nd <strong>R</strong>eporting</p>
+<p>INSTAR is an 18-item reporting standard for how invertebrates are obtained, housed, handled, and disposed of in research. It asks for those details, and for the reasoning behind the choices that affect the animals, whether or not any formal ethics review applied to the work.</p>
+<p>It is written for the researchers who use invertebrates — in ecology and evolution, behaviour, physiology and neurobiology, pathology, and mass rearing for food and feed — and can be adopted by an individual author without waiting for anyone’s permission.</p>
+<p>Version 1.0. This is a living document, and we welcome <a href="https://github.com/thomased/instarreport/issues" class="external-link">feedback and suggestions</a>.</p>
 <div class="section level2">
-<h2 id="quick-start-no-installation">Quick start: no installation<a class="anchor" aria-label="anchor" href="#quick-start-no-installation"></a>
+<h2 id="the-18-items">The 18 items<a class="anchor" aria-label="anchor" href="#the-18-items"></a>
 </h2>
-<p>Open the web tool at <strong><a href="https://instar-statement.org/app/" class="uri">https://instar-statement.org/app/</a></strong>. You can either fill the items in the browser and download both the figure and the completed <code>INSTAR.csv</code>, or download the blank <code>INSTAR.csv</code>, fill it in a spreadsheet, and upload it to get the figure back.</p>
-<p>(A second copy runs at <a href="https://thomas-white.shinyapps.io/instar/" class="external-link uri">https://thomas-white.shinyapps.io/instar/</a>. Both serve the same app; the shinyapps.io one is a full R session, the one above runs entirely in your browser.)</p>
-<p>Everything below is the R package, for scripted or reproducible use.</p>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"thomased/instarreport"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="filling-out-the-framework">Filling out the framework<a class="anchor" aria-label="anchor" href="#filling-out-the-framework"></a>
-</h2>
-<p>Three workflows, all producing the same <code>items</code> object that <code><a href="reference/instar_report.html">instar_report()</a></code> consumes.</p>
-<div class="section level3">
-<h3 id="id_1-the-instarcsv-sheet-the-usual-route">1. The INSTAR.csv sheet (the usual route)<a class="anchor" aria-label="anchor" href="#id_1-the-instarcsv-sheet-the-usual-route"></a>
-</h3>
-<p>Write the blank sheet, fill in the <code>report</code> column, read it back:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://instar-statement.org/">instarreport</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/write_template.html">write_template</a></span><span class="op">(</span><span class="st">"INSTAR.csv"</span><span class="op">)</span></span>
-<span><span class="co"># ...fill the `report` column in Excel, Numbers, or any editor...</span></span>
-<span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_items.html">read_items</a></span><span class="op">(</span><span class="st">"INSTAR.csv"</span><span class="op">)</span></span></code></pre></div>
-<p>The sheet has one row per reporting item, carrying the item’s <code>domain</code>, <code>item</code>, <code>description</code>, and applicability flags, plus an empty <code>report</code> column at the far right to type into. Reserved rows at the top hold a usage note, the framework version, and the paper’s own details (title, authors, journal, DOI), so a completed file explains itself and identifies both the study it belongs to and the framework it was completed against.</p>
-<p>Because the sheet carries the paper’s details, <code><a href="reference/instar_report.html">instar_report()</a></code> can pick them up without being told:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_report.html">instar_report</a></span><span class="op">(</span><span class="fu"><a href="reference/read_items.html">read_items</a></span><span class="op">(</span><span class="st">"INSTAR.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Copies are bundled with the package if you would rather not write one:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"INSTAR.csv"</span>, package <span class="op">=</span> <span class="st">"instarreport"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="id_2-interactive-prompt">2. Interactive prompt<a class="anchor" aria-label="anchor" href="#id_2-interactive-prompt"></a>
-</h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://instar-statement.org/">instarreport</a></span><span class="op">)</span></span>
-<span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_fill.html">instar_fill</a></span><span class="op">(</span>save_to <span class="op">=</span> <span class="st">"INSTAR.csv"</span><span class="op">)</span></span></code></pre></div>
-<p>This walks through the 18 items in order, showing each one’s name, description, and current value, and prompting you for input. At any prompt you can type:</p>
-<ul>
-<li>the value, or just press <strong>enter</strong> to keep the current one</li>
-<li>
-<code>NA</code> to mark the item as not applicable to your study</li>
-<li>
-<code>skip</code> to leave it blank (it’ll render as “Not reported”)</li>
-<li>
-<code>back</code> to return to the previous item</li>
-<li>
-<code>save</code> (or <code>save other_path.csv</code>) to write progress to disk</li>
-<li>
-<code>quit</code> to stop and return what you have so far</li>
-</ul>
-<p>To resume later, load the saved CSV back in:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_fill.html">instar_fill</a></span><span class="op">(</span><span class="fu"><a href="reference/read_items.html">read_items</a></span><span class="op">(</span><span class="st">"INSTAR.csv"</span><span class="op">)</span>,</span>
-<span>                    save_to <span class="op">=</span> <span class="st">"INSTAR.csv"</span><span class="op">)</span></span></code></pre></div>
-<p>To tweak a single item afterwards:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_edit.html">instar_edit</a></span><span class="op">(</span><span class="va">items</span>, <span class="st">"subjects_n"</span><span class="op">)</span>   <span class="co"># by item_id</span></span>
-<span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_edit.html">instar_edit</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span>                 <span class="co"># numbered menu of all 18 items</span></span></code></pre></div>
-<p>To check your progress at any point:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="id_3-programmatic-fill-for-scripts">3. Programmatic fill (for scripts)<a class="anchor" aria-label="anchor" href="#id_3-programmatic-fill-for-scripts"></a>
-</h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_set.html">instar_set</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="reference/instar_template.html">instar_template</a></span><span class="op">(</span>study_type <span class="op">=</span> <span class="st">"field"</span><span class="op">)</span>,</span>
-<span>  subjects_taxon   <span class="op">=</span> <span class="st">"Bombus terrestris (worker female); COI"</span>,</span>
-<span>  subjects_source  <span class="op">=</span> <span class="st">"Wild-collected, Royal NP, May 2025"</span>,</span>
-<span>  subjects_n       <span class="op">=</span> <span class="st">"n=80; n=72 analysed (10% attrition)"</span>,</span>
-<span>  proc_anaesthesia <span class="op">=</span> <span class="cn">NA</span>           <span class="co"># does not apply to this study</span></span>
-<span>  <span class="co"># ...and so on</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/instar_set.html">instar_set()</a></code> sets both <code>value</code> and <code>status</code> together. Assigning <code>items$value</code> on its own does <strong>not</strong> work: <code>status</code> is the source of truth, so an item whose status is still <code>"not_reported"</code> has its value discarded when the report is built — silently, with no error.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="building-the-figure">Building the figure<a class="anchor" aria-label="anchor" href="#building-the-figure"></a>
-</h2>
-<p>Once <code>items</code> is filled, the rest is the same regardless of how you got there:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_report.html">instar_report</a></span><span class="op">(</span></span>
-<span>  <span class="va">items</span>,</span>
-<span>  paper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    title   <span class="op">=</span> <span class="st">"My study title"</span>,</span>
-<span>    authors <span class="op">=</span> <span class="st">"Smith et al. (2026)"</span>,</span>
-<span>    journal <span class="op">=</span> <span class="st">"Some Journal"</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">report</span></span>
-<span><span class="co">#&gt; &lt;instar_report&gt;</span></span>
-<span><span class="co">#&gt;   My study title</span></span>
-<span><span class="co">#&gt;   14 of 17 applicable items reported (82%); 1 not applicable.</span></span>
-<span><span class="co">#&gt;   Use plot() to draw it, or save_figure() to write it to disk.</span></span>
-<span></span>
-<span><span class="co"># `report` is data, not a plot. Compute on it:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">report</span><span class="op">)</span>                 <span class="co"># one row per item, with status</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">report</span><span class="op">)</span>, <span class="va">status</span> <span class="op">==</span> <span class="st">"not_reported"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># ...or write the two deposit artifacts:</span></span>
-<span><span class="fu"><a href="reference/write_report.html">write_report</a></span><span class="op">(</span><span class="va">report</span>, <span class="st">"INSTAR.csv"</span><span class="op">)</span>     <span class="co"># the completed sheet</span></span>
-<span><span class="fu"><a href="reference/save_figure.html">save_figure</a></span><span class="op">(</span><span class="va">report</span>, <span class="st">"INSTAR.pdf"</span><span class="op">)</span>      <span class="co"># the figure</span></span></code></pre></div>
-<p><code>write_</code> produces text, <code>save_</code> produces figures. <code><a href="reference/write_report.html">write_report()</a></code> writes the same file shape an author would have filled in by hand, with the paper’s details in the reserved rows, so it round-trips back through <code><a href="reference/read_items.html">read_items()</a></code>.</p>
-<p>If you want the figure as an object to modify before rendering, use <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>, which returns the underlying patchwork composition:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">report</span><span class="op">)</span> <span class="op">+</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Figure S1"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="web-tool">Web tool<a class="anchor" aria-label="anchor" href="#web-tool"></a>
-</h2>
-<p><strong><a href="https://instar-statement.org/app/" class="uri">https://instar-statement.org/app/</a></strong> — no installation required. Fill the items in the browser with a live preview, or upload a filled <code>INSTAR.csv</code> to render it. Downloads the figure (PDF or PNG) and the completed <code>INSTAR.csv</code>.</p>
-<p>For a local copy (and no shinyapps.io free-tier sleep):</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/instar_app.html">instar_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="auditing-many-studies">Auditing many studies<a class="anchor" aria-label="anchor" href="#auditing-many-studies"></a>
-</h2>
-<p>Once sheets are being deposited, a corpus of them is just a folder. <code><a href="reference/read_instar.html">read_instar()</a></code> takes a file, a directory, or a vector of either, works out the format from the extension, and always returns the same thing:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_instar.html">read_instar</a></span><span class="op">(</span><span class="st">"supplements/"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading 47 files...</span></span>
-<span><span class="co">#&gt; ================================================================== 47/47</span></span>
-<span><span class="co">#&gt; Imported 45 sheets; 2 failed.</span></span>
-<span></span>
-<span><span class="va">corpus</span></span>
-<span><span class="co">#&gt; &lt;instar_corpus&gt;</span></span>
-<span><span class="co">#&gt;   45 sheets, INSTAR v1.0</span></span>
-<span><span class="co">#&gt;   median coverage 71% (range 22-100%)</span></span>
-<span><span class="co">#&gt;   2 files failed to read; see attr(., "failed")</span></span></code></pre></div>
-<p>A file it cannot read does not stop the run: it warns, skips, and records the error in <code>attr(corpus, "failed")</code> for you to go and look at. Sheets are named by DOI where they carry one, and duplicate DOIs are flagged, since the same study counted twice will skew any audit.</p>
-<p><code><a href="reference/instar_audit.html">instar_audit()</a></code> turns that into coverage per framework item:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/instar_audit.html">instar_audit</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span>     <span class="co"># or instar_audit("supplements/")</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span>                    <span class="co"># one row per item</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span>, by <span class="op">=</span> <span class="st">"journal"</span><span class="op">)</span>    <span class="co"># ...per item per journal</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span>                       <span class="co"># coverage barchart</span></span>
-<span></span>
-<span><span class="co"># Which items does the literature handle worst?</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span><span class="op">$</span><span class="va">percent_reported</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p>Not-applicable items stay out of the denominator throughout, so an item that genuinely does not apply to a study is never counted against it.</p>
-<p>For studies that predate the framework and have no sheets, score them into a wide table instead and hand that over:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># one row per paper, one column per item_id, plus any metadata columns</span></span>
-<span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/audit_from_matrix.html">audit_from_matrix</a></span><span class="op">(</span><span class="va">scores</span>, id <span class="op">=</span> <span class="st">"doi"</span><span class="op">)</span></span></code></pre></div>
-<p>Columns matching an <code>item_id</code> are treated as items; everything else (<code>journal</code>, <code>year</code>) rides along as study metadata and becomes available to <code>summary(by = )</code>. Scores are read leniently: <code>Y</code>/<code>yes</code>/<code>TRUE</code>/<code>1</code>/<code>C</code> mean reported, <code>N</code>/<code>no</code>/<code>FALSE</code>/<code>0</code> mean not, and <code>NA</code>/<code>-</code>/blank mean not applicable.</p>
-<div class="section level3">
-<h3 id="framework-versions">Framework versions<a class="anchor" aria-label="anchor" href="#framework-versions"></a>
-</h3>
-<p>Every sheet records the INSTAR version it was completed against, in a reserved row. Reading a corpus that mixes versions warns, because coverage is not comparable across them: an item absent from half the sheets because it did not exist yet is not the same as an item those studies failed to report.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="the-framework">The framework<a class="anchor" aria-label="anchor" href="#the-framework"></a>
-</h2>
-<p>The 18 items are split into five welfare domains adapted from Mellor <em>et al.</em> (2020) (Nutrition, Environment, Health, Behaviour, Affective state) and three cross-cutting foundations (Subjects, Procedures, Ethics &amp; compliance). End-of-study disposition lives within the Health welfare domain. See <code><a href="reference/instar_items.html">?instar_items</a></code> for the full table, or:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">instar_items</span><span class="op">$</span><span class="va">domain</span>, <span class="va">instar_items</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="conventions">Conventions<a class="anchor" aria-label="anchor" href="#conventions"></a>
-</h2>
-<p>In the sheet, the <code>report</code> column is all you fill in: write a sentence or two for items your study reports, leave it blank for items it does not, and write <code>NA</code> for items that do not apply.</p>
-<p>In R, that resolves to a <code>status</code> column, which is the single source of truth:</p>
+<p>Five welfare domains adapted from the Mellor five-domains model, and three cross-cutting foundations that apply regardless of domain.</p>
 <table class="table">
 <colgroup>
-<col width="24%">
-<col width="41%">
+<col width="33%">
+<col width="33%">
 <col width="33%">
 </colgroup>
 <thead><tr>
-<th><code>status</code></th>
-<th>Meaning</th>
-<th>Renders as</th>
+<th></th>
+<th>Domain</th>
+<th>Items</th>
 </tr></thead>
 <tbody>
 <tr>
-<td><code>"reported"</code></td>
-<td>The study reports this item</td>
-<td>The text in <code>value</code>
-</td>
+<td><strong>Foundations</strong></td>
+<td>Subjects</td>
+<td>Taxonomic ID, life stage, &amp; sex · Source &amp; culture history · Sample size &amp; attrition</td>
 </tr>
 <tr>
-<td><code>"not_reported"</code></td>
-<td>The study is silent on it</td>
-<td>
-<em>Not reported</em>, muted</td>
+<td></td>
+<td>Procedures</td>
+<td>Capture, transport, &amp; handling · Anaesthesia, analgesia, &amp; invasive procedures · Containment &amp; biosecurity</td>
 </tr>
 <tr>
-<td><code>"not_applicable"</code></td>
-<td>It does not apply to this study</td>
-<td>
-<em>Not applicable</em>, grey</td>
+<td></td>
+<td>Ethics &amp; Compliance</td>
+<td>Ethics review, permits, &amp; conservation status · Humane endpoints &amp; non-target impacts · Welfare &amp; 3Rs statement</td>
+</tr>
+<tr>
+<td><strong>Welfare domains</strong></td>
+<td>Nutrition</td>
+<td>Diet, feeding, &amp; water</td>
+</tr>
+<tr>
+<td></td>
+<td>Environment</td>
+<td>Housing &amp; abiotic conditions · Acclimation · Field site &amp; collection</td>
+</tr>
+<tr>
+<td></td>
+<td>Health</td>
+<td>Health monitoring · Injury &amp; mortality · End of study</td>
+</tr>
+<tr>
+<td></td>
+<td>Behaviour</td>
+<td>Behavioural opportunities, enrichment, &amp; disturbance</td>
+</tr>
+<tr>
+<td></td>
+<td>Affective state</td>
+<td>Indicators &amp; precautionary measures</td>
 </tr>
 </tbody>
 </table>
-<ul>
-<li>
-<code>value</code> carries substantive content only, and is <code>NA</code> whenever <code>status</code> is not <code>"reported"</code>. The two can never disagree.</li>
-<li>Use <code>instar_na(items, "item_id")</code> to mark items that do not apply.</li>
-<li>Reading a sheet derives <code>status</code> from the <code>report</code> column: blanks become <code>"not_reported"</code>, and <code>"NA"</code> or <code>"N/A"</code> are honoured as shorthand for <code>"not_applicable"</code>.</li>
-<li>There is deliberately no <code>status</code> column in the sheet, so the two can never disagree.</li>
-</ul>
+<p>Not every item applies to every study. Each is flagged for laboratory work, field work, or both, and items that do not apply are marked as such rather than left ambiguous.</p>
 </div>
 <div class="section level2">
-<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>If you use <code>instarreport</code>, please cite:</p>
-<blockquote>
-<p>White, T. E. … &amp; Drinkwater, E. (in prep). INSTAR: reporting items for invertebrate welfare in research.</p>
-</blockquote>
-<p>And the package directly:</p>
-<blockquote>
-<p>White, T. E., &amp; Drinkwater, E. (2026). <code>instarreport</code>: INSTAR reporting of invertebrate welfare in research. R package version 0.2.0. <a href="https://instar-statement.org/" class="uri">https://instar-statement.org/</a></p>
-</blockquote>
-<p><code>citation("instarreport")</code> prints both.</p>
+<p>The unit of work is a single file, <code>INSTAR.csv</code>: one row per item, with a <code>report</code> column you fill in. Write a sentence or two for each item your study reports, leave it blank for those it does not, and write <code>NA</code> for those that do not apply. Deposit the completed file alongside your paper as supplementary material.</p>
+<p>It is plain text, so it stays readable and machine-readable indefinitely, and a set of them can be read back and summarised without anyone re-extracting the information from prose.</p>
+<p>Three ways to complete it, all producing the same file.</p>
+<p><strong>In a spreadsheet.</strong> Download the blank sheet, fill in the <code>report</code> column, deposit it. No software required. <a href="https://github.com/thomased/instarreport/raw/main/inst/extdata/INSTAR.csv" class="external-link">INSTAR.csv</a> · <a href="https://github.com/thomased/instarreport/raw/main/inst/extdata/INSTAR.xlsx" class="external-link">INSTAR.xlsx</a></p>
+<p><strong>In your browser.</strong> Fill the items in the web tool with a live preview, or upload a sheet you have already started. Nothing you enter leaves your machine. → <a href="app/index.html">instar-statement.org/app</a></p>
+<p><strong>In R.</strong> For scripted and reproducible workflows.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"thomased/instarreport"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="the-summary-figure">The summary figure<a class="anchor" aria-label="anchor" href="#the-summary-figure"></a>
+</h3>
+<p>Optional, and useful mainly as a supplementary figure. The same completed sheet renders as a one-page summary in which every cell carries the substantive content for its item, in the same spirit as the PRISMA and ROSES diagrams for evidence synthesis. Here it is applied to a real study (<a href="https://doi.org/10.1098/rspb.2026.0609" class="external-link">Manzi et al. 2026</a>):</p>
+<p><img src="img/instar-exemplar.png" alt="A one-page INSTAR report for a study of house crickets, laid out as two columns of cards. The left column covers the three foundations (Subjects, Procedures, Ethics and Compliance) in blue; the right covers the five welfare domains (Nutrition, Environment, Health, Behaviour, Affective state) in green. Each card names an item and carries a sentence or two describing what the study reported, with unreported items shown in muted italics." style="max-width:100%; border:1px solid #d8d8d8;"></p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="licence">Licence<a class="anchor" aria-label="anchor" href="#licence"></a>
+<h2 id="the-tools">The tools<a class="anchor" aria-label="anchor" href="#the-tools"></a>
 </h2>
-<p>MIT. See <code>LICENSE</code>.</p>
+<p>Two implementations, both free and open source.</p>
+<p>The <strong><a href="reference/index.html">R package</a></strong> provides the item set as data, three routes to completing it, validation against the canonical items, and functions that write both deposit artefacts. Because a deposited sheet is structured text rather than a picture, it also reads sheets back in: point <a href="reference/read_instar.html"><code>read_instar()</code></a> at a directory of them and <a href="reference/instar_audit.html"><code>instar_audit()</code></a> will summarise reporting coverage across a whole literature.</p>
+<p>That second direction is the part a reporting standard usually cannot offer. Once sheets are being deposited routinely, questions like which items the field handles worst, whether reporting differs between laboratory and field studies, or whether it improves after a journal adopts the framework, become a matter of reading the deposited files rather than of hand-scoring papers. The same machinery works retrospectively on studies that predate INSTAR: score them into a table of one row per paper and <a href="reference/audit_from_matrix.html"><code>audit_from_matrix()</code></a> treats them the same way, which is how the survey in the paper was carried out. <a href="articles/usage.html">Getting started</a> walks through all of it.</p>
+<p>The <strong><a href="app/index.html">web tool</a></strong> offers the same functionality for those who do not work in R, and is private by construction. There is no server, no upload, and no account: the R session runs inside your browser tab via WebAssembly, and the file you build never leaves your computer unless you choose to save it. You can complete a report for unpublished work, on a shared or institutional machine, without any of it being transmitted anywhere — and once the page has loaded, it keeps working offline.</p>
+</div>
+<div class="section level2">
+<h2 id="citing-instar">Citing INSTAR<a class="anchor" aria-label="anchor" href="#citing-instar"></a>
+</h2>
+<p>If you use the framework, please cite the paper:</p>
+<blockquote>
+<p>White, T. E., Lynch, K., Hart, A. G., Latty, T., Forster, C. Y., Amory, J., Umbers, K., &amp; Drinkwater, E. (2026). INSTAR: Reporting items for invertebrate welfare in research. <em>Manuscript in preparation</em>.</p>
+</blockquote>
+<p><code>citation("instarreport")</code> prints this along with the software citation.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -328,14 +191,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/thomased/instarreport" class="external-link"><img src="https://codecov.io/gh/thomased/instarreport/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>
