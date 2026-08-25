@@ -211,19 +211,23 @@ instar_set <- function(items, ...) {
 
   ids <- names(vals)
   if (is.null(ids) || any(!nzchar(ids))) {
-    stop("Every value must be named with an item_id, for example: ",
-         "instar_set(items, subjects_n = \"n = 24\").", call. = FALSE)
+    cli::cli_abort(c(
+      "Every value must be named with an {.field item_id}.",
+      "i" = "For example: {.code instar_set(items, subjects_n = \"n = 24\")}."
+    ))
   }
   dup <- unique(ids[duplicated(ids)])
   if (length(dup) > 0L) {
-    stop("Each item can only be set once per call. Repeated: ",
-         paste(dup, collapse = ", "), call. = FALSE)
+    cli::cli_abort("Each item can only be set once per call.
+                    Repeated: {.val {dup}}.")
   }
   unknown <- setdiff(ids, instar_items$item_id)
   if (length(unknown) > 0L) {
-    stop("Unknown item_id(s): ", paste(unknown, collapse = ", "),
-         .suggest_item_id(unknown),
-         " Run instar_items$item_id for the full list.", call. = FALSE)
+    cli::cli_abort(c(
+      "{cli::qty(unknown)}Unknown item_id{?s}: {.val {unknown}}.",
+      "i" = .suggest_item_id(unknown),
+      "i" = "Run {.code instar_items$item_id} for the full list."
+    ))
   }
 
   # Tables read from a partial file may not carry every framework row.
@@ -246,9 +250,10 @@ instar_set <- function(items, ...) {
       next
     }
     if (length(v) != 1L) {
-      stop("`", ids[i], "` must be a single value, not ", length(v), ". ",
-           "To report several things about one item, write them as one ",
-           "string.", call. = FALSE)
+      cli::cli_abort(c(
+        "{.field {ids[i]}} must be a single value, not {length(v)}.",
+        "i" = "To report several things about one item, write them as one string."
+      ))
     }
     v <- as.character(v)
     if (!nzchar(trimws(v))) {
@@ -294,8 +299,7 @@ instar_na <- function(items, item_id) {
   items <- validate_items(items)
   unknown <- setdiff(item_id, instar_items$item_id)
   if (length(unknown) > 0) {
-    stop("Unknown item_id(s): ", paste(unknown, collapse = ", "),
-         call. = FALSE)
+    cli::cli_abort("{cli::qty(unknown)}Unknown item_id{?s}: {.val {unknown}}.")
   }
   hit <- items$item_id %in% item_id
   items$status[hit] <- "not_applicable"
@@ -327,7 +331,7 @@ instar_na <- function(items, item_id) {
 #'
 #' @export
 instar_template <- function(study_type = c("both", "lab", "field")) {
-  study_type <- match.arg(study_type)
+  study_type <- rlang::arg_match(study_type)
   out <- instar_items[, c("order", "domain", "item_id", "item", "description",
                        "lab", "field")]
   out$value  <- NA_character_
@@ -398,10 +402,11 @@ read_items <- function(path, ...) {
   required <- c("item_id", "value")
   missing <- setdiff(required, names(df))
   if (length(missing) > 0) {
-    stop("File `", path, "` is missing required column(s): ",
-         paste(missing, collapse = ", "),
-         ". Expected an `item_id` column and a `report` (or `value`) column.",
-         call. = FALSE)
+    cli::cli_abort(c(
+      "{.file {path}} is missing {cli::qty(missing)}required column{?s}: {.field {missing}}.",
+      "i" = "A sheet needs an {.field item_id} column and a {.field report}
+             (or {.field value}) column."
+    ))
   }
 
   # Usage notes are for the human filling the sheet in; drop them.

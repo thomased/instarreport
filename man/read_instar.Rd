@@ -11,7 +11,7 @@ read_instar(
   subdir_names = FALSE,
   ext = c("csv", "xlsx"),
   quiet = FALSE,
-  strict = FALSE
+  unknown = c("drop", "error")
 )
 }
 \arguments{
@@ -36,7 +36,7 @@ Reading \code{.xlsx} requires the \pkg{readxl} package.}
 \item{quiet}{Logical; suppress the progress messages. Defaults to
 \code{FALSE}.}
 
-\item{strict}{Passed to \code{\link[=instar_report]{instar_report()}}. Defaults to \code{FALSE}, so
+\item{unknown}{Passed to \code{\link[=instar_report]{instar_report()}}. Defaults to \code{"drop"}, so
 that a sheet carrying an unrecognised \code{item_id} (a hand-edited row,
 a later framework version) warns rather than failing the whole
 corpus.}

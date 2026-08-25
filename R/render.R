@@ -159,7 +159,10 @@
 #' @keywords internal
 .build_figure <- function(paper, data, value_wrap = 75) {
   if (!requireNamespace("patchwork", quietly = TRUE)) {
-    stop("Install patchwork: install.packages('patchwork')", call. = FALSE)
+    cli::cli_abort(c(
+      "The {.pkg patchwork} package is required to draw the figure.",
+      "i" = 'Install it with {.run install.packages("patchwork")}.'
+    ))
   }
 
   # Card height = content line budget + title overhead. This makes each

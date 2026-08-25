@@ -95,7 +95,8 @@ test_that("the bundle qualifies foreign generics it calls", {
   # Functions that live in a package the bundle never attaches. A bare
   # call to any of these is an undefined-function error at runtime.
   foreign <- c("autoplot", "ggsave", "ggplot", "aes", "theme_void",
-               "wrap_plots", "plot_layout", "geom_richtext")
+               "wrap_plots", "plot_layout", "geom_richtext",
+               "cli_abort", "cli_warn", "cli_inform", "arg_match")
 
   offenders <- character(0)
   for (f in files) {

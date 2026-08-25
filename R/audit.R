@@ -50,7 +50,7 @@ instar_audit <- function(x, ...) {
   if (is.data.frame(x)) return(audit_from_matrix(x, ...))
   corpus <- as_instar_corpus(x, ...)
   if (length(corpus) == 0L) {
-    stop("Nothing to audit: the corpus is empty.", call. = FALSE)
+    cli::cli_abort("Nothing to audit: the corpus is empty.")
   }
 
   long <- do.call(rbind, lapply(seq_along(corpus), function(i) {
@@ -114,16 +114,20 @@ audit_from_matrix <- function(scores, id = NULL) {
   scores <- as.data.frame(scores, stringsAsFactors = FALSE)
   item_cols <- intersect(names(scores), instar_items$item_id)
   if (length(item_cols) == 0L) {
-    stop("None of the columns match a framework `item_id`. Expected ",
-         "column names drawn from instar_items$item_id, for example: ",
-         paste(utils::head(instar_items$item_id, 3), collapse = ", "),
-         ".", call. = FALSE)
+    cli::cli_abort(c(
+      "None of the columns in {.arg scores} match a framework {.field item_id}.",
+      "i" = "Expected names drawn from {.code instar_items$item_id}, for
+             example {.val {utils::head(instar_items$item_id, 3)}}."
+    ))
   }
   meta_cols <- setdiff(names(scores), item_cols)
 
   if (!is.null(id)) {
     if (!id %in% names(scores)) {
-      stop("`id` column not found: ", id, call. = FALSE)
+      cli::cli_abort(c(
+        "{.arg id} column not found: {.val {id}}.",
+        "i" = "Available: {.val {names(scores)}}."
+      ))
     }
     study <- as.character(scores[[id]])
   } else if (length(meta_cols) > 0L) {
@@ -139,23 +143,21 @@ audit_from_matrix <- function(scores, id = NULL) {
   study[is.na(study)] <- ""
   dup <- unique(study[duplicated(study)])
   if (length(dup) > 0L) {
-    blank <- any(!nzchar(dup))
-    warning(
-      "Duplicate study identifier(s) in `", id %||% meta_cols[1], "`: ",
-      paste(utils::head(ifelse(nzchar(dup), dup, "<blank>"), 5),
-            collapse = ", "),
-      if (length(dup) > 5L) sprintf(" (and %d more)", length(dup) - 5L) else "",
-      ". They have been made unique, so each row is still counted as its ",
-      "own study",
-      if (blank) {
-        paste0(". A blank id usually means the column is incomplete ",
-               "rather than that those rows are duplicates: pick a ",
-               "column that identifies every row")
-      } else {
-        ", but check they are not the same study scored twice"
-      },
-      ".", call. = FALSE
-    )
+    id_col <- id %||% meta_cols[1]
+    shown <- utils::head(ifelse(nzchar(dup), dup, "<blank>"), 5)
+    more <- if (length(dup) > 5L) length(dup) - 5L else 0L
+    hint <- if (any(!nzchar(dup))) {
+      "A blank id usually means the column is incomplete rather than that
+       those rows are duplicates: pick a column that identifies every row."
+    } else {
+      "Check they are not the same study scored twice."
+    }
+    cli::cli_warn(c(
+      "{cli::qty(dup)}Duplicate study identifier{?s} in {.field {id_col}}: {.val {shown}}.",
+      if (more > 0L) c("i" = "...and {more} more."),
+      "i" = "They have been made unique, so each row still counts as its own study.",
+      "!" = hint
+    ))
   }
   study <- make.unique(study, sep = "_")
 
@@ -186,10 +188,9 @@ audit_from_matrix <- function(scores, id = NULL) {
   # scoring never checked.
   unscored <- setdiff(instar_items$item_id, item_cols)
   if (length(unscored) > 0L) {
-    message(sprintf(
-      "%d framework item%s not present in `scores` and left out of the audit: %s",
-      length(unscored), if (length(unscored) == 1L) "" else "s",
-      paste(unscored, collapse = ", ")
+    cli::cli_inform(c(
+      "i" = "{length(unscored)} framework item{?s} not present in {.arg scores}
+             and left out of the audit: {.field {unscored}}."
     ))
   }
 
@@ -209,8 +210,10 @@ audit_from_matrix <- function(scores, id = NULL) {
     "not_applicable"
   bad <- unique(v[is.na(out)])
   if (length(bad) > 0L) {
-    warning("Unrecognised score value(s) treated as not reported: ",
-            paste(bad, collapse = ", "), call. = FALSE)
+    cli::cli_warn(c(
+      "{cli::qty(bad)}Unrecognised score value{?s}: {.val {bad}}.",
+      "!" = "Treated as not reported. Check the scoring table."
+    ))
     out[is.na(out)] <- "not_reported"
   }
   factor(out, levels = .STATUS_LEVELS)
@@ -330,12 +333,12 @@ summary.instar_audit <- function(object, by = NULL, ...) {
   if (is.null(by)) return(object$items)
 
   if (!by %in% names(object$studies)) {
-    stop("No study-level column called `", by, "`. Available: ",
-         paste(setdiff(names(object$studies),
-                       c("reported", "not_reported", "not_applicable",
-                         "applicable", "percent_reported")),
-               collapse = ", "),
-         call. = FALSE)
+    cli::cli_abort(c(
+      "No study-level column called {.field {by}}.",
+      "i" = "Available: {.field {setdiff(names(object$studies),
+             c(\"reported\", \"not_reported\", \"not_applicable\",
+               \"applicable\", \"percent_reported\"))}}."
+    ))
   }
 
   key <- object$studies[, unique(c("study", by)), drop = FALSE]

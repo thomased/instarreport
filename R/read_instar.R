@@ -55,7 +55,7 @@
 #'   Reading `.xlsx` requires the \pkg{readxl} package.
 #' @param quiet Logical; suppress the progress messages. Defaults to
 #'   `FALSE`.
-#' @param strict Passed to [instar_report()]. Defaults to `FALSE`, so
+#' @param unknown Passed to [instar_report()]. Defaults to `"drop"`, so
 #'   that a sheet carrying an unrecognised `item_id` (a hand-edited row,
 #'   a later framework version) warns rather than failing the whole
 #'   corpus.
@@ -87,26 +87,28 @@ read_instar <- function(where,
                         subdir_names = FALSE,
                         ext = c("csv", "xlsx"),
                         quiet = FALSE,
-                        strict = FALSE) {
+                        unknown = c("drop", "error")) {
+  unknown <- rlang::arg_match(unknown)
   if (!is.character(where) || length(where) == 0L) {
-    stop("`where` must be a character vector of file or directory paths.",
-         call. = FALSE)
+    cli::cli_abort("{.arg where} must be a character vector of file or
+                    directory paths, not {.obj_type_friendly {where}}.")
   }
   ext <- tolower(sub("^\\.", "", ext))
 
   files <- .collect_files(where, pattern = pattern, recursive = recursive,
                           ext = ext)
   if (length(files$path) == 0L) {
-    stop("No INSTAR sheets found in: ", paste(where, collapse = ", "),
-         ". Looked for files ending in ",
-         paste0(".", ext, collapse = ", "),
-         if (!recursive) ". Try recursive = TRUE." else ".",
-         call. = FALSE)
+    cli::cli_abort(c(
+      "No INSTAR sheets found in {.file {where}}.",
+      "i" = "Looked for files ending in {.val {paste0(\".\", ext)}}.",
+      if (!recursive) c("i" = "Use {.code recursive = TRUE} to search
+                              subdirectories.")
+    ))
   }
 
   n <- length(files$path)
   if (!quiet) {
-    message(sprintf("Reading %d file%s...", n, if (n == 1L) "" else "s"))
+    cli::cli_inform("Reading {n} file{?s}...")
   }
   pb <- if (!quiet && n > 1L) {
     utils::txtProgressBar(min = 0, max = n, style = 3)
@@ -120,12 +122,12 @@ read_instar <- function(where,
   for (i in seq_len(n)) {
     warned <- FALSE
     # A warning while reading one sheet (an unrecognised item_id under
-    # strict = FALSE, say) is information about that sheet, not a reason
+    # unknown = "drop", say) is information about that sheet, not a reason
     # to drop it. Muffle it here so the read completes, and report the
     # count at the end rather than emitting one per file.
     res <- withCallingHandlers(
       tryCatch(
-        .read_one(files$path[i], strict = strict),
+        .read_one(files$path[i], unknown = unknown),
         error = function(e) {
           structure(conditionMessage(e), class = "instar_fail")
         }
@@ -167,22 +169,23 @@ read_instar <- function(where,
 
   names(reports) <- .corpus_names(reports, labels)
 
-  if (nrow(failed_df) > 0L) {
-    warning(sprintf(
-      "%d of %d file%s could not be read: %s. See attr(x, \"failed\").",
-      nrow(failed_df), n, if (n == 1L) "" else "s",
-      paste(basename(failed_df$file), collapse = ", ")
-    ), call. = FALSE)
+  n_failed <- nrow(failed_df)
+  if (n_failed > 0L) {
+    bad_names <- basename(failed_df$file)
+    cli::cli_warn(c(
+      "{n_failed} of {n} file{?s} could not be read: {.file {bad_names}}.",
+      "i" = "See {.code attr(x, \"failed\")} for the error from each."
+    ))
   }
   if (!quiet) {
-    message(sprintf(
-      "Imported %d sheet%s%s%s.", length(reports),
-      if (length(reports) == 1L) "" else "s",
-      if (nrow(failed_df) > 0L) sprintf("; %d failed", nrow(failed_df)) else "",
+    n_ok <- length(reports)
+    cli::cli_inform(c(
+      "v" = "Imported {n_ok} sheet{?s}.",
+      if (n_failed > 0L) c("x" = "{n_failed} failed."),
       if (n_warned > 0L) {
-        sprintf("; %d read with warnings (re-read individually with %s)",
-                n_warned, "read_items() to see them")
-      } else ""
+        c("!" = "{n_warned} read with warnings; re-read individually with
+                 {.fn read_items} to see them.")
+      }
     ))
   }
 
@@ -216,7 +219,7 @@ read_instar <- function(where,
       paths  <- c(paths, w)
       labels <- c(labels, basename(w))
     } else {
-      warning("No such file or directory: ", w, call. = FALSE)
+      cli::cli_warn("No such file or directory: {.file {w}}.")
     }
   }
 
@@ -235,14 +238,14 @@ read_instar <- function(where,
 
 #' Read one sheet of any supported format into a report
 #' @keywords internal
-.read_one <- function(path, strict = FALSE) {
+.read_one <- function(path, unknown = "drop") {
   ext <- tolower(tools::file_ext(path))
   items <- switch(
     ext,
     csv  = read_items(path),
     xlsx = .read_items_xlsx(path),
     xls  = .read_items_xlsx(path),
-    stop("Unsupported file type: .", ext, call. = FALSE)
+    cli::cli_abort("Unsupported file type {.val {ext}}.")
   )
   paper <- attr(items, "paper")
   # A sheet with no title row still belongs in the corpus: for an audit
@@ -254,7 +257,7 @@ read_instar <- function(where,
       paper %||% list()
     )
   }
-  instar_report(items, paper = paper, strict = strict)
+  instar_report(items, paper = paper, unknown = unknown)
 }
 
 
@@ -267,9 +270,11 @@ read_instar <- function(where,
 #' @keywords internal
 .read_items_xlsx <- function(path) {
   if (!requireNamespace("readxl", quietly = TRUE)) {
-    stop("Reading .xlsx sheets needs the readxl package. ",
-         "Install it with install.packages(\"readxl\"), ",
-         "or save the sheet as CSV.", call. = FALSE)
+    cli::cli_abort(c(
+      "Reading {.file .xlsx} sheets needs the {.pkg readxl} package.",
+      "i" = 'Install it with {.run install.packages("readxl")}, or save the
+             sheet as CSV.'
+    ))
   }
   df <- as.data.frame(
     readxl::read_excel(path, col_types = "text", .name_repair = "minimal"),
@@ -311,14 +316,13 @@ read_instar <- function(where,
   }, character(1))
   known <- unique(stats::na.omit(v))
   if (length(known) > 1L) {
-    warning(
-      "This corpus mixes INSTAR framework versions (",
-      paste(sort(known), collapse = ", "),
-      "). Coverage is not comparable across versions, because an item ",
-      "that did not exist in an earlier version is not an item those ",
-      "studies failed to report. Split the corpus by version before ",
-      "auditing.", call. = FALSE
-    )
+    cli::cli_warn(c(
+      "This corpus mixes INSTAR framework versions: {.val {sort(known)}}.",
+      "!" = "Coverage is not comparable across versions: an item that did not
+             exist in an earlier version is not an item those studies failed
+             to report.",
+      "i" = "Split the corpus by version before auditing."
+    ))
   }
   invisible(x)
 }
@@ -334,9 +338,10 @@ read_instar <- function(where,
   }, character(1))
   dup <- unique(dois[duplicated(dois) & !is.na(dois)])
   if (length(dup) > 0L) {
-    warning("Duplicate DOI(s) in this corpus: ", paste(dup, collapse = ", "),
-            ". The same study counted twice will skew any audit.",
-            call. = FALSE)
+    cli::cli_warn(c(
+      "{cli::qty(dup)}Duplicate DOI{?s} in this corpus: {.val {dup}}.",
+      "!" = "The same study counted twice will skew any audit."
+    ))
   }
   invisible(x)
 }

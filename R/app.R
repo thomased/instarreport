@@ -17,12 +17,15 @@
 #' @export
 instar_app <- function(launch.browser = TRUE, ...) {
   if (!requireNamespace("shiny", quietly = TRUE)) {
-    stop("Install shiny: install.packages('shiny')", call. = FALSE)
+    cli::cli_abort(c(
+      "The {.pkg shiny} package is required to run the web tool locally.",
+      "i" = 'Install it with {.run install.packages("shiny")},',
+      "i" = "or use the hosted copy at {.url https://instar-statement.org/app/}."
+    ))
   }
   app_dir <- system.file("shiny", package = "instarreport")
   if (!nzchar(app_dir)) {
-    stop("Shiny app directory not found. Reinstall instarreport.",
-         call. = FALSE)
+    cli::cli_abort("Shiny app directory not found. Try reinstalling {.pkg instarreport}.")
   }
   shiny::runApp(app_dir, launch.browser = launch.browser, ...)
 }

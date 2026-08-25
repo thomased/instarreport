@@ -41,7 +41,7 @@
       "study reports; leave it blank if the study does not report it;",
       "write NA if the item does not apply. Do not edit the other columns,",
       "or add or remove rows. Upload the completed file at",
-      "https://thomas-white.shinyapps.io/instar/ to generate the summary",
+      "https://instar-statement.org/app/ to generate the summary",
       "figure (save as CSV first if you are in a spreadsheet)."
     )
   )
@@ -162,9 +162,13 @@
   x[is.na(x)] <- "not_reported"
   bad <- setdiff(unique(x), .STATUS_LEVELS)
   if (length(bad) > 0) {
-    stop("Invalid `status` value(s): ", paste(bad, collapse = ", "),
-         ". Must be one of: ", paste(.STATUS_LEVELS, collapse = ", "),
-         call. = FALSE)
+    # Bound to a local first: cli >= 3.4 reads `{.anything}` as a style,
+    # so interpolating a dot-prefixed object directly is an error.
+    levels_ok <- .STATUS_LEVELS
+    cli::cli_abort(c(
+      "Invalid {cli::qty(bad)}`status` value{?s}: {.val {bad}}.",
+      "i" = "Must be one of {.val {levels_ok}}."
+    ))
   }
   factor(x, levels = .STATUS_LEVELS)
 }

@@ -4,7 +4,7 @@
 \alias{validate_items}
 \title{Validate user inputs to instar_report()}
 \usage{
-validate_items(items, items_ref = instar_items, strict = TRUE)
+validate_items(items, items_ref = instar_items, unknown = c("error", "drop"))
 }
 \arguments{
 \item{items}{A data frame with at least \code{item_id} and \code{value} columns.}
@@ -12,8 +12,10 @@ validate_items(items, items_ref = instar_items, strict = TRUE)
 \item{items_ref}{The framework to validate against. Defaults to
 \link{instar_items}.}
 
-\item{strict}{Logical. If \code{TRUE} (the default), unknown \code{item_id}s
-raise an error. If \code{FALSE}, they are warned about and dropped.}
+\item{unknown}{What to do with \code{item_id}s that are not in the
+framework. \code{"error"} (the default) stops; \code{"drop"} warns and
+discards them, which is what you want when reading sheets in bulk
+and one bad row should not fail the batch.}
 }
 \value{
 The validated items table, with the \code{instar_items} class and a

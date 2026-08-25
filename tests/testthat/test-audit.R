@@ -203,7 +203,7 @@ test_that("blank study ids get their own advice", {
 test_that("a matrix with no recognisable items errors", {
   expect_error(
     audit_from_matrix(data.frame(a = 1, b = 2)),
-    "None of the columns match"
+    "None of the columns"
   )
 })
 

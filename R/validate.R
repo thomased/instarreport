@@ -8,8 +8,10 @@
 #' @param items A data frame with at least `item_id` and `value` columns.
 #' @param items_ref The framework to validate against. Defaults to
 #'   [instar_items].
-#' @param strict Logical. If `TRUE` (the default), unknown `item_id`s
-#'   raise an error. If `FALSE`, they are warned about and dropped.
+#' @param unknown What to do with `item_id`s that are not in the
+#'   framework. `"error"` (the default) stops; `"drop"` warns and
+#'   discards them, which is what you want when reading sheets in bulk
+#'   and one bad row should not fail the batch.
 #'
 #' @return The validated items table, with the `instar_items` class and a
 #'   canonical `status` column. Errors if validation fails.
@@ -20,31 +22,44 @@
 #'
 #' @export
 validate_items <- function(items, items_ref = instar_items,
-                           strict = TRUE) {
+                           unknown = c("error", "drop")) {
+  unknown <- rlang::arg_match(unknown)
+
   if (!is.data.frame(items)) {
-    stop("`items` must be a data frame.", call. = FALSE)
+    cli::cli_abort("{.arg items} must be a data frame, not {.obj_type_friendly {items}}.")
   }
   required <- c("item_id", "value")
   missing_cols <- setdiff(required, names(items))
   if (length(missing_cols) > 0) {
-    stop("`items` is missing required column(s): ",
-         paste(missing_cols, collapse = ", "), call. = FALSE)
+    cli::cli_abort(c(
+      "{.arg items} is missing {cli::qty(missing_cols)}required column{?s}: {.field {missing_cols}}.",
+      "i" = "An items table needs an {.field item_id} column and a
+             {.field report} (or {.field value}) column."
+    ))
   }
+
   # Reserved metadata ids are stripped by read_items(), but tolerate them
   # here so a hand-built table carrying them does not trip the check.
-  unknown <- setdiff(items$item_id, c(items_ref$item_id, .RESERVED_FIELDS))
-  if (length(unknown) > 0) {
-    msg <- paste0("Unknown item_id(s): ", paste(unknown, collapse = ", "),
-                  ". Run `instar_items$item_id` to see the canonical list.")
-    if (strict) stop(msg, call. = FALSE) else {
-      warning(msg, call. = FALSE)
-      items <- items[items$item_id %in% items_ref$item_id, , drop = FALSE]
+  bad <- setdiff(items$item_id, c(items_ref$item_id, .RESERVED_FIELDS))
+  if (length(bad) > 0) {
+    if (identical(unknown, "error")) {
+      cli::cli_abort(c(
+        "{cli::qty(bad)}Unknown item_id{?s}: {.val {bad}}.",
+        "i" = "Run {.code instar_items$item_id} for the canonical list.",
+        "i" = "Use {.code unknown = \"drop\"} to discard unrecognised items
+               instead of failing."
+      ))
     }
+    cli::cli_warn("{cli::qty(bad)}Dropping unknown item_id{?s}: {.val {bad}}.")
+    items <- items[items$item_id %in% items_ref$item_id, , drop = FALSE]
   }
-  duplicated_ids <- items$item_id[duplicated(items$item_id)]
-  if (length(duplicated_ids) > 0) {
-    stop("Duplicate item_id(s) in `items`: ",
-         paste(unique(duplicated_ids), collapse = ", "), call. = FALSE)
+
+  dups <- unique(items$item_id[duplicated(items$item_id)])
+  if (length(dups) > 0) {
+    cli::cli_abort(c(
+      "{cli::qty(dups)}Duplicate item_id{?s} in {.arg items}: {.val {dups}}.",
+      "i" = "Each framework item may appear at most once."
+    ))
   }
   new_instar_items(items)
 }
@@ -57,15 +72,14 @@ validate_items <- function(items, items_ref = instar_items,
 #' @keywords internal
 validate_paper <- function(paper) {
   if (!is.list(paper) || is.null(names(paper))) {
-    stop("`paper` must be a named list.", call. = FALSE)
+    cli::cli_abort("{.arg paper} must be a named list.")
   }
-  required <- c("title", "authors")
-  missing <- setdiff(required, names(paper))
+  missing <- setdiff(c("title", "authors"), names(paper))
   if (length(missing) > 0) {
-    stop("`paper` must contain at least: ",
-         paste(required, collapse = ", "),
-         ". Missing: ", paste(missing, collapse = ", "),
-         call. = FALSE)
+    cli::cli_abort(c(
+      "{.arg paper} is missing {.field {missing}}.",
+      "i" = "At minimum: {.code paper = list(title = , authors = )}."
+    ))
   }
   invisible(TRUE)
 }

@@ -4,7 +4,7 @@
 \alias{.read_one}
 \title{Read one sheet of any supported format into a report}
 \usage{
-.read_one(path, strict = FALSE)
+.read_one(path, unknown = "drop")
 }
 \description{
 Read one sheet of any supported format into a report

@@ -232,7 +232,8 @@ to override.
 
 Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study.
+summarises a literature rather than a study. This is a sketch; see
+`vignette("auditing")` for the full treatment.
 
 `read_instar()` is the loader. Point it at a file, a directory, or a
 vector of either; it works out the format from the extension and always

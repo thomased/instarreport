@@ -4,7 +4,12 @@
 \alias{instar_report}
 \title{Build an invertebrate welfare report}
 \usage{
-instar_report(items, paper = NULL, value_wrap = 75, strict = TRUE)
+instar_report(
+  items,
+  paper = NULL,
+  value_wrap = 75,
+  unknown = c("error", "drop")
+)
 }
 \arguments{
 \item{items}{A data frame with at least \code{item_id} and a \code{report} (or
@@ -21,8 +26,9 @@ metadata rows, in which case those details are used.}
 \item{value_wrap}{Integer; approximate characters per line for the
 value text when the report is plotted. Defaults to \code{75}.}
 
-\item{strict}{Logical; if \code{TRUE}, unknown \code{item_id}s in \code{items} raise
-an error. If \code{FALSE}, they are warned about and ignored.}
+\item{unknown}{What to do with \code{item_id}s in \code{items} that are not in
+the framework. \code{"error"} (the default) stops; \code{"drop"} warns and
+ignores them. Passed to \code{\link[=validate_items]{validate_items()}}.}
 }
 \value{
 An object of class \code{instar_report}: a list with elements

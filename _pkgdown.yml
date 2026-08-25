@@ -32,6 +32,8 @@ navbar:
       menu:
       - text: Getting started
         href: articles/usage.html
+      - text: Auditing a body of literature
+        href: articles/auditing.html
 reference:
 - title: The framework
   desc: |

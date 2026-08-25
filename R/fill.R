@@ -48,10 +48,10 @@ instar_fill <- function(items = NULL,
                        study_type = c("both", "lab", "field"),
                        save_to = NULL) {
   if (!interactive()) {
-    stop("instar_fill() requires an interactive R session.", call. = FALSE)
+    cli::cli_abort("{.fn instar_fill} needs an interactive R session.")
   }
   if (is.null(items)) {
-    study_type <- match.arg(study_type)
+    study_type <- rlang::arg_match(study_type)
     items <- instar_template(study_type)
   } else {
     items <- validate_items(items)
@@ -152,7 +152,7 @@ instar_fill <- function(items = NULL,
 #' @export
 instar_edit <- function(items, item_id = NULL) {
   if (!interactive()) {
-    stop("instar_edit() requires an interactive R session.", call. = FALSE)
+    cli::cli_abort("{.fn instar_edit} needs an interactive R session.")
   }
   items <- validate_items(items)
 
@@ -175,7 +175,7 @@ instar_edit <- function(items, item_id = NULL) {
     item_id <- instar_items$item_id[n]
   }
   if (!item_id %in% instar_items$item_id) {
-    stop("Unknown item_id: ", item_id, call. = FALSE)
+    cli::cli_abort("Unknown {.field item_id}: {.val {item_id}}.")
   }
 
   meta <- instar_items[instar_items$item_id == item_id, ]
@@ -235,7 +235,7 @@ instar_edit <- function(items, item_id = NULL) {
 .instar_csv <- function(items = NULL, paper = NULL, version = NULL,
                         study_type = c("both", "lab", "field")) {
   if (is.null(items)) {
-    study_type <- match.arg(study_type)
+    study_type <- rlang::arg_match(study_type)
     items <- instar_template(study_type)
   } else {
     items <- validate_items(items)
@@ -355,8 +355,8 @@ write_items <- function(items, path) {
 #' @export
 write_report <- function(report, path) {
   if (!inherits(report, "instar_report")) {
-    stop("`report` must be an object created by instar_report().",
-         call. = FALSE)
+    cli::cli_abort("{.arg report} must come from {.fn instar_report}, not
+                    {.obj_type_friendly {report}}.")
   }
   utils::write.csv(.instar_csv(report$items, report$paper, report$version),
                    path, row.names = FALSE)
@@ -402,10 +402,10 @@ write_report <- function(report, path) {
 #'
 #' @export
 write_template <- function(path, study_type = c("both", "lab", "field")) {
-  study_type <- match.arg(study_type)
+  study_type <- rlang::arg_match(study_type)
   utils::write.csv(.instar_csv(NULL, study_type = study_type), path,
                    row.names = FALSE)
-  message(sprintf("Wrote INSTAR template to %s", path))
+  cli::cli_inform(c("v" = "Wrote INSTAR template to {.file {path}}."))
   invisible(path)
 }
 

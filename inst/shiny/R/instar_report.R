@@ -20,8 +20,9 @@
 #'   metadata rows, in which case those details are used.
 #' @param value_wrap Integer; approximate characters per line for the
 #'   value text when the report is plotted. Defaults to `75`.
-#' @param strict Logical; if `TRUE`, unknown `item_id`s in `items` raise
-#'   an error. If `FALSE`, they are warned about and ignored.
+#' @param unknown What to do with `item_id`s in `items` that are not in
+#'   the framework. `"error"` (the default) stops; `"drop"` warns and
+#'   ignores them. Passed to [validate_items()].
 #'
 #' @return An object of class `instar_report`: a list with elements
 #'   `paper`, `items` (one row per framework item, with `value` and
@@ -44,20 +45,24 @@
 #'
 #' @export
 instar_report <- function(items, paper = NULL, value_wrap = 75,
-                          strict = TRUE) {
+                          unknown = c("error", "drop")) {
+  unknown <- rlang::arg_match(unknown)
   # A file written by write_template() carries the paper's own details in
   # reserved rows, which read_items() peels off into an attribute. Fall
   # back to those when `paper` is not supplied.
   if (is.null(paper)) paper <- attr(items, "paper")
   if (is.null(paper)) {
-    stop("No paper metadata. Either pass `paper = list(title = , authors = )`,",
-         " or read items from a file whose title and authors rows are filled in.",
-         call. = FALSE)
+    cli::cli_abort(c(
+      "No paper metadata.",
+      "i" = "Pass {.code paper = list(title = , authors = )},",
+      "i" = "or read items from a sheet whose title and authors rows are
+             filled in, which {.fn read_items} picks up automatically."
+    ))
   }
   validate_paper(paper)
   version <- attr(items, "version")
   if (is.null(version)) version <- NA_character_
-  items <- validate_items(items, strict = strict)
+  items <- validate_items(items, unknown = unknown)
   items <- items[!items$item_id %in% .RESERVED_FIELDS, , drop = FALSE]
 
   # Join onto the canonical framework so every item has exactly one row,
@@ -233,8 +238,8 @@ autoplot.instar_report <- function(object, ...) {
 save_figure <- function(report, filename, width = 8.5, height = NULL,
                         dpi = 300, ...) {
   if (!inherits(report, "instar_report")) {
-    stop("`report` must be an object created by instar_report().",
-         call. = FALSE)
+    cli::cli_abort("{.arg report} must come from {.fn instar_report}, not
+                    {.obj_type_friendly {report}}.")
   }
   fig <- ggplot2::autoplot(report)
   if (is.null(height)) {

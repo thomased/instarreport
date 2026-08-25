@@ -187,7 +187,7 @@ server <- function(input, output, session) {
       doi     = nzchar_or(input$paper_doi,     NULL)
     )
     tryCatch(
-      instar_report(current_items(), paper = paper, strict = FALSE),
+      instar_report(current_items(), paper = paper, unknown = "drop"),
       error = function(e) {
         showNotification(paste("Error building figure:",
                                conditionMessage(e)),

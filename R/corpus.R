@@ -13,8 +13,9 @@
 new_instar_corpus <- function(x) {
   bad <- !vapply(x, inherits, logical(1), "instar_report")
   if (any(bad)) {
-    stop("All elements must be instar_report objects. Offending element(s): ",
-         paste(which(bad), collapse = ", "), call. = FALSE)
+    offenders <- which(bad)
+    cli::cli_abort("All elements must be {.cls instar_report} objects.
+                    {cli::qty(offenders)}Offending element{?s}: {offenders}.")
   }
   # Guard the empty case: paste0() recycles a zero-length argument to "",
   # so paste0("study_", seq_along(list())) is "study_" -- length 1, which
@@ -51,12 +52,14 @@ as_instar_corpus <- function(x, ...) {
       nm <- names(x)[i] %||% paste0("study_", i)
       paper <- attr(el, "paper") %||% list()
       paper <- utils::modifyList(list(title = nm, authors = "Not given"), paper)
-      instar_report(el, paper = paper, strict = FALSE)
+      instar_report(el, paper = paper, unknown = "drop")
     })
     return(new_instar_corpus(x))
   }
-  stop("Cannot treat this as a corpus of INSTAR sheets. Supply a path, ",
-       "a list of reports, or the result of read_instar().", call. = FALSE)
+  cli::cli_abort(c(
+    "Cannot treat {.obj_type_friendly {x}} as a corpus of INSTAR sheets.",
+    "i" = "Supply a path, a list of reports, or the result of {.fn read_instar}."
+  ))
 }
 
 
