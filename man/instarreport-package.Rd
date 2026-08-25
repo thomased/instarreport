@@ -68,8 +68,8 @@ framework with a live preview.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://instar-statement.org/}
   \item \url{https://github.com/thomased/instarreport}
-  \item \url{https://thomased.github.io/instarreport/}
   \item Report bugs at \url{https://github.com/thomased/instarreport/issues}
 }
 
