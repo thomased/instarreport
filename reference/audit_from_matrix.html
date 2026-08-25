@@ -23,6 +23,7 @@ one row per paper, one column per framework item, scored by a reader."></head><b
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/usage.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/auditing.html">Auditing a body of literature</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../app/index.html">Web tool</a></li>
@@ -92,7 +93,11 @@ the framework's applicability codes.</p>
 <span class="r-in"><span>  env_field <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NA"</span>, <span class="st">"Y"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu">audit_from_matrix</span><span class="op">(</span><span class="va">scores</span>, id <span class="op">=</span> <span class="st">"doi"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 15 framework items not present in `scores` and left out of the audit: subjects_source, proc_handling, proc_anaesthesia, proc_biosecurity, ethics_review, ethics_endpoints, ethics_statement, nutrition_diet, env_housing, env_acclimation, health_monitoring, health_injury, fate_end, behaviour_general, affect_indicators</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> 15 framework items not present in `scores` and left out of the audit:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #00BB00;">subjects_source</span>, <span style="color: #00BB00;">proc_handling</span>, <span style="color: #00BB00;">proc_anaesthesia</span>, <span style="color: #00BB00;">proc_biosecurity</span>,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #00BB00;">ethics_review</span>, <span style="color: #00BB00;">ethics_endpoints</span>, <span style="color: #00BB00;">ethics_statement</span>, <span style="color: #00BB00;">nutrition_diet</span>,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #00BB00;">env_housing</span>, <span style="color: #00BB00;">env_acclimation</span>, <span style="color: #00BB00;">health_monitoring</span>, <span style="color: #00BB00;">health_injury</span>, <span style="color: #00BB00;">fate_end</span>,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #00BB00;">behaviour_general</span>, and <span style="color: #00BB00;">affect_indicators</span>.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          item_id                            item      domain      group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 subjects_taxon Taxonomic ID, life stage, &amp; sex    Subjects foundation</span>

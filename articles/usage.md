@@ -417,7 +417,9 @@ choosing a compact page height from the figure’s natural content size
 
 Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study.
+summarises a literature rather than a study. This is a sketch; see
+[`vignette("auditing")`](https://instar-statement.org/articles/auditing.md)
+for the full treatment.
 
 [`read_instar()`](https://instar-statement.org/reference/read_instar.md)
 is the loader. Point it at a file, a directory, or a vector of either;

@@ -10,7 +10,7 @@ absent.
 ## Usage
 
 ``` r
-validate_items(items, items_ref = instar_items, strict = TRUE)
+validate_items(items, items_ref = instar_items, unknown = c("error", "drop"))
 ```
 
 ## Arguments
@@ -24,10 +24,12 @@ validate_items(items, items_ref = instar_items, strict = TRUE)
   The framework to validate against. Defaults to
   [instar_items](https://instar-statement.org/reference/instar_items.md).
 
-- strict:
+- unknown:
 
-  Logical. If `TRUE` (the default), unknown `item_id`s raise an error.
-  If `FALSE`, they are warned about and dropped.
+  What to do with `item_id`s that are not in the framework. `"error"`
+  (the default) stops; `"drop"` warns and discards them, which is what
+  you want when reading sheets in bulk and one bad row should not fail
+  the batch.
 
 ## Value
 

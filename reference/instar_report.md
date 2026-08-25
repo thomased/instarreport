@@ -17,7 +17,12 @@ modify further, use
 ## Usage
 
 ``` r
-instar_report(items, paper = NULL, value_wrap = 75, strict = TRUE)
+instar_report(
+  items,
+  paper = NULL,
+  value_wrap = 75,
+  unknown = c("error", "drop")
+)
 ```
 
 ## Arguments
@@ -47,10 +52,12 @@ instar_report(items, paper = NULL, value_wrap = 75, strict = TRUE)
   Integer; approximate characters per line for the value text when the
   report is plotted. Defaults to `75`.
 
-- strict:
+- unknown:
 
-  Logical; if `TRUE`, unknown `item_id`s in `items` raise an error. If
-  `FALSE`, they are warned about and ignored.
+  What to do with `item_id`s in `items` that are not in the framework.
+  `"error"` (the default) stops; `"drop"` warns and ignores them. Passed
+  to
+  [`validate_items()`](https://instar-statement.org/reference/validate_items.md).
 
 ## Value
 

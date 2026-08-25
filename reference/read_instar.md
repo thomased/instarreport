@@ -15,7 +15,7 @@ read_instar(
   subdir_names = FALSE,
   ext = c("csv", "xlsx"),
   quiet = FALSE,
-  strict = FALSE
+  unknown = c("drop", "error")
 )
 ```
 
@@ -53,11 +53,11 @@ read_instar(
 
   Logical; suppress the progress messages. Defaults to `FALSE`.
 
-- strict:
+- unknown:
 
   Passed to
   [`instar_report()`](https://instar-statement.org/reference/instar_report.md).
-  Defaults to `FALSE`, so that a sheet carrying an unrecognised
+  Defaults to `"drop"`, so that a sheet carrying an unrecognised
   `item_id` (a hand-edited row, a later framework version) warns rather
   than failing the whole corpus.
 

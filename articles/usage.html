@@ -36,6 +36,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/usage.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/auditing.html">Auditing a body of literature</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -452,7 +453,8 @@ formats). Pass an explicit <code>height</code> to override.</p>
 </h2>
 <p>Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study.</p>
+summarises a literature rather than a study. This is a sketch; see
+<code><a href="../articles/auditing.html">vignette("auditing")</a></code> for the full treatment.</p>
 <p><code><a href="../reference/read_instar.html">read_instar()</a></code> is the loader. Point it at a file, a
 directory, or a vector of either; it works out the format from the
 extension and always returns an <code>instar_corpus</code>, whether it

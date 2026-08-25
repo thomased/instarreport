@@ -50,7 +50,11 @@ scores <- data.frame(
   env_field = c("NA", "Y")
 )
 audit <- audit_from_matrix(scores, id = "doi")
-#> 15 framework items not present in `scores` and left out of the audit: subjects_source, proc_handling, proc_anaesthesia, proc_biosecurity, ethics_review, ethics_endpoints, ethics_statement, nutrition_diet, env_housing, env_acclimation, health_monitoring, health_injury, fate_end, behaviour_general, affect_indicators
+#> ℹ 15 framework items not present in `scores` and left out of the audit:
+#>   subjects_source, proc_handling, proc_anaesthesia, proc_biosecurity,
+#>   ethics_review, ethics_endpoints, ethics_statement, nutrition_diet,
+#>   env_housing, env_acclimation, health_monitoring, health_injury, fate_end,
+#>   behaviour_general, and affect_indicators.
 summary(audit)
 #>          item_id                            item      domain      group
 #> 1 subjects_taxon Taxonomic ID, life stage, & sex    Subjects foundation
