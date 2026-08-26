@@ -230,9 +230,9 @@ corpus <- suppressWarnings(read_instar(corpus_dir))
 #> ✖ 1 failed.
 attr(corpus, "failed")
 #>                                   file
-#> 1 /tmp/RtmpIL1CVA/supplements/junk.csv
+#> 1 /tmp/RtmpIpJ6jM/supplements/junk.csv
 #>                                                                                                                                                                                                                                                                                     error
-#> 1 \033[1m\033[22m\033[34m/tmp/RtmpIL1CVA/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.
+#> 1 \033[1m\033[22m\033[34m/tmp/RtmpIpJ6jM/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.
 ```
 
 Getting the other five sheets plus a list of what to go and fix is more
@@ -485,19 +485,16 @@ its items table, so pulling one item across a corpus is a one-liner:
 
 ``` r
 
-housing <- vapply(corpus, function(r) {
-  v <- r$items$value[r$items$item_id == "env_housing"]
-  if (length(v) == 0 || is.na(v)) NA_character_ else v
-}, character(1))
+d <- as.data.frame(corpus)
 
-data.frame(study = names(housing), housing = unname(housing),
-           row.names = NULL)
-#>            study                                           housing
-#> 1 10.1234/study1                     25 +/- 1 C, 12:12 L:D, 60% RH
-#> 2 10.1234/study2 23 C, 14:10 L:D, group housed at 20 per container
-#> 3 10.1234/study3            Ambient (18-26 C), natural photoperiod
-#> 4 10.1234/study4              25 C, 12:12 L:D, individually housed
-#> 5 10.1234/study5                    27 +/- 0.5 C, 16:8 L:D, 70% RH
+subset(d, item_id == "env_housing" & status == "reported",
+       select = c(study, value))
+#>             study                                             value
+#> 11 10.1234/study1                     25 +/- 1 C, 12:12 L:D, 60% RH
+#> 29 10.1234/study2 23 C, 14:10 L:D, group housed at 20 per container
+#> 47 10.1234/study3            Ambient (18-26 C), natural photoperiod
+#> 65 10.1234/study4              25 C, 12:12 L:D, individually housed
+#> 83 10.1234/study5                    27 +/- 0.5 C, 16:8 L:D, 70% RH
 ```
 
 From there it is ordinary text work. Parse temperatures out, tabulate
@@ -513,20 +510,22 @@ you what is actually used, and how often nothing is. `ethics_review`
 tells you how often review applied at all, and what reasoning was
 offered when it did not.
 
-To get everything at once, in long form:
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) on a
+corpus gives one row per study per item, carrying the paper’s details
+alongside, so grouping and filtering are ordinary data frame work.
 
 ``` r
 
-all_values <- do.call(rbind, lapply(names(corpus), function(nm) {
-  d <- as.data.frame(corpus[[nm]]$items)
-  data.frame(study = nm, item_id = d$item_id, value = d$value,
-             status = as.character(d$status), stringsAsFactors = FALSE)
-}))
-
-head(subset(all_values, status == "reported", select = -status), 4)
-#>            study         item_id                 value
-#> 1 10.1234/study1  subjects_taxon Reported in the paper
-#> 2 10.1234/study1 subjects_source Reported in the paper
-#> 3 10.1234/study1      subjects_n Reported in the paper
-#> 4 10.1234/study1   proc_handling Reported in the paper
+str(d, vec.len = 2)
+#> 'data.frame':    90 obs. of  10 variables:
+#>  $ study  : chr  "10.1234/study1" "10.1234/study1" ...
+#>  $ title  : chr  "Study 1" "Study 1" ...
+#>  $ doi    : chr  "10.1234/study1" "10.1234/study1" ...
+#>  $ journal: chr  "J Alpha" "J Alpha" ...
+#>  $ item_id: chr  "subjects_taxon" "subjects_source" ...
+#>  $ item   : chr  "Taxonomic ID, life stage, & sex" "Source & culture history" ...
+#>  $ domain : chr  "Subjects" "Subjects" ...
+#>  $ group  : chr  "foundation" "foundation" ...
+#>  $ status : chr  "reported" "reported" ...
+#>  $ value  : chr  "Reported in the paper" "Reported in the paper" ...
 ```

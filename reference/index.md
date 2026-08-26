@@ -42,6 +42,8 @@ standardised one-page figure or a depositable sheet.
   : Print method for instar_report
 - [`summary(`*`<instar_report>`*`)`](https://instar-statement.org/reference/summary.instar_report.md)
   : Coverage summary for a report, as a data frame
+- [`as.data.frame(`*`<instar_report>`*`)`](https://instar-statement.org/reference/as.data.frame.instar_report.md)
+  : Coerce a report to a plain data frame
 - [`plot(`*`<instar_report>`*`)`](https://instar-statement.org/reference/plot.instar_report.md)
   : Draw the standardised INSTAR figure
 - [`autoplot(`*`<instar_report>`*`)`](https://instar-statement.org/reference/autoplot.instar_report.md)
@@ -62,6 +64,8 @@ across a literature rather than a single study.
   : Print an INSTAR corpus
 - [`summary(`*`<instar_corpus>`*`)`](https://instar-statement.org/reference/summary.instar_corpus.md)
   : Per-sheet summary of a corpus
+- [`as.data.frame(`*`<instar_corpus>`*`)`](https://instar-statement.org/reference/as.data.frame.instar_corpus.md)
+  : Coerce a corpus to a plain data frame
 - [`` `[`( ``*`<instar_corpus>`*`)`](https://instar-statement.org/reference/sub-.instar_corpus.md)
   : Subset a corpus
 - [`c(`*`<instar_corpus>`*`)`](https://instar-statement.org/reference/c.instar_corpus.md)

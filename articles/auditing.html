@@ -275,9 +275,9 @@ warns, skips them, and records what went wrong.</p>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> 1 failed.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">corpus</span>, <span class="st">"failed"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                   file</span></span>
-<span><span class="co">#&gt; 1 /tmp/RtmpIL1CVA/supplements/junk.csv</span></span>
+<span><span class="co">#&gt; 1 /tmp/RtmpIpJ6jM/supplements/junk.csv</span></span>
 <span><span class="co">#&gt;                                                                                                                                                                                                                                                                                     error</span></span>
-<span><span class="co">#&gt; 1 \033[1m\033[22m\033[34m/tmp/RtmpIL1CVA/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 \033[1m\033[22m\033[34m/tmp/RtmpIpJ6jM/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.</span></span></code></pre></div>
 <p>Getting the other five sheets plus a list of what to go and fix is
 more useful than getting nothing.</p>
 </div>
@@ -493,19 +493,16 @@ carries <em>what was said</em>, which for most of the questions in <a href="#use
 the text in its items table, so pulling one item across a corpus is a
 one-liner:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">housing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">corpus</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">r</span><span class="op">$</span><span class="va">items</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">r</span><span class="op">$</span><span class="va">items</span><span class="op">$</span><span class="va">item_id</span> <span class="op">==</span> <span class="st">"env_housing"</span><span class="op">]</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA_character_</span> <span class="kw">else</span> <span class="va">v</span></span>
-<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>study <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">housing</span><span class="op">)</span>, housing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">housing</span><span class="op">)</span>,</span>
-<span>           row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            study                                           housing</span></span>
-<span><span class="co">#&gt; 1 10.1234/study1                     25 +/- 1 C, 12:12 L:D, 60% RH</span></span>
-<span><span class="co">#&gt; 2 10.1234/study2 23 C, 14:10 L:D, group housed at 20 per container</span></span>
-<span><span class="co">#&gt; 3 10.1234/study3            Ambient (18-26 C), natural photoperiod</span></span>
-<span><span class="co">#&gt; 4 10.1234/study4              25 C, 12:12 L:D, individually housed</span></span>
-<span><span class="co">#&gt; 5 10.1234/study5                    27 +/- 0.5 C, 16:8 L:D, 70% RH</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">item_id</span> <span class="op">==</span> <span class="st">"env_housing"</span> <span class="op">&amp;</span> <span class="va">status</span> <span class="op">==</span> <span class="st">"reported"</span>,</span>
+<span>       select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">study</span>, <span class="va">value</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             study                                             value</span></span>
+<span><span class="co">#&gt; 11 10.1234/study1                     25 +/- 1 C, 12:12 L:D, 60% RH</span></span>
+<span><span class="co">#&gt; 29 10.1234/study2 23 C, 14:10 L:D, group housed at 20 per container</span></span>
+<span><span class="co">#&gt; 47 10.1234/study3            Ambient (18-26 C), natural photoperiod</span></span>
+<span><span class="co">#&gt; 65 10.1234/study4              25 C, 12:12 L:D, individually housed</span></span>
+<span><span class="co">#&gt; 83 10.1234/study5                    27 +/- 0.5 C, 16:8 L:D, 70% RH</span></span></code></pre></div>
 <p>From there it is ordinary text work. Parse temperatures out, tabulate
 photoperiods, count how many housed animals individually. The framework
 does not standardise the content, deliberately, since forcing husbandry
@@ -517,20 +514,22 @@ tells you how often animals are released, killed, or kept.
 <code>proc_anaesthesia</code> tells you what is actually used, and how
 often nothing is. <code>ethics_review</code> tells you how often review
 applied at all, and what reasoning was offered when it did not.</p>
-<p>To get everything at once, in long form:</p>
+<p><code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> on a corpus gives one row per study per
+item, carrying the paper’s details alongside, so grouping and filtering
+are ordinary data frame work.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">nm</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">[[</span><span class="va">nm</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">items</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>study <span class="op">=</span> <span class="va">nm</span>, item_id <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">item_id</span>, value <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">value</span>,</span>
-<span>             status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">status</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">all_values</span>, <span class="va">status</span> <span class="op">==</span> <span class="st">"reported"</span>, select <span class="op">=</span> <span class="op">-</span><span class="va">status</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            study         item_id                 value</span></span>
-<span><span class="co">#&gt; 1 10.1234/study1  subjects_taxon Reported in the paper</span></span>
-<span><span class="co">#&gt; 2 10.1234/study1 subjects_source Reported in the paper</span></span>
-<span><span class="co">#&gt; 3 10.1234/study1      subjects_n Reported in the paper</span></span>
-<span><span class="co">#&gt; 4 10.1234/study1   proc_handling Reported in the paper</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">d</span>, vec.len <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 'data.frame':    90 obs. of  10 variables:</span></span>
+<span><span class="co">#&gt;  $ study  : chr  "10.1234/study1" "10.1234/study1" ...</span></span>
+<span><span class="co">#&gt;  $ title  : chr  "Study 1" "Study 1" ...</span></span>
+<span><span class="co">#&gt;  $ doi    : chr  "10.1234/study1" "10.1234/study1" ...</span></span>
+<span><span class="co">#&gt;  $ journal: chr  "J Alpha" "J Alpha" ...</span></span>
+<span><span class="co">#&gt;  $ item_id: chr  "subjects_taxon" "subjects_source" ...</span></span>
+<span><span class="co">#&gt;  $ item   : chr  "Taxonomic ID, life stage, &amp; sex" "Source &amp; culture history" ...</span></span>
+<span><span class="co">#&gt;  $ domain : chr  "Subjects" "Subjects" ...</span></span>
+<span><span class="co">#&gt;  $ group  : chr  "foundation" "foundation" ...</span></span>
+<span><span class="co">#&gt;  $ status : chr  "reported" "reported" ...</span></span>
+<span><span class="co">#&gt;  $ value  : chr  "Reported in the paper" "Reported in the paper" ...</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
