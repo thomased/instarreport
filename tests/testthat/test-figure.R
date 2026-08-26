@@ -68,6 +68,20 @@ test_that("value_wrap changes the layout", {
   vdiffr::expect_doppelganger("instar report figure narrow", autoplot(rep))
 })
 
+test_that("value_wrap can be overridden at draw time", {
+  # It used to be accepted and silently discarded, so plot(rep, value_wrap =)
+  # looked like it worked and did nothing.
+  rep <- demo_report()
+  wide   <- attr(autoplot(rep, value_wrap = 100), "natural_lines")
+  narrow <- attr(autoplot(rep, value_wrap = 40),  "natural_lines")
+  expect_gt(narrow, wide)
+
+  # The report's own setting is still the default.
+  expect_equal(attr(autoplot(rep), "natural_lines"),
+               attr(autoplot(rep, value_wrap = rep$value_wrap),
+                    "natural_lines"))
+})
+
 
 # --- Structural checks that are safe on every platform ----------------
 

@@ -12,14 +12,17 @@
 #' @param items A data frame with at least `item_id` and a `report` (or
 #'   `value`) column, optionally a `status` column. Use
 #'   [instar_template()] for an in-session template, [write_template()]
-#'   for a fillable CSV, and [instar_na()] to mark items that do not
-#'   apply.
+#'   for a fillable CSV, and [instar_set()] with `NA` to mark items
+#'   that do not apply.
 #' @param paper A named list of paper metadata. Required: `title`,
 #'   `authors`. Optional: `journal`, `version`, `doi`. May be omitted if
 #'   `items` came from [read_items()] on a file carrying the reserved
 #'   metadata rows, in which case those details are used.
 #' @param value_wrap Integer; approximate characters per line for the
-#'   value text when the report is plotted. Defaults to `75`.
+#'   item text when the report is drawn. Defaults to `75`. Set here it
+#'   becomes the report's default, so the preview and the saved file
+#'   agree; override it per call in [plot()][plot.instar_report],
+#'   [autoplot()][autoplot.instar_report] or [save_figure()] when tuning.
 #' @param unknown What to do with `item_id`s in `items` that are not in
 #'   the framework. `"error"` (the default) stops; `"drop"` warns and
 #'   ignores them. Passed to [validate_items()].
@@ -30,11 +33,11 @@
 #'   declared, or `NA`), and `value_wrap`.
 #'
 #' @examples
-#' tmpl <- instar_template()
-#' tmpl$value[tmpl$item_id == "subjects_taxon"] <-
-#'   "Bombus terrestris (worker female); morphology + COI"
-#' tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
-#' tmpl <- instar_na(tmpl, "proc_anaesthesia")
+#' tmpl <- instar_set(
+#'   instar_template(),
+#'   subjects_taxon   = "Bombus terrestris (worker female); morphology + COI",
+#'   proc_anaesthesia = NA
+#' )
 #'
 #' rep <- instar_report(
 #'   tmpl,
@@ -187,7 +190,8 @@ as.data.frame.instar_report <- function(x, row.names = NULL,
 #' write it straight to a file, use [save_figure()].
 #'
 #' @param x An object of class `instar_report`.
-#' @param ... Passed to [autoplot()][autoplot.instar_report].
+#' @param ... Passed to [autoplot()][autoplot.instar_report], notably
+#'   `value_wrap`.
 #'
 #' @return `x`, invisibly.
 #'
@@ -215,6 +219,8 @@ plot.instar_report <- function(x, ...) {
 #' ```
 #'
 #' @param object An object of class `instar_report`.
+#' @param value_wrap Approximate characters per line for the item text.
+#'   Defaults to the value stored on the report by [instar_report()].
 #' @param ... Unused.
 #'
 #' @return A patchwork object.
@@ -227,9 +233,9 @@ plot.instar_report <- function(x, ...) {
 #'
 #' @importFrom ggplot2 autoplot
 #' @export
-autoplot.instar_report <- function(object, ...) {
+autoplot.instar_report <- function(object, value_wrap = NULL, ...) {
   .build_figure(object$paper, .render_data(object),
-                value_wrap = object$value_wrap)
+                value_wrap = value_wrap %||% object$value_wrap)
 }
 
 
@@ -262,15 +268,17 @@ autoplot.instar_report <- function(object, ...) {
 #' large blank regions. Pass an explicit `height` to override.
 #'
 #' @param report An object of class `instar_report`.
-#' @param filename Output file path (extension determines format; .pdf or
-#'   .png are recommended).
+#' @param path Output file path. The extension chooses the format;
+#'   `.pdf` or `.png` are recommended.
 #' @param width Page width in inches. Defaults to 8.5".
 #' @param height Page height in inches. If `NULL` (the default), a
 #'   compact height is chosen from the content, clamped to `[6, 11]`.
 #' @param dpi Resolution for raster formats. Defaults to 300.
+#' @param value_wrap Approximate characters per line for the item text.
+#'   Defaults to the value stored on the report.
 #' @param ... Additional arguments passed to [ggplot2::ggsave()].
 #'
-#' @return The filename, invisibly.
+#' @return The path, invisibly.
 #'
 #' @examples
 #' \dontrun{
@@ -279,20 +287,20 @@ autoplot.instar_report <- function(object, ...) {
 #' }
 #'
 #' @export
-save_figure <- function(report, filename, width = 8.5, height = NULL,
-                        dpi = 300, ...) {
+save_figure <- function(report, path, width = 8.5, height = NULL,
+                        dpi = 300, value_wrap = NULL, ...) {
   if (!inherits(report, "instar_report")) {
     cli::cli_abort("{.arg report} must come from {.fn instar_report}, not
                     {.obj_type_friendly {report}}.")
   }
-  fig <- ggplot2::autoplot(report)
+  fig <- ggplot2::autoplot(report, value_wrap = value_wrap)
   if (is.null(height)) {
     # ~0.18" per line at body text size, clamped to a sensible range.
     nat <- attr(fig, "natural_lines")
     height <- if (is.null(nat)) 9.5 else max(6, min(11, nat * 0.18))
   }
-  ggplot2::ggsave(filename, plot = fig,
+  ggplot2::ggsave(path, plot = fig,
                   width = width, height = height, dpi = dpi,
                   bg = "white", ...)
-  invisible(filename)
+  invisible(path)
 }

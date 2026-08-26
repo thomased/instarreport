@@ -17,8 +17,8 @@ number.}
 An object of class \code{instar_audit}.
 }
 \description{
-For auditing studies that never completed an INSTAR sheet, which is
-every study published before the framework existed. The usual shape is
+For auditing studies that have no INSTAR sheet, which is most of the
+published literature and will be for a long time. The usual shape is
 one row per paper, one column per framework item, scored by a reader.
 }
 \details{

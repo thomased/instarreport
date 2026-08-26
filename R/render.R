@@ -257,11 +257,3 @@
   attr(fig, "natural_lines") <- .HEADER_LINES + col_total + .FOOTER_LINES
   fig
 }
-
-# Internal: %||%
-`%||%` <- function(a, b) {
-  if (is.null(a) || (length(a) == 1 && is.na(a))) b else a
-}
-
-# Silence R CMD check NOTEs about non-standard evaluation in aes()
-utils::globalVariables(c("y", "content"))

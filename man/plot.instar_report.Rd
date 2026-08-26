@@ -9,7 +9,8 @@
 \arguments{
 \item{x}{An object of class \code{instar_report}.}
 
-\item{...}{Passed to \link[=autoplot.instar_report]{autoplot()}.}
+\item{...}{Passed to \link[=autoplot.instar_report]{autoplot()}, notably
+\code{value_wrap}.}
 }
 \value{
 \code{x}, invisibly.

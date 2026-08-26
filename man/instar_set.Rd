@@ -48,6 +48,5 @@ summary(instar_report(items, paper = list(title = "T", authors = "A")))
 
 }
 \seealso{
-\code{\link[=instar_na]{instar_na()}} for marking items not applicable by id,
 \code{\link[=instar_fill]{instar_fill()}} for the interactive equivalent.
 }

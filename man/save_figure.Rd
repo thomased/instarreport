@@ -4,13 +4,21 @@
 \alias{save_figure}
 \title{Save a report's figure to disk}
 \usage{
-save_figure(report, filename, width = 8.5, height = NULL, dpi = 300, ...)
+save_figure(
+  report,
+  path,
+  width = 8.5,
+  height = NULL,
+  dpi = 300,
+  value_wrap = NULL,
+  ...
+)
 }
 \arguments{
 \item{report}{An object of class \code{instar_report}.}
 
-\item{filename}{Output file path (extension determines format; .pdf or
-.png are recommended).}
+\item{path}{Output file path. The extension chooses the format;
+\code{.pdf} or \code{.png} are recommended.}
 
 \item{width}{Page width in inches. Defaults to 8.5".}
 
@@ -19,10 +27,13 @@ compact height is chosen from the content, clamped to \verb{[6, 11]}.}
 
 \item{dpi}{Resolution for raster formats. Defaults to 300.}
 
+\item{value_wrap}{Approximate characters per line for the item text.
+Defaults to the value stored on the report.}
+
 \item{...}{Additional arguments passed to \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}.}
 }
 \value{
-The filename, invisibly.
+The path, invisibly.
 }
 \description{
 Renders a report's figure and writes it via \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. For

@@ -22,8 +22,8 @@ column recording each item's state.
 }
 \details{
 Write substantive content into \code{value} to report an item. Leave it
-blank for items the study does not report. Use \code{\link[=instar_na]{instar_na()}} to mark
-items that do not apply.
+blank for items the study does not report. Use \code{\link[=instar_set]{instar_set()}} with
+\code{NA} to mark items that do not apply.
 }
 \examples{
 tmpl <- instar_template("lab")

@@ -211,3 +211,23 @@
        not_applicable = n_na, applicable = applicable,
        percent_reported = pct)
 }
+
+
+# Default value for NULL or NA.
+#
+# Base R gained %||% in 4.4.0, but the package supports 4.1, so it is
+# defined here. This version also treats a length-one NA as absent,
+# which base's does not, because paper metadata read from a sheet comes
+# back as NA rather than NULL when a field was left blank.
+#
+# Deliberately a plain comment, not roxygen: an Rd file for this would
+# have \name{%||%}, and \name cannot contain a pipe.
+`%||%` <- function(a, b) {
+  if (is.null(a) || (length(a) == 1 && is.na(a))) b else a
+}
+
+
+# Non-standard evaluation in aes() looks like undefined globals to
+# R CMD check. Declared here rather than scattered across the files that
+# happen to plot.
+utils::globalVariables(c("y", "content", "percent_reported", "item", "group"))

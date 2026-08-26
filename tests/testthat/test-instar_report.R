@@ -81,7 +81,7 @@ test_that("coverage counts statuses correctly", {
   # Fill 10 items; mark 2 as not applicable; leave 6 not reported
   tmpl$value[1:10]  <- "filled"
   tmpl$status[1:10] <- "reported"
-  tmpl <- instar_na(tmpl, tmpl$item_id[11:12])
+  tmpl <- instar_set(tmpl, env_housing = NA, env_acclimation = NA)
 
   rep <- instar_report(
     tmpl,

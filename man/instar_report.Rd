@@ -15,8 +15,8 @@ instar_report(
 \item{items}{A data frame with at least \code{item_id} and a \code{report} (or
 \code{value}) column, optionally a \code{status} column. Use
 \code{\link[=instar_template]{instar_template()}} for an in-session template, \code{\link[=write_template]{write_template()}}
-for a fillable CSV, and \code{\link[=instar_na]{instar_na()}} to mark items that do not
-apply.}
+for a fillable CSV, and \code{\link[=instar_set]{instar_set()}} with \code{NA} to mark items
+that do not apply.}
 
 \item{paper}{A named list of paper metadata. Required: \code{title},
 \code{authors}. Optional: \code{journal}, \code{version}, \code{doi}. May be omitted if
@@ -24,7 +24,10 @@ apply.}
 metadata rows, in which case those details are used.}
 
 \item{value_wrap}{Integer; approximate characters per line for the
-value text when the report is plotted. Defaults to \code{75}.}
+item text when the report is drawn. Defaults to \code{75}. Set here it
+becomes the report's default, so the preview and the saved file
+agree; override it per call in \link[=plot.instar_report]{plot()},
+\link[=autoplot.instar_report]{autoplot()} or \code{\link[=save_figure]{save_figure()}} when tuning.}
 
 \item{unknown}{What to do with \code{item_id}s in \code{items} that are not in
 the framework. \code{"error"} (the default) stops; \code{"drop"} warns and
@@ -47,11 +50,11 @@ figure as an object to modify further, use
 \link[=autoplot.instar_report]{autoplot()}.
 }
 \examples{
-tmpl <- instar_template()
-tmpl$value[tmpl$item_id == "subjects_taxon"] <-
-  "Bombus terrestris (worker female); morphology + COI"
-tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
-tmpl <- instar_na(tmpl, "proc_anaesthesia")
+tmpl <- instar_set(
+  instar_template(),
+  subjects_taxon   = "Bombus terrestris (worker female); morphology + COI",
+  proc_anaesthesia = NA
+)
 
 rep <- instar_report(
   tmpl,

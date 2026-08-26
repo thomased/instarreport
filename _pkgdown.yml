@@ -42,7 +42,6 @@ reference:
   - instar_items
   - instar_template
   - instar_set
-  - instar_na
 - title: Completing a report
   desc: |
     Three routes to the same items table: the INSTAR.csv sheet, an interactive prompt, or direct assignment in a script.

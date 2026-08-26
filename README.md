@@ -287,7 +287,7 @@ truth:
 
 - `value` carries substantive content only, and is `NA` whenever `status`
   is not `"reported"`. The two can never disagree.
-- Use `instar_na(items, "item_id")` to mark items that do not apply.
+- Use `instar_set(items, item_id = NA)` to mark items that do not apply.
 - Reading a sheet derives `status` from the `report` column: blanks
   become `"not_reported"`, and `"NA"` or `"N/A"` are honoured as shorthand
   for `"not_applicable"`.

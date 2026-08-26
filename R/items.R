@@ -190,8 +190,7 @@ new_instar_items <- function(x) {
 #'
 #' @return The updated items table.
 #'
-#' @seealso [instar_na()] for marking items not applicable by id,
-#'   [instar_fill()] for the interactive equivalent.
+#' @seealso [instar_fill()] for the interactive equivalent.
 #'
 #' @examples
 #' items <- instar_set(
@@ -225,7 +224,7 @@ instar_set <- function(items, ...) {
   if (length(unknown) > 0L) {
     cli::cli_abort(c(
       "{cli::qty(unknown)}Unknown item_id{?s}: {.val {unknown}}.",
-      "i" = .suggest_item_id(unknown),
+      .suggest_item_id(unknown),
       "i" = "Run {.code instar_items$item_id} for the full list."
     ))
   }
@@ -269,42 +268,21 @@ instar_set <- function(items, ...) {
 
 
 #' Suggest a near-matching item_id for a typo
+#'
+#' Returns a named cli bullet, or a zero-length vector when nothing is
+#' close. Zero-length rather than `""`, so that `c()` drops it and cli
+#' does not render an empty bullet.
+#'
 #' @keywords internal
 .suggest_item_id <- function(bad) {
   near <- unique(unlist(lapply(bad, function(b) {
     agrep(b, instar_items$item_id, max.distance = 0.35, value = TRUE)
   })))
-  if (length(near) == 0L) return("")
-  paste0(" Did you mean: ", paste(near, collapse = ", "), "?")
-}
-
-
-#' Mark items as not applicable
-#'
-#' Sets `status` to `"not_applicable"` for the named items, clearing any
-#' value they carried. The explicit alternative to the older convention
-#' of writing the string `"NA"` into `value`.
-#'
-#' @param items An items table.
-#' @param item_id Character vector of `item_id`s to mark.
-#'
-#' @return The updated items table.
-#'
-#' @examples
-#' tmpl <- instar_template()
-#' tmpl <- instar_na(tmpl, c("env_field", "proc_anaesthesia"))
-#'
-#' @export
-instar_na <- function(items, item_id) {
-  items <- validate_items(items)
-  unknown <- setdiff(item_id, instar_items$item_id)
-  if (length(unknown) > 0) {
-    cli::cli_abort("{cli::qty(unknown)}Unknown item_id{?s}: {.val {unknown}}.")
-  }
-  hit <- items$item_id %in% item_id
-  items$status[hit] <- "not_applicable"
-  items$value[hit]  <- NA_character_
-  items
+  if (length(near) == 0L) return(character(0))
+  # Plain text, not cli markup: the message is glued in the *caller's*
+  # frame, where `near` does not exist.
+  c("i" = paste0("Did you mean ",
+                 paste0("\"", near, "\"", collapse = " or "), "?"))
 }
 
 
@@ -315,8 +293,8 @@ instar_na <- function(items, item_id) {
 #' column recording each item's state.
 #'
 #' Write substantive content into `value` to report an item. Leave it
-#' blank for items the study does not report. Use [instar_na()] to mark
-#' items that do not apply.
+#' blank for items the study does not report. Use [instar_set()] with
+#' `NA` to mark items that do not apply.
 #'
 #' @param study_type Optional. One of `"lab"`, `"field"`, or `"both"`.
 #'   If supplied, items flagged as not applicable in that context are

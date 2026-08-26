@@ -4,10 +4,13 @@
 \alias{autoplot.instar_report}
 \title{Return a report's figure as a plot object}
 \usage{
-\method{autoplot}{instar_report}(object, ...)
+\method{autoplot}{instar_report}(object, value_wrap = NULL, ...)
 }
 \arguments{
 \item{object}{An object of class \code{instar_report}.}
+
+\item{value_wrap}{Approximate characters per line for the item text.
+Defaults to the value stored on the report by \code{\link[=instar_report]{instar_report()}}.}
 
 \item{...}{Unused.}
 }

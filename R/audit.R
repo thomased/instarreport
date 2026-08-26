@@ -67,17 +67,15 @@ instar_audit <- function(x, ...) {
   }))
   rownames(long) <- NULL
 
-  .new_audit(long = long,
-             studies = summary(corpus),
-             meta = NULL,
-             corpus = corpus)
+  new_instar_audit(long = long, studies = summary(corpus),
+                   meta = NULL, corpus = corpus)
 }
 
 
 #' Build an audit from a wide matrix of scores
 #'
-#' For auditing studies that never completed an INSTAR sheet, which is
-#' every study published before the framework existed. The usual shape is
+#' For auditing studies that have no INSTAR sheet, which is most of the
+#' published literature and will be for a long time. The usual shape is
 #' one row per paper, one column per framework item, scored by a reader.
 #'
 #' Columns whose names match an `item_id` in [instar_items] are treated
@@ -195,7 +193,7 @@ audit_from_matrix <- function(scores, id = NULL) {
   }
 
   studies <- .studies_from_long(long, meta)
-  .new_audit(long = long, studies = studies, meta = meta, corpus = NULL)
+  new_instar_audit(long = long, studies = studies, meta = meta, corpus = NULL)
 }
 
 
@@ -240,9 +238,9 @@ audit_from_matrix <- function(scores, id = NULL) {
 }
 
 
-#' Assemble an instar_audit from its parts
+#' Construct an instar_audit from its parts
 #' @keywords internal
-.new_audit <- function(long, studies, meta, corpus) {
+new_instar_audit <- function(long, studies, meta, corpus) {
   parts <- split(long, long$item_id)
   rows <- lapply(names(parts), function(id) {
     p <- parts[[id]]
@@ -443,6 +441,3 @@ autoplot.instar_audit <- function(object, by = NULL, ...) {
   }
   p
 }
-
-# Silence R CMD check NOTEs about non-standard evaluation in aes()
-utils::globalVariables(c("percent_reported", "item", "group"))

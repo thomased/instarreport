@@ -12,7 +12,10 @@ demo_corpus <- function() {
     items <- instar_template()
     items$value[items$item_id %in% reported]  <- "Reported"
     items$status[items$item_id %in% reported] <- "reported"
-    if (length(na) > 0) items <- instar_na(items, na)
+    if (length(na) > 0) {
+      items <- do.call(instar_set,
+                       c(list(items), stats::setNames(as.list(rep(NA, length(na))), na)))
+    }
     instar_report(items, paper = list(title = title, authors = "A",
                                       journal = journal, doi = doi))
   }

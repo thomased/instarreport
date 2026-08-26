@@ -142,19 +142,19 @@ test_that("instar_set adds a row absent from a partial table", {
   expect_equal(out$value[out$item_id == "subjects_n"], "n = 24")
 })
 
-test_that("instar_na marks items and clears their value", {
+test_that("instar_set with NA marks items and clears their value", {
   tmpl <- instar_template()
   tmpl$value[tmpl$item_id == "env_field"]  <- "should be cleared"
   tmpl$status[tmpl$item_id == "env_field"] <- "reported"
 
-  out <- instar_na(tmpl, "env_field")
+  out <- instar_set(tmpl, env_field = NA)
   expect_equal(as.character(out$status[out$item_id == "env_field"]),
                "not_applicable")
   expect_true(is.na(out$value[out$item_id == "env_field"]))
 })
 
-test_that("instar_na rejects unknown ids", {
-  expect_error(instar_na(instar_template(), "not_an_item"), "Unknown item_id")
+test_that("instar_set rejects unknown ids for NA too", {
+  expect_error(instar_set(instar_template(), not_an_item = NA), "Unknown item_id")
 })
 
 test_that("status is derived from value when absent", {

@@ -10,7 +10,7 @@ test_that("write_items writes the INSTAR CSV shape and round-trips", {
   tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
   tmpl$value[tmpl$item_id == "subjects_n"]      <- "n=24"
   tmpl$status[tmpl$item_id == "subjects_n"]     <- "reported"
-  tmpl <- instar_na(tmpl, "env_field")
+  tmpl <- instar_set(tmpl, env_field = NA)
 
   tmp <- tempfile(fileext = ".csv")
   on.exit(unlink(tmp), add = TRUE)
@@ -81,7 +81,7 @@ test_that("print.instar_items prints without error", {
   tmpl <- instar_template()
   tmpl$value[1]  <- "filled"
   tmpl$status[1] <- "reported"
-  tmpl <- instar_na(tmpl, tmpl$item_id[2])
+  tmpl <- instar_set(tmpl, subjects_source = NA)
   expect_output(print(tmpl))
 })
 
@@ -213,7 +213,7 @@ test_that("a report survives a full write/read/write cycle unchanged", {
   items <- instar_template()
   items$value[items$item_id == "env_housing"]  <- "23 +/- 1 C; 12:12 L:D"
   items$status[items$item_id == "env_housing"] <- "reported"
-  items <- instar_na(items, "env_field")
+  items <- instar_set(items, env_field = NA)
   rep1 <- instar_report(items, paper = list(title = "T", authors = "A"))
 
   write_report(rep1, t1)
