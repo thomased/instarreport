@@ -159,9 +159,9 @@ for a value. It can save partway and resume later.
 items <- instar_fill(save_to = "INSTAR.csv")
 ```
 
-At any prompt, type the value, or one of: `[enter]` to keep current,
-`NA` for not applicable, `skip` to leave blank, `back` to step back,
-`save` to write progress, `quit` to stop.
+At any prompt, type the value, or one of `[enter]` to keep current, `NA`
+for not applicable, `skip` to leave blank, `back` to step back, `save`
+to write progress, or `quit` to stop.
 
 To resume:
 
@@ -171,8 +171,8 @@ items <- instar_fill(read_items("INSTAR.csv"),
                     save_to = "INSTAR.csv")
 ```
 
-To edit a single item afterwards (no need to know `item_id`s — pass no
-`item_id` and you’ll be shown a numbered menu):
+To edit a single item afterwards, with no need to know `item_id`s. Pass
+no `item_id` and you will be shown a numbered menu.
 
 ``` r
 
@@ -186,7 +186,7 @@ Useful in scripts and pipelines.
 
 [`instar_set()`](https://instar-statement.org/reference/instar_set.md)
 takes `item_id = "what the study reports"` pairs, as many as you like at
-once:
+once.
 
 ``` r
 
@@ -203,11 +203,11 @@ A string reports the item, `NA` marks it not applicable, and `""` leaves
 it unreported. The same three states as the `report` column of the
 sheet.
 
-Set `value` directly and it will not work — and will not tell you so.
+Set `value` directly and it will not work, and will not tell you so.
 `status` is the single source of truth, and
 [`instar_report()`](https://instar-statement.org/reference/instar_report.md)
 blanks `value` for any item whose status is not `"reported"`, so a table
-filled in that way renders as an entirely unreported study:
+filled in that way renders as an entirely unreported study.
 
 ``` r
 
@@ -296,7 +296,7 @@ prints all 18 items grouped by domain, marking each as reported (`*`),
 not applicable (`-`), or blank (`o`), with the current value shown
 underneath.
 
-Every item carries a `status`, which is the single source of truth:
+Every item carries a `status`, which is the single source of truth.
 
 | `status`           | Meaning                         | Renders as             |
 |--------------------|---------------------------------|------------------------|
@@ -306,16 +306,16 @@ Every item carries a `status`, which is the single source of truth:
 
 `value` carries substantive content only, and is `NA` whenever `status`
 is not `"reported"`, so the two can never disagree. Reading a CSV with
-no `status` column derives it from `value`: blanks become
+no `status` column derives it from `value`. Blanks become
 `"not_reported"`, and `"NA"` or `"N/A"` are honoured as shorthand for
 `"not_applicable"`.
 
 ## Build the report
 
 [`instar_report()`](https://instar-statement.org/reference/instar_report.md)
-returns *data*, not a plot: the paper metadata, the resolved item table,
-and a coverage summary. Rendering is a separate step, so you can compute
-on a report before (or without) drawing it.
+returns *data*, not a plot. It carries the paper metadata, the resolved
+item table, and a coverage summary. Rendering is a separate step, so you
+can compute on a report before (or without) drawing it.
 
 ``` r
 
@@ -378,7 +378,7 @@ figure](usage_files/figure-html/unnamed-chunk-14-1.png)
 
 If you want to modify the figure before rendering,
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
-returns the underlying patchwork composition instead of drawing it:
+returns the underlying patchwork composition instead of drawing it.
 
 ``` r
 
@@ -387,7 +387,7 @@ autoplot(report) + patchwork::plot_annotation(caption = "Figure S1")
 
 ## Save it
 
-A finished report has two deposit artifacts: the completed sheet and the
+A finished report has two deposit artifacts, the completed sheet and the
 figure. The naming convention is that `write_` produces text and `save_`
 produces figures.
 
@@ -403,7 +403,7 @@ writes the same file shape an author would have filled in by hand, with
 the paper’s details in the reserved rows, so it reads straight back
 through
 [`read_items()`](https://instar-statement.org/reference/read_items.md).
-This is the machine-readable artifact worth depositing; the figure is
+This is the machine-readable artifact worth depositing. The figure is
 for human readers.
 
 [`save_figure()`](https://instar-statement.org/reference/save_figure.md)
@@ -417,13 +417,13 @@ choosing a compact page height from the figure’s natural content size
 
 Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study. This is a sketch; see
+summarises a literature rather than a study. This is a sketch. See
 [`vignette("auditing")`](https://instar-statement.org/articles/auditing.md)
 for the full treatment.
 
 [`read_instar()`](https://instar-statement.org/reference/read_instar.md)
-is the loader. Point it at a file, a directory, or a vector of either;
-it works out the format from the extension and always returns an
+is the loader. Point it at a file, a directory, or a vector of either.
+It works out the format from the extension and always returns an
 `instar_corpus`, whether it found one sheet or two hundred.
 
 ``` r
@@ -503,7 +503,7 @@ summary(audit)
 #> 3         3        1            0              2          1        100.00000
 ```
 
-Columns matching an `item_id` are treated as items; every other column
+Columns matching an `item_id` are treated as items. Every other column
 is carried through as study metadata, so `journal` here is immediately
 available to `summary(by = )` without building a lookup table. Cell
 values are read leniently, because scoring sheets are made by people:
@@ -518,7 +518,7 @@ than counted as unreported, since the scoring never checked them.
 
 Each sheet records the INSTAR version it was completed against. Reading
 a corpus that mixes versions warns, because coverage is not comparable
-across them: an item missing from half the sheets because it did not
+across them. An item missing from half the sheets because it did not
 exist yet is not the same as an item those studies failed to report.
 
 ``` r

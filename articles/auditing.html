@@ -68,39 +68,149 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://instar-statement.org/">instarreport</a></span><span class="op">)</span></span></code></pre></div>
-<p>The other vignette covers one study. This one covers many: reading a
-set of completed sheets, or a set of scored papers, and asking what a
-field reports and what it does not.</p>
-<p>There are two ways in, depending on whether the studies have INSTAR
-sheets of their own.</p>
+<p>The introductory vignette covers working with a single study. This
+one covers many. You assemble a set of studies, then ask what a field
+reports, what it does not, and how that changes.</p>
+<div class="section level2">
+<h2 id="use-cases">Use cases<a class="anchor" aria-label="anchor" href="#use-cases"></a>
+</h2>
+<p>If you are writing a review, a meta-analysis, or a methods paper, you
+probably want to say something about how the animals in your corpus were
+handled, and at the moment that means reading every methods section
+yourself and keeping notes in a spreadsheet you invented. A shared item
+set means those notes are comparable with everyone else’s, and the
+arithmetic is done for you.</p>
+<p>Beyond that, a good deal opens up, and most of it is not about
+reporting at all. A completed sheet records <em>what was done</em>. The
+actual temperatures, diets, acclimation periods, anaesthetics, killing
+methods. A set of them is a structured record of husbandry and methods
+practice, not just a tally of what got mentioned.</p>
+<p><strong>What the field actually does.</strong> Nobody has a good
+description of how invertebrates are typically kept and handled in
+research. What is the modal housing temperature for <em>Drosophila</em>
+behavioural work? How often is anything used for analgesia in a
+procedure that would warrant it in a vertebrate? What proportion of
+field-collected animals are released, and on what reasoning? These are
+answerable questions that currently are not answered, because the
+information is scattered through prose.</p>
+<p><strong>Methods as moderators.</strong> Housing density, photoperiod,
+acclimation and handling regime all shape outcomes. Extracting them
+across a corpus gives a meta-analyst covariates rather than unexplained
+heterogeneity, and may explain why two labs asking the same question of
+the same species disagree.</p>
+<p><strong>Refinement, and whether it spreads.</strong> A better
+practice appears from time to time. A humane endpoint, an anaesthetic
+protocol, a less damaging trap design. A structured record makes it
+possible to watch whether it diffuses, how fast, and where it
+stalls.</p>
+<p><strong>Change over time.</strong> Both practice and reporting move.
+Scoring a comparable sample at intervals, or either side of a policy
+change, turns an impression into a measurement.</p>
+<p><strong>Comparison across whatever unit you care about.</strong>
+Taxon, subdiscipline, lab versus field, question type, jurisdiction,
+funder, decade, institution, journal. Norms differ along all of these,
+and the differences are often the interesting result rather than a
+nuisance.</p>
+<p><strong>Where the evidence is missing.</strong> An item almost nobody
+reports is either being overlooked or is something the field genuinely
+does not know how to answer. Both are worth knowing. The first is an
+advocacy problem, the second a research agenda.</p>
+<p><strong>Evidence for policy.</strong> Journals, funders and ethics
+bodies weighing a requirement reasonably ask what it would cost and what
+it would change. Coverage data answers that far better than a principle
+does.</p>
+<p><strong>Teaching.</strong> Handing students a folder of sheets and
+asking what is missing, or what they would have done differently, is a
+fast way into both research ethics and methods criticism.</p>
+<p>None of this needs the whole literature, or a whole journal. A
+well-chosen sample of one taxon, one technique or one question is enough
+to say something.</p>
+</div>
+<div class="section level2">
+<h2 id="compiling-a-corpus">Compiling a corpus<a class="anchor" aria-label="anchor" href="#compiling-a-corpus"></a>
+</h2>
+<p>Three realistic routes, in rough order of how common they will
+be.</p>
+<div class="section level3">
+<h3 id="manual-scoring">Manual scoring<a class="anchor" aria-label="anchor" href="#manual-scoring"></a>
+</h3>
+<p>Read the methods sections and record, for each paper and each item,
+whether it was reported. This is the main path and will stay that way.
+Most published work has no INSTAR sheet, and careful reading is still
+the most reliable way to decide whether an item was genuinely
+addressed.</p>
+<p>Record it as a wide table, one row per paper and one column per
+<code>item_id</code>, then hand it to <code><a href="../reference/audit_from_matrix.html">audit_from_matrix()</a></code>.
+Section <a href="#from-a-scoring-table">From a scoring table</a> covers
+the mechanics.</p>
+<p>Worth doing regardless of scale. Score a subset twice, or have a
+second reader do it, and check agreement before trusting the totals.
+Reporting is not always a clean yes or no, and the boundary cases are
+where two readers diverge.</p>
+</div>
+<div class="section level3">
+<h3 id="deposited-sheets">Deposited sheets<a class="anchor" aria-label="anchor" href="#deposited-sheets"></a>
+</h3>
+<p>Where authors have completed and deposited a sheet, the work is
+already done and no reading is required. Point
+<code><a href="../reference/read_instar.html">read_instar()</a></code> at the folder.</p>
+<p>This is the smallest number of studies today and will grow slowly. It
+is also the reason the sheet is plain text rather than only a figure. A
+deposited sheet can be read back, a deposited figure cannot.</p>
+</div>
+<div class="section level3">
+<h3 id="assisted-extraction">Assisted extraction<a class="anchor" aria-label="anchor" href="#assisted-extraction"></a>
+</h3>
+<p>Large language models can be used to pull structured answers out of
+methods text, and for a corpus of a few hundred papers that is a large
+saving. It is also easy to do badly. If you go this way, then:</p>
 <ul>
 <li>
-<strong>Prospective.</strong> Studies deposit completed sheets, and
-a corpus is just a folder of them. Read them with
-<code><a href="../reference/read_instar.html">read_instar()</a></code>.</li>
+<strong>Validate against hand-scoring.</strong> Score a random
+subset yourself and compare, item by item. Report the agreement. Without
+this you have numbers of unknown quality.</li>
 <li>
-<strong>Retrospective.</strong> The studies predate the framework,
-so someone reads the papers and scores them by hand into a table. Hand
-that to <code><a href="../reference/audit_from_matrix.html">audit_from_matrix()</a></code>.</li>
+<strong>Give the model the item descriptions</strong>, not just the
+item names. <code>instar_items$description</code> is written to be
+exactly this kind of prompt material.</li>
+<li>
+<strong>Allow an “uncertain” response</strong> as well as yes, no,
+and not applicable. Forcing a binary choice on ambiguous text
+manufactures confidence that is not there. Resolve the uncertain ones by
+hand.</li>
+<li>
+<strong>Report what you did</strong> in your methods. Which model
+and version, the prompt or rubric, how many papers were re-scored by
+hand, and the agreement you found. This is a methods choice like any
+other and should be reproducible.</li>
+<li>
+<strong>Feed it the methods section</strong>, not the whole paper.
+Precision improves and cost falls.</li>
 </ul>
-<p>Both produce the same <code>instar_audit</code> object, so everything
-downstream is identical.</p>
+<p>The output is the same wide table as manual scoring, so it reaches
+<code><a href="../reference/audit_from_matrix.html">audit_from_matrix()</a></code> the same way. The survey reported in
+the INSTAR paper was built this way, and its methods section documents
+the model, the rubric, and the hand-validation.</p>
+<p>Whichever route you take, the resulting object is the same and
+everything downstream is identical.</p>
+</div>
+</div>
 <div class="section level2">
-<h2 id="reading-a-folder-of-sheets">Reading a folder of sheets<a class="anchor" aria-label="anchor" href="#reading-a-folder-of-sheets"></a>
+<h2 id="reading-deposited-sheets">Reading deposited sheets<a class="anchor" aria-label="anchor" href="#reading-deposited-sheets"></a>
 </h2>
 <p><code><a href="../reference/read_instar.html">read_instar()</a></code> takes a file, a directory, or a vector of
-either. Let’s build a small corpus to work with, so the examples
-run.</p>
+either. Let’s build a small corpus so the examples run.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">corpus_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"supplements"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">corpus_dir</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">make_sheet</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_reported</span>, <span class="va">title</span>, <span class="va">journal</span>, <span class="va">doi</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">make_sheet</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_reported</span>, <span class="va">title</span>, <span class="va">journal</span>, <span class="va">doi</span>, <span class="va">housing</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># instar_set() takes item_id = value pairs. Building them programmatically</span></span>
 <span>  <span class="co"># means assembling a named list and using do.call().</span></span>
 <span>  <span class="va">ids</span> <span class="op">&lt;-</span> <span class="va">instar_items</span><span class="op">$</span><span class="va">item_id</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_reported</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">filled</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Reported in the paper"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ids</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                            <span class="va">ids</span><span class="op">)</span></span>
+<span>  <span class="va">filled</span><span class="op">$</span><span class="va">env_housing</span> <span class="op">&lt;-</span> <span class="va">housing</span></span>
 <span>  <span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">instar_set</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="../reference/instar_template.html">instar_template</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="va">filled</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="va">rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_report.html">instar_report</a></span><span class="op">(</span><span class="va">items</span>, paper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -115,7 +225,12 @@ run.</p>
 <span>  n_reported <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">9</span>, <span class="fl">14</span>, <span class="fl">6</span>, <span class="fl">11</span><span class="op">)</span>,</span>
 <span>  title      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Study"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,</span>
 <span>  journal    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"J Alpha"</span>, <span class="st">"J Alpha"</span>, <span class="st">"J Beta"</span>, <span class="st">"J Beta"</span>, <span class="st">"J Beta"</span><span class="op">)</span>,</span>
-<span>  doi        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"10.1234/study"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  doi        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"10.1234/study"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>,</span>
+<span>  housing    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"25 +/- 1 C, 12:12 L:D, 60% RH"</span>,</span>
+<span>                 <span class="st">"23 C, 14:10 L:D, group housed at 20 per container"</span>,</span>
+<span>                 <span class="st">"Ambient (18-26 C), natural photoperiod"</span>,</span>
+<span>                 <span class="st">"25 C, 12:12 L:D, individually housed"</span>,</span>
+<span>                 <span class="st">"27 +/- 0.5 C, 16:8 L:D, 70% RH"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">corpus_dir</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "10-1234-study1.csv" "10-1234-study2.csv" "10-1234-study3.csv"</span></span>
@@ -129,7 +244,7 @@ run.</p>
 <span><span class="va">corpus</span></span>
 <span><span class="co">#&gt; &lt;instar_corpus&gt;</span></span>
 <span><span class="co">#&gt;   5 sheets, INSTAR v1.0</span></span>
-<span><span class="co">#&gt;   median coverage 50% (range 22-78%)</span></span>
+<span><span class="co">#&gt;   median coverage 56% (range 28-78%)</span></span>
 <span><span class="co">#&gt;   summary() for per-sheet coverage; instar_audit() for item-level.</span></span></code></pre></div>
 <p>A corpus is a named list of reports underneath, so
 <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code>, <code><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Filter()</a></code>, <code>[</code> and friends
@@ -137,15 +252,15 @@ all work on it. <code><a href="https://rdrr.io/r/base/summary.html" class="exter
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"study"</span>, <span class="st">"title"</span>, <span class="st">"journal"</span>, <span class="st">"reported"</span>, <span class="st">"percent_reported"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;            study   title journal reported percent_reported</span></span>
-<span><span class="co">#&gt; 1 10.1234/study1 Study 1 J Alpha        4         22.22222</span></span>
-<span><span class="co">#&gt; 2 10.1234/study2 Study 2 J Alpha        9         50.00000</span></span>
+<span><span class="co">#&gt; 1 10.1234/study1 Study 1 J Alpha        5         27.77778</span></span>
+<span><span class="co">#&gt; 2 10.1234/study2 Study 2 J Alpha       10         55.55556</span></span>
 <span><span class="co">#&gt; 3 10.1234/study3 Study 3  J Beta       14         77.77778</span></span>
-<span><span class="co">#&gt; 4 10.1234/study4 Study 4  J Beta        6         33.33333</span></span>
+<span><span class="co">#&gt; 4 10.1234/study4 Study 4  J Beta        7         38.88889</span></span>
 <span><span class="co">#&gt; 5 10.1234/study5 Study 5  J Beta       11         61.11111</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="when-a-file-will-not-read">When a file will not read<a class="anchor" aria-label="anchor" href="#when-a-file-will-not-read"></a>
 </h3>
-<p>Pointed at a real directory you will meet malformed files: a deleted
+<p>Pointed at a real directory you will meet malformed files. A deleted
 column, a semicolon-delimited export, a stray spreadsheet someone left
 in the folder. <code><a href="../reference/read_instar.html">read_instar()</a></code> does not stop on those. It
 warns, skips them, and records what went wrong.</p>
@@ -160,9 +275,9 @@ warns, skips them, and records what went wrong.</p>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> 1 failed.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">corpus</span>, <span class="st">"failed"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                   file</span></span>
-<span><span class="co">#&gt; 1 /tmp/RtmpjMlo3F/supplements/junk.csv</span></span>
+<span><span class="co">#&gt; 1 /tmp/RtmpIL1CVA/supplements/junk.csv</span></span>
 <span><span class="co">#&gt;                                                                                                                                                                                                                                                                                     error</span></span>
-<span><span class="co">#&gt; 1 \033[1m\033[22m\033[34m/tmp/RtmpjMlo3F/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 \033[1m\033[22m\033[34m/tmp/RtmpIL1CVA/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.</span></span></code></pre></div>
 <p>Getting the other five sheets plus a list of what to go and fix is
 more useful than getting nothing.</p>
 </div>
@@ -171,7 +286,7 @@ more useful than getting nothing.</p>
 </h3>
 <p>Every sheet records the version it was completed against. A corpus
 that mixes versions is warned about, because coverage across them is not
-comparable: an item missing from half the sheets because it did not
+comparable. An item missing from half the sheets because it did not
 exist yet is not the same as an item those studies failed to report.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span><span class="op">$</span><span class="va">version</span>, useNA <span class="op">=</span> <span class="st">"ifany"</span><span class="op">)</span></span>
@@ -186,113 +301,12 @@ exist yet is not the same as an item those studies failed to report.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="auditing">Auditing<a class="anchor" aria-label="anchor" href="#auditing"></a>
+<h2 id="from-a-scoring-table">From a scoring table<a class="anchor" aria-label="anchor" href="#from-a-scoring-table"></a>
 </h2>
-<p><code><a href="../reference/instar_audit.html">instar_audit()</a></code> takes the corpus, or the path
-directly:</p>
+<p>However you produced it, whether by reading papers yourself, a second
+coder, or assisted extraction, the shape is one row per paper and one
+column per <code>item_id</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_audit.html">instar_audit</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span></span>
-<span><span class="va">audit</span></span>
-<span><span class="co">#&gt; &lt;instar_audit&gt;</span></span>
-<span><span class="co">#&gt;   5 studies, 18 framework items</span></span>
-<span><span class="co">#&gt;   median study coverage 50% (range 22-78%)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Least often reported:</span></span>
-<span><span class="co">#&gt;         0%  Injury &amp; mortality</span></span>
-<span><span class="co">#&gt;         0%  End of study</span></span>
-<span><span class="co">#&gt;         0%  Behavioural opportunities, enrichment, &amp; disturbance</span></span>
-<span><span class="co">#&gt;         0%  Indicators &amp; precautionary measures</span></span>
-<span><span class="co">#&gt;        20%  Acclimation</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   summary() for all items; summary(by = ) to group; plot() to draw.</span></span></code></pre></div>
-<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives one row per framework item:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           item_id                            item     domain      group</span></span>
-<span><span class="co">#&gt; 1  subjects_taxon Taxonomic ID, life stage, &amp; sex   Subjects foundation</span></span>
-<span><span class="co">#&gt; 2 subjects_source        Source &amp; culture history   Subjects foundation</span></span>
-<span><span class="co">#&gt; 3      subjects_n         Sample size &amp; attrition   Subjects foundation</span></span>
-<span><span class="co">#&gt; 4   proc_handling  Capture, transport, &amp; handling Procedures foundation</span></span>
-<span><span class="co">#&gt;   n_studies reported not_reported not_applicable applicable percent_reported</span></span>
-<span><span class="co">#&gt; 1         5        5            0              0          5              100</span></span>
-<span><span class="co">#&gt; 2         5        5            0              0          5              100</span></span>
-<span><span class="co">#&gt; 3         5        5            0              0          5              100</span></span>
-<span><span class="co">#&gt; 4         5        5            0              0          5              100</span></span></code></pre></div>
-<p>The columns worth knowing: <code>applicable</code> is the
-denominator, excluding studies that marked the item not applicable, and
-<code>percent_reported</code> is <code>reported / applicable</code>. An
-item that genuinely does not apply to a study is never counted against
-it.</p>
-<p>Which items does this literature handle worst?</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">percent_reported</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item"</span>, <span class="st">"reported"</span>, <span class="st">"applicable"</span>,</span>
-<span>                                    <span class="st">"percent_reported"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                                                    item reported applicable</span></span>
-<span><span class="co">#&gt; 15                                   Injury &amp; mortality        0          5</span></span>
-<span><span class="co">#&gt; 16                                         End of study        0          5</span></span>
-<span><span class="co">#&gt; 17 Behavioural opportunities, enrichment, &amp; disturbance        0          5</span></span>
-<span><span class="co">#&gt; 18                  Indicators &amp; precautionary measures        0          5</span></span>
-<span><span class="co">#&gt; 12                                          Acclimation        1          5</span></span>
-<span><span class="co">#&gt;    percent_reported</span></span>
-<span><span class="co">#&gt; 15                0</span></span>
-<span><span class="co">#&gt; 16                0</span></span>
-<span><span class="co">#&gt; 17                0</span></span>
-<span><span class="co">#&gt; 18                0</span></span>
-<span><span class="co">#&gt; 12               20</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="grouping">Grouping<a class="anchor" aria-label="anchor" href="#grouping"></a>
-</h3>
-<p>Any study-level column can be a grouping variable. For a corpus read
-from sheets that means anything the reserved rows carry —
-<code>journal</code>, <code>doi</code>, <code>version</code> — plus
-<code>folder</code>, the directory each sheet came from.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">by_journal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span>, by <span class="op">=</span> <span class="st">"journal"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">by_journal</span>, <span class="va">item_id</span> <span class="op">==</span> <span class="st">"subjects_taxon"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    journal        item_id                            item   domain n_studies</span></span>
-<span><span class="co">#&gt; 1  J Alpha subjects_taxon Taxonomic ID, life stage, &amp; sex Subjects         2</span></span>
-<span><span class="co">#&gt; 19  J Beta subjects_taxon Taxonomic ID, life stage, &amp; sex Subjects         3</span></span>
-<span><span class="co">#&gt;    reported applicable percent_reported</span></span>
-<span><span class="co">#&gt; 1         2          2              100</span></span>
-<span><span class="co">#&gt; 19        3          3              100</span></span></code></pre></div>
-<p><code>folder</code> is the useful one when a corpus is filed into
-directories that mean something. Read recursively and the structure
-comes through:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_instar.html">read_instar</a></span><span class="op">(</span><span class="st">"corpus/"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/instar_audit.html">instar_audit</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"folder"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="per-study-coverage">Per-study coverage<a class="anchor" aria-label="anchor" href="#per-study-coverage"></a>
-</h3>
-<p><code>audit$studies</code> is one row per study, which is what you
-want for questions about papers rather than items:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">percent_reported</span> <span class="op">~</span> <span class="va">journal</span>, data <span class="op">=</span> <span class="va">audit</span><span class="op">$</span><span class="va">studies</span>,</span>
-<span>                 FUN <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt;   journal percent_reported</span></span>
-<span><span class="co">#&gt; 1 J Alpha         36.11111</span></span>
-<span><span class="co">#&gt; 2  J Beta         61.11111</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
-</h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span></span></code></pre></div>
-<p><img src="auditing_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="Bar chart of reporting coverage per framework item" width="672"></p>
-<p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns the ggplot object instead of drawing
-it, so you can modify it. <code>plot(audit, by = "journal")</code>
-facets.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="studies-with-no-sheet">Studies with no sheet<a class="anchor" aria-label="anchor" href="#studies-with-no-sheet"></a>
-</h2>
-<p>Which is every study published before the framework existed. Score
-the papers into a wide table: one row per paper, one column per
-<code>item_id</code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  doi            <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"10.1/a"</span>, <span class="st">"10.1/b"</span>, <span class="st">"10.1/c"</span>, <span class="st">"10.1/d"</span><span class="op">)</span>,</span>
 <span>  journal        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"J Alpha"</span>, <span class="st">"J Alpha"</span>, <span class="st">"J Beta"</span>, <span class="st">"J Beta"</span><span class="op">)</span>,</span>
@@ -316,19 +330,20 @@ the papers into a wide table: one row per paper, one column per
 <span><span class="co">#&gt; 2         Sample size &amp; attrition        2          4         50.00000</span></span>
 <span><span class="co">#&gt; 3    Housing &amp; abiotic conditions        2          3         66.66667</span></span>
 <span><span class="co">#&gt; 4         Field site &amp; collection        1          1        100.00000</span></span></code></pre></div>
-<p>Three things are happening there worth spelling out.</p>
+<p>Three things there are worth spelling out.</p>
 <p><strong>Cell values are read leniently</strong>, because scoring
 sheets are made by people. <code>Y</code>, <code>yes</code>,
-<code>TRUE</code>, <code>1</code> and <code>C</code> mean reported;
+<code>TRUE</code>, <code>1</code> and <code>C</code> all mean reported.
 <code>N</code>, <code>no</code>, <code>FALSE</code> and <code>0</code>
-mean not; <code>NA</code>, <code>N/A</code>, <code>-</code> and blanks
+mean not. <code>NA</code>, <code>N/A</code>, <code>-</code> and blanks
 mean not applicable. Anything unrecognised warns rather than being
-silently counted.</p>
+silently counted, so a stray <code>?</code> or <code>U</code> from an
+uncertain call will not slip through as a decision you did not make.</p>
 <p><strong>Non-item columns become study metadata.</strong>
 <code>journal</code> and <code>year</code> are not
 <code>item_id</code>s, so they ride along and are immediately available
 for grouping:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit2</span>, by <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>, <span class="va">item_id</span> <span class="op">==</span> <span class="st">"subjects_n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    year    item_id                    item   domain n_studies reported</span></span>
 <span><span class="co">#&gt; 2  2024 subjects_n Sample size &amp; attrition Subjects         1        1</span></span>
@@ -341,13 +356,14 @@ for grouping:</p>
 <p><strong>Items absent from the table are left out</strong>, not
 counted as unreported. The message above says which. Recording an
 unscored item as a failure to report would assert something the scoring
-never checked.</p>
+never checked, which matters if you scored a subset of items
+deliberately.</p>
 <div class="section level3">
 <h3 id="choosing-the-identifier">Choosing the identifier<a class="anchor" aria-label="anchor" href="#choosing-the-identifier"></a>
 </h3>
 <p><code>id</code> should name a column that identifies every row. If it
 does not, you get told rather than finding out later:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">incomplete</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  doi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"10.1/a"</span>, <span class="st">""</span>, <span class="st">""</span><span class="op">)</span>,          <span class="co"># DOI extraction failed for two</span></span>
 <span>  subjects_taxon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Y"</span>, <span class="st">"N"</span>, <span class="st">"Y"</span><span class="op">)</span>,</span>
@@ -361,21 +377,160 @@ does not, you get told rather than finding out later:</p>
 <span><span class="va">audit3</span><span class="op">$</span><span class="va">n</span></span>
 <span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
 <p>That warns about the blank ids and still counts three studies. It is
-a real case: in the survey reported in the INSTAR paper, DOI extraction
+a real case. In the survey reported in the INSTAR paper, DOI extraction
 failed for 25 of 150 PDFs, and keying on DOI would have collapsed them
 into one repeated blank identifier. The fix was to key on a per-file
 slug instead and keep DOI as metadata.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="a-note-on-what-this-is-for">A note on what this is for<a class="anchor" aria-label="anchor" href="#a-note-on-what-this-is-for"></a>
+<h2 id="auditing">Auditing<a class="anchor" aria-label="anchor" href="#auditing"></a>
 </h2>
-<p>The point of depositing the sheet as structured text rather than only
-as a figure is that the second direction becomes possible at all. Once
-sheets are routinely deposited, questions like which items a field
-handles worst, whether reporting differs between laboratory and field
-work, or whether it improves after a journal adopts the framework, are a
-matter of reading files rather than of re-reading papers.</p>
+<p><code><a href="../reference/instar_audit.html">instar_audit()</a></code> takes a corpus, a scoring table, or a
+path directly.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">audit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_audit.html">instar_audit</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span></span>
+<span><span class="va">audit</span></span>
+<span><span class="co">#&gt; &lt;instar_audit&gt;</span></span>
+<span><span class="co">#&gt;   5 studies, 18 framework items</span></span>
+<span><span class="co">#&gt;   median study coverage 56% (range 28-78%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Least often reported:</span></span>
+<span><span class="co">#&gt;         0%  Injury &amp; mortality</span></span>
+<span><span class="co">#&gt;         0%  End of study</span></span>
+<span><span class="co">#&gt;         0%  Behavioural opportunities, enrichment, &amp; disturbance</span></span>
+<span><span class="co">#&gt;         0%  Indicators &amp; precautionary measures</span></span>
+<span><span class="co">#&gt;        20%  Acclimation</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   summary() for all items; summary(by = ) to group; plot() to draw.</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives one row per framework item:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           item_id                            item     domain      group</span></span>
+<span><span class="co">#&gt; 1  subjects_taxon Taxonomic ID, life stage, &amp; sex   Subjects foundation</span></span>
+<span><span class="co">#&gt; 2 subjects_source        Source &amp; culture history   Subjects foundation</span></span>
+<span><span class="co">#&gt; 3      subjects_n         Sample size &amp; attrition   Subjects foundation</span></span>
+<span><span class="co">#&gt; 4   proc_handling  Capture, transport, &amp; handling Procedures foundation</span></span>
+<span><span class="co">#&gt;   n_studies reported not_reported not_applicable applicable percent_reported</span></span>
+<span><span class="co">#&gt; 1         5        5            0              0          5              100</span></span>
+<span><span class="co">#&gt; 2         5        5            0              0          5              100</span></span>
+<span><span class="co">#&gt; 3         5        5            0              0          5              100</span></span>
+<span><span class="co">#&gt; 4         5        5            0              0          5              100</span></span></code></pre></div>
+<p>Two columns are worth knowing. <code>applicable</code> is the
+denominator, which excludes studies that marked the item not applicable,
+and <code>percent_reported</code> is <code>reported / applicable</code>.
+An item that genuinely does not apply to a study is never counted
+against it.</p>
+<p>Which items does this literature handle worst?</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">percent_reported</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"item"</span>, <span class="st">"reported"</span>, <span class="st">"applicable"</span>,</span>
+<span>                                    <span class="st">"percent_reported"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                                    item reported applicable</span></span>
+<span><span class="co">#&gt; 15                                   Injury &amp; mortality        0          5</span></span>
+<span><span class="co">#&gt; 16                                         End of study        0          5</span></span>
+<span><span class="co">#&gt; 17 Behavioural opportunities, enrichment, &amp; disturbance        0          5</span></span>
+<span><span class="co">#&gt; 18                  Indicators &amp; precautionary measures        0          5</span></span>
+<span><span class="co">#&gt; 12                                          Acclimation        1          5</span></span>
+<span><span class="co">#&gt;    percent_reported</span></span>
+<span><span class="co">#&gt; 15                0</span></span>
+<span><span class="co">#&gt; 16                0</span></span>
+<span><span class="co">#&gt; 17                0</span></span>
+<span><span class="co">#&gt; 18                0</span></span>
+<span><span class="co">#&gt; 12               20</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="grouping">Grouping<a class="anchor" aria-label="anchor" href="#grouping"></a>
+</h3>
+<p>Any study-level column can be a grouping variable. For a corpus read
+from sheets that means anything the reserved rows carry, so
+<code>journal</code>, <code>doi</code> and <code>version</code>, plus
+<code>folder</code>, the directory each sheet came from. For a scoring
+table it means any column that was not an item.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">by_journal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">audit</span>, by <span class="op">=</span> <span class="st">"journal"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">by_journal</span>, <span class="va">item_id</span> <span class="op">==</span> <span class="st">"subjects_taxon"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    journal        item_id                            item   domain n_studies</span></span>
+<span><span class="co">#&gt; 1  J Alpha subjects_taxon Taxonomic ID, life stage, &amp; sex Subjects         2</span></span>
+<span><span class="co">#&gt; 19  J Beta subjects_taxon Taxonomic ID, life stage, &amp; sex Subjects         3</span></span>
+<span><span class="co">#&gt;    reported applicable percent_reported</span></span>
+<span><span class="co">#&gt; 1         2          2              100</span></span>
+<span><span class="co">#&gt; 19        3          3              100</span></span></code></pre></div>
+<p><code>folder</code> is the useful one when a corpus is filed into
+directories that mean something. Read recursively and the structure
+comes through:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_instar.html">read_instar</a></span><span class="op">(</span><span class="st">"corpus/"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/instar_audit.html">instar_audit</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"folder"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="per-study-coverage">Per-study coverage<a class="anchor" aria-label="anchor" href="#per-study-coverage"></a>
+</h3>
+<p><code>audit$studies</code> is one row per study, which is what you
+want for questions about papers rather than items:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">percent_reported</span> <span class="op">~</span> <span class="va">journal</span>, data <span class="op">=</span> <span class="va">audit</span><span class="op">$</span><span class="va">studies</span>,</span>
+<span>                 FUN <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt;   journal percent_reported</span></span>
+<span><span class="co">#&gt; 1 J Alpha         41.66667</span></span>
+<span><span class="co">#&gt; 2  J Beta         61.11111</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
+</h3>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">audit</span><span class="op">)</span></span></code></pre></div>
+<p><img src="auditing_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="Bar chart of reporting coverage per framework item" width="672"></p>
+<p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns the ggplot object instead of drawing
+it, so you can modify it before rendering.
+<code>plot(audit, by = "journal")</code> facets.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="beyond-coverage-to-what-the-studies-actually-did">Beyond coverage, to what the studies actually did<a class="anchor" aria-label="anchor" href="#beyond-coverage-to-what-the-studies-actually-did"></a>
+</h2>
+<p>Coverage tells you whether an item was addressed. The sheet also
+carries <em>what was said</em>, which for most of the questions in <a href="#use-cases">Use cases</a> is the part you want. Each report keeps
+the text in its items table, so pulling one item across a corpus is a
+one-liner:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">housing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">corpus</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="va">r</span><span class="op">$</span><span class="va">items</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">r</span><span class="op">$</span><span class="va">items</span><span class="op">$</span><span class="va">item_id</span> <span class="op">==</span> <span class="st">"env_housing"</span><span class="op">]</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA_character_</span> <span class="kw">else</span> <span class="va">v</span></span>
+<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>study <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">housing</span><span class="op">)</span>, housing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">housing</span><span class="op">)</span>,</span>
+<span>           row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            study                                           housing</span></span>
+<span><span class="co">#&gt; 1 10.1234/study1                     25 +/- 1 C, 12:12 L:D, 60% RH</span></span>
+<span><span class="co">#&gt; 2 10.1234/study2 23 C, 14:10 L:D, group housed at 20 per container</span></span>
+<span><span class="co">#&gt; 3 10.1234/study3            Ambient (18-26 C), natural photoperiod</span></span>
+<span><span class="co">#&gt; 4 10.1234/study4              25 C, 12:12 L:D, individually housed</span></span>
+<span><span class="co">#&gt; 5 10.1234/study5                    27 +/- 0.5 C, 16:8 L:D, 70% RH</span></span></code></pre></div>
+<p>From there it is ordinary text work. Parse temperatures out, tabulate
+photoperiods, count how many housed animals individually. The framework
+does not standardise the content, deliberately, since forcing husbandry
+into fixed fields would lose more than it gained. It does guarantee that
+the housing description sits in the housing row of every sheet, which is
+most of the battle.</p>
+<p>The same applies to any item. <code>fate_end</code> across a corpus
+tells you how often animals are released, killed, or kept.
+<code>proc_anaesthesia</code> tells you what is actually used, and how
+often nothing is. <code>ethics_review</code> tells you how often review
+applied at all, and what reasoning was offered when it did not.</p>
+<p>To get everything at once, in long form:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">all_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">nm</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">[[</span><span class="va">nm</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">items</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>study <span class="op">=</span> <span class="va">nm</span>, item_id <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">item_id</span>, value <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">value</span>,</span>
+<span>             status <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">d</span><span class="op">$</span><span class="va">status</span><span class="op">)</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">all_values</span>, <span class="va">status</span> <span class="op">==</span> <span class="st">"reported"</span>, select <span class="op">=</span> <span class="op">-</span><span class="va">status</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co">#&gt;            study         item_id                 value</span></span>
+<span><span class="co">#&gt; 1 10.1234/study1  subjects_taxon Reported in the paper</span></span>
+<span><span class="co">#&gt; 2 10.1234/study1 subjects_source Reported in the paper</span></span>
+<span><span class="co">#&gt; 3 10.1234/study1      subjects_n Reported in the paper</span></span>
+<span><span class="co">#&gt; 4 10.1234/study1   proc_handling Reported in the paper</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

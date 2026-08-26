@@ -205,17 +205,17 @@ description, and prompts for a value. It can save partway and resume
 later.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_fill.html">instar_fill</a></span><span class="op">(</span>save_to <span class="op">=</span> <span class="st">"INSTAR.csv"</span><span class="op">)</span></span></code></pre></div>
-<p>At any prompt, type the value, or one of: <code>[enter]</code> to
-keep current, <code>NA</code> for not applicable, <code>skip</code> to
-leave blank, <code>back</code> to step back, <code>save</code> to write
-progress, <code>quit</code> to stop.</p>
+<p>At any prompt, type the value, or one of <code>[enter]</code> to keep
+current, <code>NA</code> for not applicable, <code>skip</code> to leave
+blank, <code>back</code> to step back, <code>save</code> to write
+progress, or <code>quit</code> to stop.</p>
 <p>To resume:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_fill.html">instar_fill</a></span><span class="op">(</span><span class="fu"><a href="../reference/read_items.html">read_items</a></span><span class="op">(</span><span class="st">"INSTAR.csv"</span><span class="op">)</span>,</span>
 <span>                    save_to <span class="op">=</span> <span class="st">"INSTAR.csv"</span><span class="op">)</span></span></code></pre></div>
-<p>To edit a single item afterwards (no need to know
-<code>item_id</code>s — pass no <code>item_id</code> and you’ll be shown
-a numbered menu):</p>
+<p>To edit a single item afterwards, with no need to know
+<code>item_id</code>s. Pass no <code>item_id</code> and you will be
+shown a numbered menu.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_edit.html">instar_edit</a></span><span class="op">(</span><span class="va">items</span><span class="op">)</span></span>
 <span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_edit.html">instar_edit</a></span><span class="op">(</span><span class="va">items</span>, <span class="st">"subjects_n"</span><span class="op">)</span>   <span class="co"># or by id</span></span></code></pre></div>
@@ -226,7 +226,7 @@ a numbered menu):</p>
 <p>Useful in scripts and pipelines.</p>
 <p><code><a href="../reference/instar_set.html">instar_set()</a></code> takes
 <code>item_id = "what the study reports"</code> pairs, as many as you
-like at once:</p>
+like at once.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">items</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_set.html">instar_set</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/instar_template.html">instar_template</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -238,11 +238,11 @@ like at once:</p>
 <p>A string reports the item, <code>NA</code> marks it not applicable,
 and <code>""</code> leaves it unreported. The same three states as the
 <code>report</code> column of the sheet.</p>
-<p>Set <code>value</code> directly and it will not work — and will not
+<p>Set <code>value</code> directly and it will not work, and will not
 tell you so. <code>status</code> is the single source of truth, and
 <code><a href="../reference/instar_report.html">instar_report()</a></code> blanks <code>value</code> for any item
 whose status is not <code>"reported"</code>, so a table filled in that
-way renders as an entirely unreported study:</p>
+way renders as an entirely unreported study.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Does nothing useful: status is still "not_reported", so the text is</span></span>
 <span><span class="co"># dropped when the report is built.</span></span>
@@ -327,7 +327,7 @@ way renders as an entirely unreported study:</p>
 (<code>*</code>), not applicable (<code>-</code>), or blank
 (<code>o</code>), with the current value shown underneath.</p>
 <p>Every item carries a <code>status</code>, which is the single source
-of truth:</p>
+of truth.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="25%">
@@ -363,18 +363,18 @@ of truth:</p>
 <p><code>value</code> carries substantive content only, and is
 <code>NA</code> whenever <code>status</code> is not
 <code>"reported"</code>, so the two can never disagree. Reading a CSV
-with no <code>status</code> column derives it from <code>value</code>:
-blanks become <code>"not_reported"</code>, and <code>"NA"</code> or
+with no <code>status</code> column derives it from <code>value</code>.
+Blanks become <code>"not_reported"</code>, and <code>"NA"</code> or
 <code>"N/A"</code> are honoured as shorthand for
 <code>"not_applicable"</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="build-the-report">Build the report<a class="anchor" aria-label="anchor" href="#build-the-report"></a>
 </h2>
-<p><code><a href="../reference/instar_report.html">instar_report()</a></code> returns <em>data</em>, not a plot: the
-paper metadata, the resolved item table, and a coverage summary.
-Rendering is a separate step, so you can compute on a report before (or
-without) drawing it.</p>
+<p><code><a href="../reference/instar_report.html">instar_report()</a></code> returns <em>data</em>, not a plot. It
+carries the paper metadata, the resolved item table, and a coverage
+summary. Rendering is a separate step, so you can compute on a report
+before (or without) drawing it.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/instar_report.html">instar_report</a></span><span class="op">(</span></span>
 <span>  <span class="va">items</span>,</span>
@@ -424,14 +424,14 @@ programmatic.</p>
 <p><img src="usage_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="Example welfare reporting figure" width="850"></p>
 <p>If you want to modify the figure before rendering,
 <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns the underlying patchwork composition
-instead of drawing it:</p>
+instead of drawing it.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">report</span><span class="op">)</span> <span class="op">+</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Figure S1"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="save-it">Save it<a class="anchor" aria-label="anchor" href="#save-it"></a>
 </h2>
-<p>A finished report has two deposit artifacts: the completed sheet and
+<p>A finished report has two deposit artifacts, the completed sheet and
 the figure. The naming convention is that <code>write_</code> produces
 text and <code>save_</code> produces figures.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -441,7 +441,7 @@ text and <code>save_</code> produces figures.</p>
 <p><code><a href="../reference/write_report.html">write_report()</a></code> writes the same file shape an author
 would have filled in by hand, with the paper’s details in the reserved
 rows, so it reads straight back through <code><a href="../reference/read_items.html">read_items()</a></code>. This
-is the machine-readable artifact worth depositing; the figure is for
+is the machine-readable artifact worth depositing. The figure is for
 human readers.</p>
 <p><code><a href="../reference/save_figure.html">save_figure()</a></code> renders the report and writes it via
 <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>, choosing a compact page height from the
@@ -453,10 +453,10 @@ formats). Pass an explicit <code>height</code> to override.</p>
 </h2>
 <p>Everything above describes one study. Once sheets are being deposited
 alongside papers, a set of them is a corpus, and the same machinery
-summarises a literature rather than a study. This is a sketch; see
+summarises a literature rather than a study. This is a sketch. See
 <code><a href="../articles/auditing.html">vignette("auditing")</a></code> for the full treatment.</p>
 <p><code><a href="../reference/read_instar.html">read_instar()</a></code> is the loader. Point it at a file, a
-directory, or a vector of either; it works out the format from the
+directory, or a vector of either. It works out the format from the
 extension and always returns an <code>instar_corpus</code>, whether it
 found one sheet or two hundred.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -518,7 +518,7 @@ them into a wide table instead, one row per paper and one column per
 <span><span class="co">#&gt; 1         3        3            0              0          3        100.00000</span></span>
 <span><span class="co">#&gt; 2         3        1            2              0          3         33.33333</span></span>
 <span><span class="co">#&gt; 3         3        1            0              2          1        100.00000</span></span></code></pre></div>
-<p>Columns matching an <code>item_id</code> are treated as items; every
+<p>Columns matching an <code>item_id</code> are treated as items. Every
 other column is carried through as study metadata, so
 <code>journal</code> here is immediately available to
 <code>summary(by = )</code> without building a lookup table. Cell values
@@ -537,7 +537,7 @@ them.</p>
 </h3>
 <p>Each sheet records the INSTAR version it was completed against.
 Reading a corpus that mixes versions warns, because coverage is not
-comparable across them: an item missing from half the sheets because it
+comparable across them. An item missing from half the sheets because it
 did not exist yet is not the same as an item those studies failed to
 report.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
