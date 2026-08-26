@@ -303,8 +303,8 @@ If you use `instarreport`, please cite:
 
 And the package directly:
 
-> White, T. E., & Drinkwater, E. (2026). `instarreport`: INSTAR reporting
-> of invertebrate welfare in research. R package version 1.0.0.
+> White, T. E., Lynch, K., & Drinkwater, E. (2026). `instarreport`: INSTAR
+> reporting of invertebrate welfare in research. R package version 1.0.0.
 > https://instar-statement.org/
 
 `citation("instarreport")` prints both.

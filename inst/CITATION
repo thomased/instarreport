@@ -33,13 +33,14 @@ bibentry(
   title    = "{instarreport}: {INSTAR} reporting of invertebrate welfare in research",
   author   = c(
     person("Thomas E.", "White"),
+    person("Kate", "Lynch"),
     person("Eleanor", "Drinkwater")
   ),
   year     = "2026",
   note     = "R package version 1.0.0",
   url      = "https://instar-statement.org/",
   textVersion = paste(
-    "White, T. E., & Drinkwater, E. (2026).",
+    "White, T. E., Lynch, K., & Drinkwater, E. (2026).",
     "instarreport: INSTAR reporting of invertebrate welfare in research.",
     "R package version 1.0.0.",
     "https://instar-statement.org/"

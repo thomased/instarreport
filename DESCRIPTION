@@ -5,6 +5,7 @@ Version: 1.0.0
 Authors@R: c(
     person("Thomas E.", "White", email = "thomas.white026@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3976-1734")),
+    person("Kate", "Lynch", role = "aut"),
     person("Eleanor", "Drinkwater", role = "aut"))
 Description: Tools for applying the INSTAR framework (INvertebrate
     Standards for Treatment And Reporting; White et al., in prep), an
