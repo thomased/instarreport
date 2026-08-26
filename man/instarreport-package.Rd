@@ -75,11 +75,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Thomas E. White \email{thomas.white@sydney.edu.au} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
+\strong{Maintainer}: Thomas E. White \email{thomas.white026@gmail.com} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
 
 Authors:
 \itemize{
-  \item Thomas E. White \email{thomas.white@sydney.edu.au} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
+  \item Thomas E. White \email{thomas.white026@gmail.com} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
   \item Eleanor Drinkwater
 }
 

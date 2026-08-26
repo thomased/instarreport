@@ -171,8 +171,8 @@
     g <- .card_geometry(domain_name, data, value_wrap = value_wrap)
     attr(g, "total_lines") + .TITLE_LINES
   }
-  w_heights <- vapply(.welfare_domains,   card_h, numeric(1))
-  e_heights <- vapply(.foundation_domains, card_h, numeric(1))
+  welfare_heights    <- vapply(.welfare_domains,    card_h, numeric(1))
+  foundation_heights <- vapply(.foundation_domains, card_h, numeric(1))
 
   welfare_cards <- lapply(.welfare_domains, .make_card,
                           data = data, accent = .palette$welfare,
@@ -185,25 +185,30 @@
   # end flush at the same vertical position. The "extra" line-units
   # are spread evenly across every card in the shorter column, so no
   # single card carries a visible blob of trailing whitespace.
-  w_body <- sum(w_heights)
-  e_body <- sum(e_heights)
-  target_body <- max(w_body, e_body)
-  if (w_body < target_body) w_heights <- w_heights * (target_body / w_body)
-  if (e_body < target_body) e_heights <- e_heights * (target_body / e_body)
+  welfare_body    <- sum(welfare_heights)
+  foundation_body <- sum(foundation_heights)
+  target_body <- max(welfare_body, foundation_body)
+  if (welfare_body < target_body) {
+    welfare_heights <- welfare_heights * (target_body / welfare_body)
+  }
+  if (foundation_body < target_body) {
+    foundation_heights <- foundation_heights * (target_body / foundation_body)
+  }
   col_total <- .STRIP_LINES + target_body
 
-  left_col  <- .header_strip("WELFARE DOMAINS", .palette$welfare) /
-               patchwork::wrap_plots(welfare_cards,
-                                     ncol = 1, heights = w_heights) +
-               patchwork::plot_layout(
-                 heights = c(.STRIP_LINES, target_body)
-               )
-  right_col <- .header_strip("FOUNDATIONS", .palette$foundation) /
-               patchwork::wrap_plots(foundation_cards,
-                                     ncol = 1, heights = e_heights) +
-               patchwork::plot_layout(
-                 heights = c(.STRIP_LINES, target_body)
-               )
+  welfare_col <- .header_strip("WELFARE DOMAINS", .palette$welfare) /
+                 patchwork::wrap_plots(welfare_cards,
+                                       ncol = 1, heights = welfare_heights) +
+                 patchwork::plot_layout(
+                   heights = c(.STRIP_LINES, target_body)
+                 )
+  foundation_col <- .header_strip("FOUNDATIONS", .palette$foundation) /
+                    patchwork::wrap_plots(foundation_cards,
+                                          ncol = 1,
+                                          heights = foundation_heights) +
+                    patchwork::plot_layout(
+                      heights = c(.STRIP_LINES, target_body)
+                    )
 
   # Anchor with explicit vjust so text always sits inside the panel
   # regardless of how patchwork sizes it. Title hangs from the top,
@@ -245,8 +250,10 @@
   # much body content the figure carries. The trailing `&` theme call
   # zeroes the default per-plot outer margins so the body fills the
   # full page width with only a small gutter between the two columns.
-  # Foundations on the left, welfare domains on the right.
-  fig <- header / (right_col | left_col) / footer +
+  # patchwork's `|` lays out left to right: foundations first, so they
+  # occupy the left column and the welfare domains the right. Figure 1's
+  # caption in the manuscript describes them in this order.
+  fig <- header / (foundation_col | welfare_col) / footer +
     patchwork::plot_layout(
       heights = c(.HEADER_LINES, col_total, .FOOTER_LINES)
     ) &

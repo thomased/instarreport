@@ -21,8 +21,8 @@ Use this rather than reaching into the object to compute on coverage.
 }
 \examples{
 rep <- instar_report(
-  paper = list(title = "Demo", authors = "A"),
-  items = instar_template()
+  instar_template(),
+  paper = list(title = "Demo", authors = "A")
 )
 summary(rep)
 
