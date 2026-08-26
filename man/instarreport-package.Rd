@@ -81,6 +81,11 @@ Authors:
 \itemize{
   \item Thomas E. White \email{thomas.white026@gmail.com} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
   \item Kate Lynch
+  \item Jonathan Amory
+  \item Caitlyn Y. Forster
+  \item Adam G. Hart
+  \item Tanya Latty
+  \item Kate Umbers
   \item Eleanor Drinkwater
 }
 

@@ -10,18 +10,18 @@ bibentry(
   author   = c(
     person("Thomas E.", "White"),
     person("Kate", "Lynch"),
+    person("Jonathan", "Amory"),
+    person("Caitlyn Y.", "Forster"),
     person("Adam G.", "Hart"),
     person("Tanya", "Latty"),
-    person("Caitlyn Y.", "Forster"),
-    person("Jonathan", "Amory"),
     person("Kate", "Umbers"),
     person("Eleanor", "Drinkwater")
   ),
   year     = "2026",
   journal  = "Manuscript in preparation",
   textVersion = paste(
-    "White, T. E., Lynch, K., Hart, A. G., Latty, T., Forster, C. Y.,",
-    "Amory, J., Umbers, K., & Drinkwater, E. (2026).",
+    "White, T. E., Lynch, K., Amory, J., Forster, C. Y., Hart, A. G., Latty, T., Umbers, K., & Drinkwater, E.",
+    "(2026).",
     "INSTAR: Reporting items for invertebrate welfare in research.",
     "Manuscript in preparation."
   )
@@ -34,13 +34,18 @@ bibentry(
   author   = c(
     person("Thomas E.", "White"),
     person("Kate", "Lynch"),
+    person("Jonathan", "Amory"),
+    person("Caitlyn Y.", "Forster"),
+    person("Adam G.", "Hart"),
+    person("Tanya", "Latty"),
+    person("Kate", "Umbers"),
     person("Eleanor", "Drinkwater")
   ),
   year     = "2026",
   note     = "R package version 1.0.0",
   url      = "https://instar-statement.org/",
   textVersion = paste(
-    "White, T. E., Lynch, K., & Drinkwater, E. (2026).",
+    "White, T. E., Lynch, K., Amory, J., Forster, C. Y., Hart, A. G., Latty, T., Umbers, K., & Drinkwater, E. (2026).",
     "instarreport: INSTAR reporting of invertebrate welfare in research.",
     "R package version 1.0.0.",
     "https://instar-statement.org/"
