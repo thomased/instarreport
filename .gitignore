@@ -54,3 +54,5 @@ vignettes/*.pdf
 # in pkgdown/assets/app/, which IS tracked.
 /docs/
 docs
+.Rhistory
+.Rproj.user/83F5B9FC/rmd-outputs
