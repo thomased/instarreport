@@ -145,8 +145,6 @@ The 18 reporting items, and how to get a blank set of them to fill in.
   : Return an empty items template for a study
 - [`instar_set()`](https://instar-statement.org/reference/instar_set.md)
   : Record what a study reports for one or more items
-- [`instar_na()`](https://instar-statement.org/reference/instar_na.md) :
-  Mark items as not applicable
 
 ## Completing a report
 

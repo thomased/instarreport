@@ -50,8 +50,6 @@ the CSV sheet:
 
 ## See also
 
-[`instar_na()`](https://instar-statement.org/reference/instar_na.md) for
-marking items not applicable by id,
 [`instar_fill()`](https://instar-statement.org/reference/instar_fill.md)
 for the interactive equivalent.
 

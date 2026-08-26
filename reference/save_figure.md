@@ -8,7 +8,15 @@ For the report as a depositable CSV instead, use
 ## Usage
 
 ``` r
-save_figure(report, filename, width = 8.5, height = NULL, dpi = 300, ...)
+save_figure(
+  report,
+  path,
+  width = 8.5,
+  height = NULL,
+  dpi = 300,
+  value_wrap = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -17,10 +25,10 @@ save_figure(report, filename, width = 8.5, height = NULL, dpi = 300, ...)
 
   An object of class `instar_report`.
 
-- filename:
+- path:
 
-  Output file path (extension determines format; .pdf or .png are
-  recommended).
+  Output file path. The extension chooses the format; `.pdf` or `.png`
+  are recommended.
 
 - width:
 
@@ -35,6 +43,11 @@ save_figure(report, filename, width = 8.5, height = NULL, dpi = 300, ...)
 
   Resolution for raster formats. Defaults to 300.
 
+- value_wrap:
+
+  Approximate characters per line for the item text. Defaults to the
+  value stored on the report.
+
 - ...:
 
   Additional arguments passed to
@@ -42,7 +55,7 @@ save_figure(report, filename, width = 8.5, height = NULL, dpi = 300, ...)
 
 ## Value
 
-The filename, invisibly.
+The path, invisibly.
 
 ## Details
 

@@ -23,7 +23,8 @@ plot(x, ...)
 - ...:
 
   Passed to
-  [autoplot()](https://instar-statement.org/reference/autoplot.instar_report.md).
+  [autoplot()](https://instar-statement.org/reference/autoplot.instar_report.md),
+  notably `value_wrap`.
 
 ## Value
 

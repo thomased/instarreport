@@ -27,8 +27,8 @@ An `instar_items` table with columns `item_id`, `item`, `domain`,
 
 Write substantive content into `value` to report an item. Leave it blank
 for items the study does not report. Use
-[`instar_na()`](https://instar-statement.org/reference/instar_na.md) to
-mark items that do not apply.
+[`instar_set()`](https://instar-statement.org/reference/instar_set.md)
+with `NA` to mark items that do not apply.
 
 ## Examples
 

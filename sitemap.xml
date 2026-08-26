@@ -39,7 +39,6 @@
 <url><loc>https://instar-statement.org/reference/dot-header_strip.html</loc></url>
 <url><loc>https://instar-statement.org/reference/dot-instar_csv.html</loc></url>
 <url><loc>https://instar-statement.org/reference/dot-make_card.html</loc></url>
-<url><loc>https://instar-statement.org/reference/dot-new_audit.html</loc></url>
 <url><loc>https://instar-statement.org/reference/dot-read_items_xlsx.html</loc></url>
 <url><loc>https://instar-statement.org/reference/dot-read_one.html</loc></url>
 <url><loc>https://instar-statement.org/reference/dot-render_attrs.html</loc></url>
@@ -56,11 +55,11 @@
 <url><loc>https://instar-statement.org/reference/instar_edit.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instar_fill.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instar_items.html</loc></url>
-<url><loc>https://instar-statement.org/reference/instar_na.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instar_report.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instar_set.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instar_template.html</loc></url>
 <url><loc>https://instar-statement.org/reference/instarreport-package.html</loc></url>
+<url><loc>https://instar-statement.org/reference/new_instar_audit.html</loc></url>
 <url><loc>https://instar-statement.org/reference/new_instar_corpus.html</loc></url>
 <url><loc>https://instar-statement.org/reference/new_instar_items.html</loc></url>
 <url><loc>https://instar-statement.org/reference/plot.instar_audit.html</loc></url>

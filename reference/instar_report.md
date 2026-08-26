@@ -35,8 +35,8 @@ instar_report(
   for an in-session template,
   [`write_template()`](https://instar-statement.org/reference/write_template.md)
   for a fillable CSV, and
-  [`instar_na()`](https://instar-statement.org/reference/instar_na.md)
-  to mark items that do not apply.
+  [`instar_set()`](https://instar-statement.org/reference/instar_set.md)
+  with `NA` to mark items that do not apply.
 
 - paper:
 
@@ -49,8 +49,15 @@ instar_report(
 
 - value_wrap:
 
-  Integer; approximate characters per line for the value text when the
-  report is plotted. Defaults to `75`.
+  Integer; approximate characters per line for the item text when the
+  report is drawn. Defaults to `75`. Set here it becomes the report's
+  default, so the preview and the saved file agree; override it per call
+  in
+  [plot()](https://instar-statement.org/reference/plot.instar_report.md),
+  [autoplot()](https://instar-statement.org/reference/autoplot.instar_report.md)
+  or
+  [`save_figure()`](https://instar-statement.org/reference/save_figure.md)
+  when tuning.
 
 - unknown:
 
@@ -69,11 +76,11 @@ An object of class `instar_report`: a list with elements `paper`,
 ## Examples
 
 ``` r
-tmpl <- instar_template()
-tmpl$value[tmpl$item_id == "subjects_taxon"] <-
-  "Bombus terrestris (worker female); morphology + COI"
-tmpl$status[tmpl$item_id == "subjects_taxon"] <- "reported"
-tmpl <- instar_na(tmpl, "proc_anaesthesia")
+tmpl <- instar_set(
+  instar_template(),
+  subjects_taxon   = "Bombus terrestris (worker female); morphology + COI",
+  proc_anaesthesia = NA
+)
 
 rep <- instar_report(
   tmpl,

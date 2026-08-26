@@ -11,7 +11,7 @@ can modify it before rendering:
 
 ``` r
 # S3 method for class 'instar_report'
-autoplot(object, ...)
+autoplot(object, value_wrap = NULL, ...)
 ```
 
 ## Arguments
@@ -19,6 +19,12 @@ autoplot(object, ...)
 - object:
 
   An object of class `instar_report`.
+
+- value_wrap:
+
+  Approximate characters per line for the item text. Defaults to the
+  value stored on the report by
+  [`instar_report()`](https://instar-statement.org/reference/instar_report.md).
 
 - ...:
 
