@@ -126,8 +126,8 @@ print.instar_report <- function(x, ...) {
 #'
 #' @examples
 #' rep <- instar_report(
-#'   paper = list(title = "Demo", authors = "A"),
-#'   items = instar_template()
+#'   instar_template(),
+#'   paper = list(title = "Demo", authors = "A")
 #' )
 #' summary(rep)
 #'
