@@ -29,8 +29,8 @@ A data frame with columns `item_id`, `item`, `domain`, `group`, and
 
 ``` r
 rep <- instar_report(
-  paper = list(title = "Demo", authors = "A"),
-  items = instar_template()
+  instar_template(),
+  paper = list(title = "Demo", authors = "A")
 )
 summary(rep)
 #>              item_id                                                 item

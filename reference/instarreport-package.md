@@ -62,12 +62,12 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Thomas E. White <thomas.white@sydney.edu.au>
+**Maintainer**: Thomas E. White <thomas.white026@gmail.com>
 ([ORCID](https://orcid.org/0000-0002-3976-1734))
 
 Authors:
 
-- Thomas E. White <thomas.white@sydney.edu.au>
+- Thomas E. White <thomas.white026@gmail.com>
   ([ORCID](https://orcid.org/0000-0002-3976-1734))
 
 - Eleanor Drinkwater

@@ -230,9 +230,9 @@ corpus <- suppressWarnings(read_instar(corpus_dir))
 #> ✖ 1 failed.
 attr(corpus, "failed")
 #>                                   file
-#> 1 /tmp/RtmpFxAjLx/supplements/junk.csv
+#> 1 /tmp/RtmpQGZfza/supplements/junk.csv
 #>                                                                                                                                                                                                                                                                                     error
-#> 1 \033[1m\033[22m\033[34m/tmp/RtmpFxAjLx/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.
+#> 1 \033[1m\033[22m\033[34m/tmp/RtmpQGZfza/supplements/junk.csv\033[39m is missing required columns:\n\033[32mitem_id\033[39m and \033[32mvalue\033[39m.\n\033[36mℹ\033[39m A sheet needs an \033[32mitem_id\033[39m column and a \033[32mreport\033[39m (or \033[32mvalue\033[39m) column.
 ```
 
 Getting the other five sheets plus a list of what to go and fix is more
