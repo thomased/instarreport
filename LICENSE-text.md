@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: Thomas E. White and the invertreport authors
+    COPYRIGHT HOLDER: Thomas E. White and the instarreport authors

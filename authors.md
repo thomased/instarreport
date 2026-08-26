@@ -24,13 +24,13 @@ invertebrate welfare in research. Manuscript in preparation.
     }
 
 White, T. E., & Drinkwater, E. (2026). instarreport: INSTAR reporting of
-invertebrate welfare in research. R package version 0.2.0.
+invertebrate welfare in research. R package version 1.0.0.
 https://instar-statement.org/
 
     @Manual{instarreport-pkg,
       title = {{instarreport}: {INSTAR} reporting of invertebrate welfare in research},
       author = {Thomas E. White and Eleanor Drinkwater},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 1.0.0},
       url = {https://instar-statement.org/},
     }
