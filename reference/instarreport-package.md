@@ -72,4 +72,14 @@ Authors:
 
 - Kate Lynch
 
+- Jonathan Amory
+
+- Caitlyn Y. Forster
+
+- Adam G. Hart
+
+- Tanya Latty
+
+- Kate Umbers
+
 - Eleanor Drinkwater

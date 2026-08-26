@@ -126,8 +126,8 @@ loaded, it keeps working offline.
 
 If you use the framework, please cite the paper:
 
-> White, T. E., Lynch, K., Hart, A. G., Latty, T., Forster, C. Y.,
-> Amory, J., Umbers, K., & Drinkwater, E. (2026). INSTAR: Reporting
+> White, T. E., Lynch, K., Amory, J., Forster, C. Y., Hart, A. G.,
+> Latty, T., Umbers, K., & Drinkwater, E. (2026). INSTAR: Reporting
 > items for invertebrate welfare in research. *Manuscript in
 > preparation*.
 
