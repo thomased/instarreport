@@ -24,6 +24,16 @@ demo_corpus <- function() {
 }
 
 
+test_that("a named list keeps its names through as_instar_corpus", {
+  # lapply(seq_along(x), ...) drops names. Losing them relabels every
+  # study as study_1, study_2, ... which is wrong everywhere downstream:
+  # audit$long$study, summary()$study, and any grouping keyed on them.
+  corpus <- demo_corpus()
+  expect_equal(names(corpus), c("a", "b", "c"))
+  expect_setequal(unique(instar_audit(corpus)$long$study), c("a", "b", "c"))
+  expect_setequal(summary(corpus)$study, c("a", "b", "c"))
+})
+
 test_that("instar_audit summarises item-level coverage", {
   audit <- instar_audit(demo_corpus())
 

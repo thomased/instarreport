@@ -60,6 +60,7 @@ reference:
   - instar_report
   - print.instar_report
   - summary.instar_report
+  - as.data.frame.instar_report
   - plot.instar_report
   - autoplot.instar_report
   - save_figure
@@ -71,6 +72,7 @@ reference:
   - read_instar
   - print.instar_corpus
   - summary.instar_corpus
+  - as.data.frame.instar_corpus
   - '[.instar_corpus'
   - c.instar_corpus
   - instar_audit

@@ -369,13 +369,10 @@ Coverage tells you whether an item was addressed. The sheet also carries
 in its items table, so pulling one item across a corpus is a one-liner:
 
 ```{r}
-housing <- vapply(corpus, function(r) {
-  v <- r$items$value[r$items$item_id == "env_housing"]
-  if (length(v) == 0 || is.na(v)) NA_character_ else v
-}, character(1))
+d <- as.data.frame(corpus)
 
-data.frame(study = names(housing), housing = unname(housing),
-           row.names = NULL)
+subset(d, item_id == "env_housing" & status == "reported",
+       select = c(study, value))
 ```
 
 From there it is ordinary text work. Parse temperatures out, tabulate
@@ -391,16 +388,12 @@ you what is actually used, and how often nothing is. `ethics_review`
 tells you how often review applied at all, and what reasoning was
 offered when it did not.
 
-To get everything at once, in long form:
+`as.data.frame()` on a corpus gives one row per study per item, carrying
+the paper's details alongside, so grouping and filtering are ordinary
+data frame work.
 
 ```{r}
-all_values <- do.call(rbind, lapply(names(corpus), function(nm) {
-  d <- as.data.frame(corpus[[nm]]$items)
-  data.frame(study = nm, item_id = d$item_id, value = d$value,
-             status = as.character(d$status), stringsAsFactors = FALSE)
-}))
-
-head(subset(all_values, status == "reported", select = -status), 4)
+str(d, vec.len = 2)
 ```
 
 ```{r, include = FALSE}

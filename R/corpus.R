@@ -46,15 +46,22 @@ as_instar_corpus <- function(x, ...) {
   if (is.list(x)) {
     # A list of items tables is a reasonable thing to hand in; promote
     # each to a report so the corpus is homogeneous.
-    x <- lapply(seq_along(x), function(i) {
+    #
+    # Capture the names first. lapply() over seq_along() returns an
+    # unnamed list, so without this the names a caller supplied are
+    # silently replaced with study_1, study_2, ... and every downstream
+    # label is wrong.
+    nms <- names(x)
+    out <- lapply(seq_along(x), function(i) {
       el <- x[[i]]
       if (inherits(el, "instar_report")) return(el)
-      nm <- names(x)[i] %||% paste0("study_", i)
+      nm <- nms[i] %||% paste0("study_", i)
       paper <- attr(el, "paper") %||% list()
       paper <- utils::modifyList(list(title = nm, authors = "Not given"), paper)
       instar_report(el, paper = paper, unknown = "drop")
     })
-    return(new_instar_corpus(x))
+    if (!is.null(nms)) names(out) <- nms
+    return(new_instar_corpus(out))
   }
   cli::cli_abort(c(
     "Cannot treat {.obj_type_friendly {x}} as a corpus of INSTAR sheets.",
@@ -145,6 +152,60 @@ summary.instar_corpus <- function(object, ...) {
       percent_reported = cov$percent_reported,
       stringsAsFactors = FALSE
     )
+  })
+  out <- do.call(rbind, rows)
+  rownames(out) <- NULL
+  out
+}
+
+
+#' Coerce a corpus to a plain data frame
+#'
+#' One row per study per framework item, in long form, carrying what each
+#' study reported. This is the shape to compute on when the question is
+#' about content rather than coverage, such as pulling every housing
+#' description out of a corpus.
+#'
+#' [summary()][summary.instar_corpus] gives one row per study, and
+#' [instar_audit()] gives one row per item. This gives both at once.
+#'
+#' @param x An `instar_corpus`.
+#' @param row.names Unused, for consistency with the generic.
+#' @param optional Unused, for consistency with the generic.
+#' @param ... Unused.
+#'
+#' @return A data frame with columns `study`, `title`, `doi`, `journal`,
+#'   `item_id`, `item`, `domain`, `group`, `status`, and `value`.
+#'
+#' @examples
+#' \dontrun{
+#' d <- as.data.frame(read_instar("supplements/"))
+#'
+#' # every housing description in the corpus
+#' subset(d, item_id == "env_housing" & status == "reported",
+#'        select = c(study, value))
+#' }
+#'
+#' @export
+as.data.frame.instar_corpus <- function(x, row.names = NULL,
+                                        optional = FALSE, ...) {
+  if (length(x) == 0L) {
+    return(data.frame(study = character(0), title = character(0),
+                      doi = character(0), journal = character(0),
+                      item_id = character(0), item = character(0),
+                      domain = character(0), group = character(0),
+                      status = character(0), value = character(0),
+                      stringsAsFactors = FALSE))
+  }
+  rows <- lapply(seq_along(x), function(i) {
+    d <- as.data.frame.instar_report(x[[i]])
+    d$study   <- names(x)[i]
+    d$journal <- {
+      j <- x[[i]]$paper$journal
+      if (is.null(j) || is.na(j)) NA_character_ else as.character(j)
+    }
+    d[, c("study", "title", "doi", "journal", "item_id", "item",
+          "domain", "group", "status", "value")]
   })
   out <- do.call(rbind, rows)
   rownames(out) <- NULL

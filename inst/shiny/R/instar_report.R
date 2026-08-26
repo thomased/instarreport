@@ -135,6 +135,50 @@ summary.instar_report <- function(object, ...) {
 }
 
 
+#' Coerce a report to a plain data frame
+#'
+#' One row per framework item, carrying the paper's identifying details
+#' alongside them. Unlike [summary()][summary.instar_report], which
+#' returns only the item and its status, this keeps `value`, so it is the
+#' method to use when you want what a study actually reported rather than
+#' whether it reported it.
+#'
+#' @param x An object of class `instar_report`.
+#' @param row.names Unused, for consistency with the generic.
+#' @param optional Unused, for consistency with the generic.
+#' @param ... Unused.
+#'
+#' @return A data frame with columns `title`, `doi`, `item_id`, `item`,
+#'   `domain`, `group`, `status`, and `value`.
+#'
+#' @examples
+#' rep <- instar_report(
+#'   instar_set(instar_template(), subjects_taxon = "Apis mellifera"),
+#'   paper = list(title = "Demo", authors = "A")
+#' )
+#' head(as.data.frame(rep), 3)
+#'
+#' @export
+as.data.frame.instar_report <- function(x, row.names = NULL,
+                                        optional = FALSE, ...) {
+  d <- as.data.frame(unclass(x$items), stringsAsFactors = FALSE)
+  chr <- function(v) if (is.null(v) || is.na(v)) NA_character_ else as.character(v)
+  out <- data.frame(
+    title   = chr(x$paper$title),
+    doi     = chr(x$paper$doi),
+    item_id = d$item_id,
+    item    = d$item,
+    domain  = d$domain,
+    group   = d$group,
+    status  = as.character(d$status),
+    value   = d$value,
+    stringsAsFactors = FALSE
+  )
+  rownames(out) <- NULL
+  out
+}
+
+
 #' Draw the standardised INSTAR figure
 #'
 #' Renders a report to the current graphics device. This is the usual way
