@@ -1,7 +1,7 @@
 Package: instarreport
 Type: Package
 Title: INSTAR: Reporting of Invertebrate Welfare in Research
-Version: 0.2.0
+Version: 1.0.0
 Authors@R: c(
     person("Thomas E.", "White", email = "thomas.white@sydney.edu.au",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3976-1734")),
@@ -19,6 +19,7 @@ Description: Tools for applying the INSTAR framework (INvertebrate
     same spirit as a PRISMA flow diagram for systematic reviews.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en-US
 LazyData: true
 Depends:
     R (>= 4.1.0)
@@ -42,7 +43,8 @@ Suggests:
     bslib,
     readr,
     readxl,
-    writexl
+    writexl,
+    spelling
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3

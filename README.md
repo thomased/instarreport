@@ -5,7 +5,7 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomased/instarreport/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/thomased/instarreport/graph/badge.svg)](https://app.codecov.io/gh/thomased/instarreport)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 A small R toolkit implementing **INSTAR** (**IN**vertebrate **S**tandards
@@ -304,7 +304,7 @@ If you use `instarreport`, please cite:
 And the package directly:
 
 > White, T. E., & Drinkwater, E. (2026). `instarreport`: INSTAR reporting
-> of invertebrate welfare in research. R package version 0.2.0.
+> of invertebrate welfare in research. R package version 1.0.0.
 > https://instar-statement.org/
 
 `citation("instarreport")` prints both.
