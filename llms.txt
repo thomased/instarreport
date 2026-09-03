@@ -17,7 +17,7 @@ suggestions](https://github.com/thomased/instarreport/issues).
 
 ## The 18 items
 
-Five welfare domains adapted from the Mellor five-domains model, and
+Five welfare domains adapted from the Mellor Five Domains Model, and
 three cross-cutting foundations that apply regardless of domain.
 
 |  | Domain | Items |
