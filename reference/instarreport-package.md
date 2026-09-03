@@ -70,16 +70,16 @@ Authors:
 - Thomas E. White <thomas.white026@gmail.com>
   ([ORCID](https://orcid.org/0000-0002-3976-1734))
 
-- Kate Lynch
+- Kate Lynch (INSTAR framework design)
 
-- Jonathan Amory
+- Jonathan Amory (INSTAR framework design)
 
-- Caitlyn Y. Forster
+- Caitlyn Y. Forster (INSTAR framework design)
 
-- Adam G. Hart
+- Adam G. Hart (INSTAR framework design)
 
-- Tanya Latty
+- Tanya Latty (INSTAR framework design)
 
-- Kate Umbers
+- Kate Umbers (INSTAR framework design)
 
-- Eleanor Drinkwater
+- Eleanor Drinkwater (INSTAR framework design)
