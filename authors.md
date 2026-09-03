@@ -5,19 +5,26 @@
 - **Thomas E. White**. Author, maintainer.
   [](https://orcid.org/0000-0002-3976-1734)
 
-- **Kate Lynch**. Author.
+- **Kate Lynch**. Author.  
+  INSTAR framework design
 
-- **Jonathan Amory**. Author.
+- **Jonathan Amory**. Author.  
+  INSTAR framework design
 
-- **Caitlyn Y. Forster**. Author.
+- **Caitlyn Y. Forster**. Author.  
+  INSTAR framework design
 
-- **Adam G. Hart**. Author.
+- **Adam G. Hart**. Author.  
+  INSTAR framework design
 
-- **Tanya Latty**. Author.
+- **Tanya Latty**. Author.  
+  INSTAR framework design
 
-- **Kate Umbers**. Author.
+- **Kate Umbers**. Author.  
+  INSTAR framework design
 
-- **Eleanor Drinkwater**. Author.
+- **Eleanor Drinkwater**. Author.  
+  INSTAR framework design
 
 ## Citation
 
