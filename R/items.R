@@ -1,7 +1,7 @@
 #' The invertebrate welfare reporting framework
 #'
 #' A data frame describing the 18 reporting items grouped into eight
-#' domains: five welfare domains adapted from the Mellor five-domains
+#' domains: five welfare domains adapted from the Mellor Five Domains
 #' model (Nutrition, Environment, Health, Behaviour, Affective state),
 #' and three cross-cutting foundations (Subjects, Procedures, Ethics &
 #' compliance). End-of-study disposition (`fate_end`) lives within the
