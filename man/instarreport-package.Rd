@@ -80,13 +80,13 @@ Useful links:
 Authors:
 \itemize{
   \item Thomas E. White \email{thomas.white026@gmail.com} (\href{https://orcid.org/0000-0002-3976-1734}{ORCID})
-  \item Kate Lynch
-  \item Jonathan Amory
-  \item Caitlyn Y. Forster
-  \item Adam G. Hart
-  \item Tanya Latty
-  \item Kate Umbers
-  \item Eleanor Drinkwater
+  \item Kate Lynch (INSTAR framework design)
+  \item Jonathan Amory (INSTAR framework design)
+  \item Caitlyn Y. Forster (INSTAR framework design)
+  \item Adam G. Hart (INSTAR framework design)
+  \item Tanya Latty (INSTAR framework design)
+  \item Kate Umbers (INSTAR framework design)
+  \item Eleanor Drinkwater (INSTAR framework design)
 }
 
 }
