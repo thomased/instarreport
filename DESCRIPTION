@@ -2,23 +2,9 @@ Package: instarreport
 Type: Package
 Title: INSTAR: Reporting of Invertebrate Welfare in Research
 Version: 1.0.0
-Authors@R: c(
+Authors@R:
     person("Thomas E.", "White", email = "thomas.white026@gmail.com",
-           role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3976-1734")),
-    person("Kate", "Lynch", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Jonathan", "Amory", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Caitlyn Y.", "Forster", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Adam G.", "Hart", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Tanya", "Latty", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Kate", "Umbers", role = "aut",
-           comment = "INSTAR framework design"),
-    person("Eleanor", "Drinkwater", role = "aut",
-           comment = "INSTAR framework design"))
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3976-1734"))
 Description: Tools for applying the INSTAR framework (INvertebrate
     Standards for Treatment And Reporting; White et al., in prep), an
     18-item reporting standard for invertebrate welfare in research.

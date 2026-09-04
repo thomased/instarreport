@@ -31,21 +31,12 @@ bibentry(
   bibtype  = "Manual",
   key      = "instarreport-pkg",
   title    = "{instarreport}: {INSTAR} reporting of invertebrate welfare in research",
-  author   = c(
-    person("Thomas E.", "White"),
-    person("Kate", "Lynch"),
-    person("Jonathan", "Amory"),
-    person("Caitlyn Y.", "Forster"),
-    person("Adam G.", "Hart"),
-    person("Tanya", "Latty"),
-    person("Kate", "Umbers"),
-    person("Eleanor", "Drinkwater")
-  ),
+  author   = person("Thomas E.", "White"),
   year     = "2026",
   note     = "R package version 1.0.0",
   url      = "https://instar-statement.org/",
   textVersion = paste(
-    "White, T. E., Lynch, K., Amory, J., Forster, C. Y., Hart, A. G., Latty, T., Umbers, K., & Drinkwater, E. (2026).",
+    "White, T. E. (2026).",
     "instarreport: INSTAR reporting of invertebrate welfare in research.",
     "R package version 1.0.0.",
     "https://instar-statement.org/"

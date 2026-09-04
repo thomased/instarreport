@@ -13,6 +13,20 @@ home:
   title: INSTAR reporting of invertebrate welfare
   description: |
     Tools for applying INSTAR (INvertebrate Standards for Treatment And Reporting), an 18-item reporting standard for invertebrate welfare in research.
+  # This site is about the framework, not just the software that implements
+  # it, so the people who developed INSTAR are listed above the package
+  # author. The `authors` block below it is generated from DESCRIPTION and
+  # covers the package alone. Its title cannot be overridden without also
+  # replacing its generated content, so it stays as "Developers".
+  sidebar:
+    structure: [links, license, citation, framework, authors, dev]
+    components:
+      framework:
+        title: INSTAR framework
+        text: |
+          Developed by Thomas E. White, Kate Lynch, Jonathan Amory,
+          Caitlyn Y. Forster, Adam G. Hart, Tanya Latty, Kate Umbers
+          and Eleanor Drinkwater.
 navbar:
   structure:
     left:
