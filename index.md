@@ -70,11 +70,13 @@ remotes::install_github("thomased/instarreport")
 
 ### The summary figure
 
-Optional, and useful mainly as a supplementary figure. The same
-completed sheet renders as a one-page summary in which every cell
-carries the substantive content for its item, in the same spirit as the
-PRISMA and ROSES diagrams for evidence synthesis. Here it is applied to
-a real study ([Manzi et
+Publish it alongside your paper. The same completed sheet renders as a
+one-page summary in which every cell carries the substantive content for
+its item, in the same spirit as the PRISMA and ROSES diagrams for
+evidence synthesis. It is what makes a study’s treatment of its animals
+legible at a glance, and comparable with the next study. The sheet alone
+satisfies INSTAR, so the figure is not compulsory, but it is meant to be
+included. Here it is applied to a real study ([Manzi et
 al. 2026](https://doi.org/10.1098/rspb.2026.0609)):
 
 ![A one-page INSTAR report for a study of house crickets, laid out as
